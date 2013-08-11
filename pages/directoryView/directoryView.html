@@ -1,0 +1,466 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <title>directoryView</title>
+
+    <!-- WinJS-Verweise -->
+    <link href="//Microsoft.WinJS.1.0/css/ui-dark.css" rel="stylesheet" />
+    <script src="//Microsoft.WinJS.1.0/js/base.js"></script>
+    <script src="//Microsoft.WinJS.1.0/js/ui.js"></script>
+
+    <link href="/css/default.css" rel="stylesheet" />
+    <link href="/pages/directoryView/directoryView.css" rel="stylesheet" />
+    <script src="directoryView.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        <!--  brauchen wir das? -->
+        $('#directoryView').bind('DOMMouseScroll', function (e) {
+            if (e.detail > 0) {
+                //scroll down
+                console.log('Down');
+            } else {
+                //scroll up
+                console.log('Up');
+            }
+
+            //prevent page fom scrolling
+            return false;
+        });
+
+        window.onscroll = function (e) {
+            document.getElementById("directoryView").style.backgroundColor = "red";
+            // called when the window is scrolled.  
+        }    
+</script>
+    <!-- BEGINTEMPLATE: Template code for ListView-Elemente -->
+    
+    <div id="directoryViewTemplate" data-win-control="WinJS.Binding.Template" style="display: none">
+        <div class="directoryViewItem" id="directoryViewItem" data-win-bind="className: deletedClass">
+            <img class="directoryViewItemImage" src="#" data-win-bind="src: picture" />
+            <div class="directoryViewItemText">
+                <h4 class="directoryViewItemHeader win-type-ellipsis" data-win-bind="textContent: title"></h4>
+                <h6 class="directoryViewItemSubHeader win-type-ellipsis" data-win-bind="textContent: sizeText"></h6>
+            </div>
+        </div>
+    </div>
+
+	<div id="ListViewTemplate" data-win-control="WinJS.Binding.Template" style="display: none">
+        <div class="ListViewItem" id="ListViewItem">
+            <img class="ListViewItemImage" src="#" data-win-bind="src: picture" />
+            <div class="ListViewItemText">
+                <h4 class="ListViewItemHeader" data-win-bind="textContent: title"></h4>
+                <h6 class="ListViewItemSubHeader" data-win-bind="textContent: sizeText"></h6>
+            </div>
+        </div>
+    </div>
+
+
+    <!--<div id="ItemTemplate" data-win-control="WinJS.Binding.Template">
+    <div>
+        <img src="#" data-win-bind="src: picture; alt: title" />
+        <div>
+            <h2 data-win-bind="innerText: title"></h2>
+        </div>
+    </div>
+</div>-->   
+    
+    <div lang="EMPTYDIRECTORY" id="emptyDirectory">Das Verzeichnis ist leer...</div>
+    <div class="directoryView fragment">
+       
+
+        <div id="variousControls">
+            <!--<button id="takePictureButton" type="button"></button>-->
+            <button id="syncButton" type="button"></button>
+            <!--<button id="showDeletedFilesAndFoldersButton" type="button"></button>-->
+            <button id="sortButton" type="button"></button>
+            <button id="clearSelectionButton" data-win-options="{id:'clearSelectionButton',icon:'clearselection', type: 'button'}"></button>
+            
+        </div>
+		
+		<div id="leftRibbon"></div>
+
+        <header id="totalHeader" aria-label="Header content" role="banner">
+			<progress id="operationPending"></progress>
+			<div class="progressContainer">
+				<span><label id="downloadProgressBarLabel" class="invisible"> Download:</label><progress id="downloadProgressBar" class="invisible" value="0" max="100"></progress></span>
+				<span><label id="uploadProgressBarLabel" class="invisible"> Upload:</label><progress id="uploadProgressBar" class="invisible" value="0" max="100"></progress></span>
+			</div>
+
+			
+
+			<div id="changeLayout">
+			<button id="changeToGridLayout" class="changeToGridLayout_class" type="button"></button>
+			<button id="changeToListLayout" class="changeToListLayout_class" type="button"></button>
+			</div>	
+
+			<div id="innerHeader">
+
+				<button class="win-backbutton" aria-label="Back" disabled type="button"></button>
+            
+			<div id="navigationButtons">
+				<button id="backButton" data-win-control="WinJS.UI.AppBarCommand"
+						data-win-options="{id:'forwardButton',icon:'back', type: 'button'}">
+				</button>
+
+				<button id="forwardButton" data-win-control="WinJS.UI.AppBarCommand"
+						data-win-options="{id:'forwardButton',icon:'right', type: 'button'}">
+				</button>
+			</div>
+
+			<div id="directoryProgressRing">
+                <progress id="loadingRing" class="win-ring withText"></progress>
+				<div class="loadingText" lang="LOADINGDIRECTORYWAIT">Verzeichnis laden...</div>
+            </div>
+
+			<div id="pagetitle" class="pagetitle win-type-ellipsis">Neuer Ordner</div>
+           
+
+			<div id="previewHeaderContainer" class="previewHeaderContainer win-type-ellipsis">
+				<div id="previewHeader" class="pageSubheader  win-type-ellipsis">Datei 1</div>
+			</div>
+
+				
+			</div>
+        </header>
+        
+        <section aria-label="Main content" role="main" id="sectionWrap">
+            <div class="contentGrid" id="contentGrid">
+				
+                <!-- LISTVIEW DER Verzeichnisinhalte -->
+			
+               <div id="directoryView" class="win-selectionstylefilled"
+                    data-win-control="WinJS.UI.ListView"
+                    data-win-options="{ itemTemplate: select('#directoryViewTemplate'), selectionMode: 'multi', tapBehavior: 'directSelect', swipeBehavior: 'select'}">
+                </div>
+
+                 
+				
+				
+				<div id="preview">
+						
+						<!--<div id="previewGrid" class="previewGrid_class" style="visibility: visible;">-->
+                            <!--img id="displayImage" src="#" data-win-bind="src: src" /-->
+							<div id="previewTag" class="previewTag_class"></div>
+							<!--<div id="pdfFlipView" data-win-control="WinJS.UI.FlipView"></div>-->
+							<div id="codeArea"><textarea id="code"></textarea></div>
+							<div id="pdfPreview" class="pdfPreview"></div>
+						<!--</div>-->
+				</div>
+
+                <div id="pdfControls">
+										<div id="pdfBackForward">
+									    <button id="pdfBackButton" data-win-control="WinJS.UI.AppBarCommand"
+											    data-win-options="{id:'pdfBackButton',icon:'back', type: 'button'}">
+									    </button>
+									    <button id="pdfNextButton" data-win-control="WinJS.UI.AppBarCommand"
+											    data-win-options="{id:'pdfNextButton',icon:'right', type: 'button'}">
+									    </button>
+										</div>
+										<div id="pdfZoom">
+                                        <button id="pdfZoomInButton" data-win-control="WinJS.UI.AppBarCommand"
+											    data-win-options="{id:'pdfZoomInButton',icon:'add', type: 'button'}">
+									    </button>
+									    <button id="pdfZoomOutButton" data-win-control="WinJS.UI.AppBarCommand"
+											    data-win-options="{id:'pdfZoomOutButton',icon:'remove', type: 'button'}">
+									    </button>
+										</div>
+										<div id="pdfJump">
+									    <input id="pdfPageNum" type="text" />
+									    <button id="pdfGoToPageButton" data-win-control="WinJS.UI.AppBarCommand"
+											    data-win-options="{id:'forwardButton',icon:'go', type: 'button'}">
+									    </button>
+										</div>
+				</div>
+                <!-- Optionale Videoeinbindung für später. Funktioniert bereits sobald
+                    der Code nicht mehr auskommentiert ist. Die Positionierung des Videos
+                    an dieser Stelle ist wichtig, da es sonst die anderen Elemente überlagert und dagegen
+                    auch nichts per z-index zu machen ist. -->
+                <!--<video id="video_background" src="/images/lilaLoop.mp4" autoplay loop />-->
+			</div>
+        </section>
+    </div>
+
+
+    <!-- Flyouts definieren: Dropdown Menüs für z.B. den "more" Button in der Appbar oder Löschbestätigung --> 
+    <!-- Definieren des Flyout für Sortieren Menü-->
+    <div id="sortFlyout" data-win-control="WinJS.UI.Menu">
+        <button lang="SORTBYNAME" data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'sortByName',label:'Sortieren nach Name'}">
+        </button>
+        <button lang="SORTBYSIZE" data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'sortBySize',label:'Sortieren nach Größe'}">
+        </button>
+    </div>
+
+    <!-- Define the delete confirmation flyout -->
+    <div id="deleteFlyout" data-win-control="WinJS.UI.Flyout" aria-label="{Confirm delete flyout}">
+        <div lang="CONFIRMDELETETEXT">
+            M&ouml;chten Sie die Datei wirklich löschen?</div><br />
+        <input lang="CONFIRMDELETEBUTTON" id="confirmDeleteButton" type="submit" />
+    </div>
+
+    <!-- FileInfo Flyout-->
+    <div id="fileInfoFlyout" data-win-control="WinJS.UI.Flyout" aria-label="{File info flyout}">
+            <div>
+                <label lang="FILEINFONAME" for="fileInfoName" style="font-weight: bold;">File name:</label>
+                <div id="fileInfoName"></div><br />
+                <label lang="FILEPATH" for="fileInfoPath"  style="font-weight: bold;">Path:</label>
+                <div id="fileInfoPath"></div><br />
+                <label lang="CREATIONDATE" for="fileInfoDateCreated"  style="font-weight: bold;">Date created:</label>
+                <div id="fileInfoDateCreated"></div><br />
+                <label lang="FILESIZE" for="fileInfoSize"  style="font-weight: bold;">File size:</label>
+                <div id="fileInfoSize"></div>
+            </div>
+    </div>
+
+    <!-- Define the rename flyout -->
+    <div id="renameFlyout" data-win-control="WinJS.UI.Flyout" aria-label="{Rename flyout}">
+        <div lang="RENAMETEXT">
+            Bitte geben Sie den neuen Namen ein:</div>
+        <input id="renameInput" type="text" />
+        <input lang="CONFIRMRENAME" id="renameButton" type="submit" />
+    </div>
+    <!-- Define the create folder flyout -->
+    <div id="createFolderFlyout" data-win-control="WinJS.UI.Flyout" aria-label="{Rename flyout}">
+        <div lang="CREATEFOLDERTEXT">
+            Bitte geben Sie den Ordnernamen ein:</div>
+        <input id="folderNameInput" type="text" />
+        <input lang="CREATEFOLDER" id="createFolder" type="submit"/>
+    </div>
+
+    <!-- Definieren des Flyouts für den "ADD" Button der Appbar -->
+    <div id="addFlyout" data-win-control="WinJS.UI.Menu">
+        <button lang="ADDFOLDER" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'addFolderButtonAppbar',icon:'newfolder',type:'flyout',flyout:select('#createFolderFlyout')}">
+        </button>
+        <hr data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'separator',type:'separator'}" />
+         <button lang="UPLOAD" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'uploadButton',icon:'upload', type: 'button'}">
+        </button>
+        <hr data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'separator',type:'separator'}" />
+        <button lang="TAKEPHOTOORVIDEO" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'cameraButton',icon:'camera', type: 'button'}">
+        </button>
+    </div>
+
+    <!-- Definieren des Flyouts für den "MANAGE" Button der Appbar -->
+    <div id="manageFlyout" data-win-control="WinJS.UI.Menu">
+        <button lang="MOVE" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'moveFileButton',icon:'movetofolder',type: 'button'}">
+        </button>
+        <hr id ="moveHR" data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'separator',type:'separator'}" />
+        <button lang="RENAME" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'renameButtonAppbar',icon:'rename',type:'flyout',flyout:select('#renameFlyout')}">
+        </button>
+        <hr id ="renameHR" data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'separator',type:'separator'}" />
+        <button lang="DELETE" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'deleteFileButtonAppbar',icon:'delete',type:'flyout',flyout:select('#deleteFlyout')}">
+        </button>
+        <hr id ="deleteHR" data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'separator',type:'separator'}" />
+        <button lang="SHARE" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'shareButtonAppbar',icon:'link',type: 'button'}">
+        </button>
+        <hr id ="shareHR" data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'separator',type:'separator'}" />
+        <button lang="HISTORY" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'historyButton',icon:'clock',type: 'button'}">
+        </button>
+
+        <hr id ="historyHR" data-win-control="WinJS.UI.MenuCommand" data-win-options="{id:'separator',type:'separator'}" />
+        <button lang="OCR" data-win-control="WinJS.UI.MenuCommand"
+            data-win-options="{id:'ocrButton',icon:'find', type: 'button'}">
+        </button>
+    </div>
+
+    <!-- HOME APP BAR -->
+    <div id="appbar" data-win-control="WinJS.UI.AppBar" class="customColor" data-win-options="{placement:'bottom'}">
+        <!--<button lang="REFRESH" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'refreshButton',icon:'sync',section:'global', extraClass:'general', type: 'button'}">
+        </button>-->
+        <!--<button lang="SORT" data-win-control="WinJS.UI.AppBarCommand" 
+            data-win-options="{id:'sortByButton',icon:'sort',section:'global', extraClass:'general', type:'flyout',flyout:select('#sortFlyout')}">
+        </button>-->
+
+        <!-- #######################  In ADD verschoben - Anfang  ############################# -->
+        <!--
+
+        <button lang="UPLOAD" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'uploadButton',icon:'upload',section:'global', extraClass:'upload', type: 'button'}">
+        </button>
+
+        <button lang="TAKEPHOTOORVIDEO" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'cameraButton',icon:'camera',section:'global', extraClass:'general', type: 'button'}">
+        </button>
+            
+        <button lang="ADDFOLDER" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'addFolderButtonAppbar', icon:'newfolder', section:'global', extraClass:'general', type:'flyout',flyout:select('#createFolderFlyout')}">
+        </button>
+            
+        -->
+         <!-- #######################  In ADD verschoben - Ende  ############################# -->
+
+        <button lang="UPLOAD" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'uploadSharedButton',icon:'upload',section:'global', extraClass:'upload', type: 'button'}">
+        </button>
+
+        <button lang="ADD" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'moreButton',icon:'add',section:'global', extraClass:'general', type:'flyout',flyout:select('#addFlyout')}">
+        </button>
+        <button lang="SHOWDELETED" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'showDeletedButton',icon:'view',section:'global', extraClass:'showDeleted', type: 'button'}">
+        </button>
+
+        <button lang="RESTOREFILEAPPBAR" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'restoreFileButton',icon:'repeatall',section:'selection', extraClass:'restore', type: 'button'}">
+        </button>
+
+        <!-- SELEKTION -->
+        <button lang="OPEN" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'openButton',icon:'openfile',section:'selection', extraClass:'singleSelectNoFolder', type: 'button'}" >
+        </button>
+        <button lang="DOWNLOAD" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'downloadButton',icon:'download',section:'selection', extraClass:'download', type: 'button'}" >
+        </button>
+        <button lang="MANAGE" data-win-control="WinJS.UI.AppBarCommand" 
+            data-win-options="{id:'manageButton',icon:'manage', section:'selection', extraClass:'manage', type:'flyout',flyout:select('#manageFlyout')}">
+        </button>
+        <button lang="FILEINFO" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'fileInfoButtonAppbar',icon:'list',section:'selection', extraClass:'singleSelectNoFolder', type:'flyout',flyout:select('#fileInfoFlyout')}">
+        </button>
+
+       <!-- #######################  In MANAGE verschoben - Anfang  ############################# -->
+       
+        <!--
+        <button lang="MOVE" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'moveFileButton',icon:'movetofolder',section:'selection', extraClass:'moveFile', type: 'button'}">
+        </button>
+        
+        <button lang="RENAME" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'renameButtonAppbar',icon:'rename',section:'selection', extraClass:'singleSelect', type:'flyout',flyout:select('#renameFlyout')}">
+        </button>
+
+        <button lang="DELETE" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'deleteFileButtonAppbar',icon:'delete',section:'selection', extraClass:'delete', type:'flyout',flyout:select('#deleteFlyout')}">
+        </button>
+
+        <button lang="SHARE" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'shareButtonAppbar',icon:'link',section:'selection', extraClass:'share', type: 'button'}">
+        </button>
+        <button lang="HISTORY" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'historyButton',icon:'clock',section:'selection', extraClass:'history', type: 'button'}">
+        </button>
+
+        <button lang="OCR" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'ocrButton',icon:'find',section:'selection', extraClass:'singleSelectImg', type: 'button'}">
+        </button>
+        -->
+
+         <!-- #######################  In MANAGE verschoben - Ende  ############################# -->
+
+
+
+        
+        <!--FILEMOVER-->
+        <button lang="PASTE" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'pasteFileButton',icon:'paste',section:'global', extraClass:'fileCopied', type: 'button'}">
+        </button>
+        <button lang="CANCEL" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'cancelButton',icon:'cancel',section:'global', extraClass:'fileCopied', type: 'button'}">
+        </button>
+
+
+        <!-- #######################  UNBENUTZT  ############################# -->
+
+        <!--<button lang="FAVORITE" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'favoriteButton',icon:'favorite',section:'selection', extraClass:'multiSelect', type: 'button'}">
+        </button>-->
+        <!--<button lang="SELECTALL" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'selectALLButton',icon:'selectall',section:'global', extraClass:'general', type: 'button'}">
+        </button>-->        
+        <!--<button lang="TAG" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'tagFileButton',icon:'tag',section:'selection', extraClass:'singleSelect', type: 'button'}">
+        </button>-->
+        <!--<button lang="FULLSCREEN" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'fullscreenButton',icon:'fullscreen',section:'selection',  extraClass:'singleSelect', type: 'button'}">
+        </button>-->
+        <!--<button lang="COMMENT" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'commentButton',icon:'comment',section:'selection', extraClass:'singleSelect', type: 'button'}">
+        </button>-->
+        <!--<button lang="ROTATE" data-win-control="WinJS.UI.AppBarCommand"
+            data-win-options="{id:'rotateButton',icon:'rotate',section:'selection', extraClass:'singleSelectImg', type: 'button'}">
+        </button>-->
+
+        <!-- ############################################################### -->
+    </div>
+
+    <!-- Navigationsleiste-->
+	<div id="navbar" data-win-control="WinJS.UI.AppBar" data-win-options="{layout:'custom',placement:'top'}">
+		<div class="navBarContent" id="navBarContentID">
+			<button id="navButtonHome" class="one"><span id="navSpan1">Home</span></button>
+			<!--<button id="navButtonFavorites" class="two"><span id="navSpan2">Favoriten</span></button>-->
+			<!--<button id="navButtonHistory" class="three"><span id="navSpan3">Zuletzt verwendet</span></button>-->
+			<!--<button id="navButtonLastChanges" class="four"><span id="navSpan4">Lezte Änderungen</span></button>-->
+			<!--<button id="navButtonNews" class="five"><span id="navSpan5">News</span></button>-->
+			<!--<button id="navButtonShares" class="six"><span id="navSpan6">Freigabeübersicht</span></button>-->
+			<button id="navButtonAccount" class="seven"><span id="navSpan7">Konto</span></button>
+			<button id="navButtonLogout" class="eight"><span id="navSpan8">Logout</span></button>
+		</div>
+	</div>
+    
+
+    <!-- HOME APP BAR ENDE-->
+</body>
+</html>
+
+
+
+
+
+
+

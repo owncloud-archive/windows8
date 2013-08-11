@@ -1,0 +1,75 @@
+﻿#leaveSetting:active {
+    color: #009DD1;
+    background-color: white;
+    border-color: white;
+}
+
+#leaveSetting {
+    color: white;
+    border-color: white;
+}
+
+
+.profileImage{
+	-ms-grid-column: 1;
+	-ms-grid-row: 1;
+	height: 280px;
+	width: 280px;
+	/*background-image: url(/images/account/profileImage.jpg);*/
+	background-size: cover;
+
+   padding: 0;
+   border: 1px solid rgba(0,0,0,0.5);
+   box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), 
+       inset 0 10px rgba(255,255,255,0.2), 
+       inset 0 10px 20px rgba(255,255,255,0.25), 
+       inset 0 -15px 30px rgba(0,0,0,0.3);
+    }
+
+
+
+
+.win-settings-section{
+	-ms-grid-row: 2;
+	-ms-grid-column: 1;
+	margin-top: 20px;
+	}
+
+.win-content {
+	display: -ms-grid;
+	-ms-grid-rows: auto auto;
+	-ms-grid-columns: auto;
+	margin-right: 20px;
+	width: 310px;
+
+}
+
+
+
+#SettingsLogoutButton{
+
+    background-color: #D1251F;
+    color: white;
+    border: none;
+ 
+
+
+	}
+
+#SettingsLogoutButton:hover {
+    background-color: #FF3830;
+}
+
+#SettingsLogoutButton:active {
+    background-color: black;
+    
+}
+
+body{
+	}
+	
+.win-settingsflyout {
+    border: none;
+    /*box-shadow: -1px 1px 11px rgba(50, 50, 50, 0.75);*/
+    box-shadow: -1px 1px 11px rgba(50, 50, 50, 0.75);
+}

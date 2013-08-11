@@ -1,0 +1,126 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!doctype HTML>
+<html>
+    <head>
+        <title>About flyout</title>
+        <script src="/settings/js/about.js"></script>
+        <link href="general.css" rel="stylesheet" />
+        <link href="//Microsoft.WinJS.1.0/css/ui-light.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- BEGINSETTINGSFLYOUT -->
+        <div data-win-control="WinJS.UI.SettingsFlyout" id="programmaticInvocationSettingsFlyout" aria-label="App Settings Flyout" data-win-options="{settingsCommandId:'about',width:'wide'}">
+            <!-- Use either 'win-ui-light' or 'win-ui-dark' depending on the contrast between the header title and background color -->
+            <div class="win-ui-light win-header" style="background-color:#009DD1; color: white;">
+                <button type="button" onclick="WinJS.UI.SettingsFlyout.show()" class="win-backbutton" id="leaveSetting"></button>
+                <div class="win-label" lang="ABOUT">Über Campus Cloud</div> 
+                
+            </div>
+            <div class="win-content" style="width: 100%;">
+                <div class="win-settings-section">
+                    <div>
+                        <h3 lang="ABOUTDEVELOPERS">Über die Entwickler</h3>
+                        <ul>
+                            <li>Benjamin Barann</li>
+                            <li>Arne Cvetkovic</li>
+                            <li>Patrick Janning</li>
+                            <li>Simon Lansmann</li>
+                            <li>David Middelbeck</li>
+                            <li>Christoph Rieger</li>
+                            <li>Tassilo Tobollik</li>
+                            <li>Jannik Weichert</li>
+                        </ul>
+                        <br />
+                        <h3>Support</h3>
+                        <a href="mailto:tobias.brockmann@uni-muenster.de">tobias.brockmann@uni-muenster.de</a>
+
+                        <h3 lang="PRIVACY">Datenschutzerklärung</h3>
+                        <a href="https://www.wi.uni-muenster.de/de/institut/gruppen/kuk/Datenschutzrichtlinie-Campus_Cloud" lang="PRIVACY">Datenschutzerklärung</a>
+                        <br />
+                       
+                        <h3 lang="COPYRIGHT" style="font-weight: bold;">Copyright</h3><br />
+                        <a href="http://thenounproject.com/noun/document/#icon-No12201" target="_blank">Pdf icon</a> designed by <a href="http://thenounproject.com/sokolovds" target="_blank">Dimitry Sokolov</a> from The Noun Project <br />
+                        <a href="http://thenounproject.com/noun/compressed-document/#icon-No14007" target="_blank">Compressed icon</a> designed by <a href="http://thenounproject.com/Ilsur1103" target="_blank">Ilsur Aptukov</a> from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/document/#icon-No5876" target="_blank">Code icon</a> designed by <a href="http://thenounproject.com/jamison" target="_blank">Jamison Wieser</a> from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/document/#icon-No6042" target="_blank">Mail icon</a> designed by <a href="http://thenounproject.com/jamison" target="_blank">Jamison Wieser</a> from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/document/#icon-No8583" target="_blank">GIF-Icon</a> designed by <a href="http://thenounproject.com/Templarian" target="_blank">Austin Andrews</a> from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/document/#icon-No453" target="_blank">Generic icon</a>  from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/document/#icon-No4561" target="_blank">Text icon</a> designed by <a href="http://thenounproject.com/prerakpatel" target="_blank">Prerak Patel</a> from The Noun Project<br />
+                        <!--Auf das MucikIcon existiert kein Copyright URL: http://thenounproject.com/noun/music/#icon-No928 -->
+                        <a href="http://thenounproject.com/noun/video/#icon-No15342" target="_blank">Video icon</a> designed by <a href="http://thenounproject.com/Weekends" target="_blank">Dominic Whittle</a> from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/picture/#icon-No541" target="_blank">Picture icon</a>  from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/folder/#icon-No10559" target="_blank">folder icon</a> designed by <a href="http://thenounproject.com/alexfuller" target="_blank">Alex Fuller</a> from The Noun Project<br />
+                        <a href="http://thenounproject.com/noun/check-mark/#icon-No2181" target="_blank">Check Mark-icon</a> designed by <a href="http://thenounproject.com/anasr" target="_blank">Anas Ramadan</a> from The Noun Project<br />
+                        <!-- Das Warnzeichen kommt von iconmonstr.com. Es besitzt kein Copyright. URL: http://iconmonstr.com/warning-2-icon/ -->
+                        <a href="http://thenounproject.com/noun/document/#icon-No6044" target="_blank">Visio icon</a> designed by <a href="http://thenounproject.com/jamison" target="_blank">Jamison Wieser</a> from The Noun Project<br />
+                        <br />
+
+                        <a href="http://www.flickr.com/photos/horiavarlan/4562679230/">Clouds reflected into ornate outdoors clock von Horia Varlan bei Flickr</a><br />
+                        <a href="http://www.flickr.com/photos/paszczak000/8715851521/">Clouds von Kamil Porembiński bei Flickr</a><br />
+                        <a href="http://www.flickr.com/photos/omni_kh/5750141094/">Schloss, University von chatchavan bei Flickr</a><br />
+                        <a href="http://www.flickr.com/photos/thomasschmitz/3580550571/">Schloss, Münster von Thomas Schmitz bei Flickr</a><br />
+                        <a href="http://www.flickr.com/photos/astrangelyisolatedplace/6127026927/">Cloud Surfing von astrangelyisolatedplace bei Flickr</a><br />
+                        <a href="http://www.flickr.com/photos/kubina/197143402/">Cloud Macro von Jeff Kubina bei Flickr</a>
+                        <a href="http://www.flickr.com/photos/kubina/882301303/">Share Background von Jeff Kubina bei Flickr</a>
+
+                        <!-- Das Zahnradild (icon) auf dem Startbildschirm ist von iconsDB. URL: http://www.iconsdb.com/black-icons/gear-icon.html -->
+                        <!-- Das Account-Symbol in der NavBar stammt von iconMonstr und erfordert keine Attribution-->
+                        <!-- Das Cloud-Symbol (home) in der NavBar kommt von iconMonstr und erfordert keine Attribution -->
+                        <!-- Das Herz-Symbol (favorite) in der NavBar kommt von iconMonstr und erfordert keine Attribution -->
+                        <!-- Das History-Symbol in der NavBar kommt von iconMonstr und erfordert keine Attribution -->
+                        <!-- Das News-Symbol in der NavBar kommt von iconMonstr und erfordert keine Attribution -->
+                        <!-- Das Recent-Symbol in der NavBar kommt von iconMonstr und erfordert keine Attribution -->
+                        <!-- Das Sharing-Symbol in der NavBar kommt von iconMonstr und erfordert keine Attribution -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ENDSETTINGSFLYOUT -->
+    </body>
+</html>

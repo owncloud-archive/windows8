@@ -1,0 +1,143 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <title>HomePage</title>
+
+    <!-- WinJS-Verweise -->
+    <link href="//Microsoft.WinJS.1.0/css/ui-dark.css" rel="stylesheet">
+    <script src="//Microsoft.WinJS.1.0/js/base.js"></script>
+    <script src="//Microsoft.WinJS.1.0/js/ui.js"></script>
+
+    <!--Evtl die default.css hier entfernen -->
+    <link href="/pages/home/home.css" rel="stylesheet" />
+    <link href="/css/default.css" rel="stylesheet" />
+    <script src="/pages/home/home.js"></script>
+
+</head>
+<body>
+    <!-- BEGINTEMPLATE: Template code for ListView-Elemente -->
+    <div id="shinyListViewTemplate" data-win-control="WinJS.Binding.Template" style="display: none">
+        <div id="shinyLIstViewItem" class="shinyListViewItem">
+            <img class="shinyListViewItem-Image" src="#" data-win-bind="src: picture" />
+            <div class="shinyListViewItem-Detail">
+                <h4 data-win-bind="lang: langKey; textContent: title"></h4>
+                <h6 data-win-bind="lang: langKeyDesc; textContent: text"></h6>
+            </div>
+        </div>
+    </div>
+    <!-- ENDTEMPLATE -->
+
+    <!-- Der Inhalt, der geladen und angezeigt wird. -->
+    <div class="fragment homepage">
+        <header aria-label="Header content" role="banner">
+            <button class="win-backbutton" aria-label="Back" disabled type="button"></button>
+            <h1 class="titlearea win-type-ellipsis">
+                <span class="pagetitle" lang="TITLEHOME">University Cloud</span>
+            </h1>
+        </header>
+        <section aria-label="Main content" role="main">
+
+				<div id="pleaseLogin" lang="LOGINLABEL"> Bitte melde dich an:</div>
+            <!-- LISTVIEW DER UNIVERSITÄTEN -->
+                        <div id="serverList" class="win-selectionstylefilled"
+                            data-win-control="WinJS.UI.ListView"
+                            data-win-options="{ itemTemplate: select('#shinyListViewTemplate'), selectionMode: 'single', tapBehavior: 'toggleSelect', swipeBehavior: 'none', layout: { type: WinJS.UI.GridLayout, maxRows: 10 }}" style="margin-top: 0px; margin-bottom: 0px;" >
+                        </div>
+          
+            <div id="loginDiv" class="loginDiv_class">
+                    <p><input id="nameInput" type="text" lang="USERNAME" placeholder ="Benutzername" style="width: 270px"/></p>
+                    <p><input id="passInput" type="password" lang="PASSWORD" placeholder="Passwort" style="width: 270px"/></p>
+                    <div id="manualConfig">
+                        <label id="manualLable" lang="MANUALCLOUD">Manuelle Konfiguration</label>
+                        <p>
+                            <select id="manualServerTypeSelection">
+                                <option value="1">Owncloud</option>
+                                <option value="2">Sharepoint</option>
+                            </select>
+                            <br />
+                            <input id="manualCloudServer" type="text" placeholder="Server: http://..." style="width: 270px"/><br />
+                            <!--input id="manualCloudPort" type="text" placeholder="Port" Style="width: 20px" lang="PORT"/-->
+                            <!-- Placeholder wird in home.js in der Funktion updateDocumentPathPlaceholder gesetzt -->
+                            <input id="manualDocumentPath" type="text" style="width: 270px" />
+                        </p>
+                    </div>
+                    <div>
+                        <button id="loginButton" lang="LOGIN">Anmelden</button>
+                        <button id="registerButton" lang="NEWUSER">Registrieren</button>
+                        <div id="loginProgressRing" class="progress">
+                            <label class="progressRingText">
+                                <progress class="win-ring withText"></progress>
+                                <span lang="LOGINWAIT">Lädt, bitte warten...</span>
+                            </label>
+                        </div>
+                    </div>
+                    <p><input id="loginCheckbox" type="checkbox" name="saveLogin" value="saveLogin" /> <span lang="STAYLOGGEDIN">Angemeldet bleiben</span></p>
+                    <br />
+
+                    
+                </div>
+
+          </section>
+    </div>
+
+     <!-- HOME APP BAR -->
+    <div id="appbar" data-win-control="WinJS.UI.AppBar" data-win-options="{placement:'bottom'}" >
+        <hr 
+            data-win-control="WinJS.UI.AppBarCommand" 
+            data-win-options="{type:'separator',section:'global'}" />
+        <button lang="HELP" data-win-control="WinJS.UI.AppBarCommand" 
+            data-win-options="{id:'helpButton',label:'Hilfe',icon:'help',section:'global', 
+            tooltip:'Hilfe', type: 'button'}">
+        </button>
+    </div>
+    <!-- HOME APP BAR ENDE-->
+</body>
+</html>

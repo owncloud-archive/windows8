@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- The icon can be used freely in both personal and commercial projects with no attribution required, but always appreciated. 
+You may NOT sub-license, resell, rent, redistribute or otherwise transfer the icon without express written permission from iconmonstr.com -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   x="0px"
+   y="0px"
+   width="512px"
+   height="512px"
+   viewBox="0 0 512 512"
+   enable-background="new 0 0 512 512"
+   xml:space="preserve"
+   id="svg2"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="news.svg"><metadata
+   id="metadata9"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs7"><filter
+     id="filter2986"
+     inkscape:label="Invert"
+     x="0"
+     y="0"
+     width="1"
+     height="1"
+     inkscape:menu="Color"
+     inkscape:menu-tooltip="Invert colors"
+     color-interpolation-filters="sRGB"><feColorMatrix
+       id="feColorMatrix2988"
+       type="saturate"
+       values="1"
+       result="fbSourceGraphic" /><feColorMatrix
+       id="feColorMatrix2990"
+       in="fbSourceGraphic"
+       values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 " /></filter></defs><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="640"
+   inkscape:window-height="480"
+   id="namedview5"
+   showgrid="false"
+   inkscape:zoom="0.4609375"
+   inkscape:cx="256"
+   inkscape:cy="256"
+   inkscape:window-x="697"
+   inkscape:window-y="138"
+   inkscape:window-maximized="0"
+   inkscape:current-layer="svg2" />
+<path
+   id="newspaper-3-icon"
+   d="M285.822,191.499l-10.475-44.133h11.48l5.467,30.58l6.123-30.58h11.189l5.42,30.014l5.658-30.014  h10.975l-11.393,44.133H308.91l-5.42-29.192l-6.184,29.192H285.822z M272.639,182.5h-17.727v-9.239h15.871v-8.936h-15.871v-7.959  h16.83v-9h-27.621v44.133h28.518V182.5z M340.496,270.084h64.832v-20h-64.832V270.084z M346.697,183.14  c-3.412,0-7.369-0.984-10.586-2.633l-0.562-0.288l-2.229,9.049l0.336,0.186c2.342,1.294,7.24,2.687,12.465,2.687  c13.217,0,17.906-7.475,17.906-13.875c0-6.188-3.662-10.425-11.521-13.331c-5.76-2.185-7.676-3.302-7.676-5.612  c0-2.223,2.266-3.659,5.771-3.659c3.088,0,6.051,0.672,8.807,1.998l0.539,0.26l2.449-8.861l-0.391-0.177  c-3.273-1.473-7.047-2.22-11.213-2.22c-10.061,0-16.818,5.422-16.818,13.491c0,5.951,4.096,10.395,12.17,13.206  c5.158,1.847,6.9,3.263,6.9,5.608C353.045,181.619,350.73,183.14,346.697,183.14z M340.496,308.084h64.832v-20h-64.832V308.084z   M209.92,161.32l15.717,30.179h11.033v-44.133h-9.959v27.051l-14.566-27.051h-12.184v44.133h9.959V161.32z M320.662,308.084v-58  h-78.334v58H320.662z M462.006,94l-0.012,289.32c0,19.153-15.527,34.68-34.68,34.68H84.676c-19.143,0-34.682-15.53-34.682-34.682  L50.006,124h30.375v245.918c0,13.229,20,13.238,20,0V94H462.006z M431.994,124H130.049v248h301.945V124z M405.328,212.666H157.662  v20h247.666V212.666z M405.328,326.084H157.662v20h247.666V326.084z M223.494,288.084h-65.832v20h65.832V288.084z M223.494,250.084  h-65.832v20h65.832V250.084z"
+   style="filter:url(#filter2986)" />
+</svg>

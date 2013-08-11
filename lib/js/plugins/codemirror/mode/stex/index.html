@@ -1,0 +1,144 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CodeMirror: sTeX mode</title>
+    <link rel="stylesheet" href="../../lib/codemirror.css">
+    <script src="../../lib/codemirror.js"></script>
+    <script src="stex.js"></script>
+    <style>.CodeMirror {background: #f8f8f8;}</style>
+    <link rel="stylesheet" href="../../doc/docs.css">
+  </head>
+  <body>
+    <h1>CodeMirror: sTeX mode</h1>
+     <form><textarea id="code" name="code">
+\begin{module}[id=bbt-size]
+\importmodule[balanced-binary-trees]{balanced-binary-trees}
+\importmodule[\KWARCslides{dmath/en/cardinality}]{cardinality}
+
+\begin{frame}
+  \frametitle{Size Lemma for Balanced Trees}
+  \begin{itemize}
+  \item
+    \begin{assertion}[id=size-lemma,type=lemma] 
+    Let $G=\tup{V,E}$ be a \termref[cd=binary-trees]{balanced binary tree} 
+    of \termref[cd=graph-depth,name=vertex-depth]{depth}$n>i$, then the set
+     $\defeq{\livar{V}i}{\setst{\inset{v}{V}}{\gdepth{v} = i}}$ of
+    \termref[cd=graphs-intro,name=node]{nodes} at 
+    \termref[cd=graph-depth,name=vertex-depth]{depth} $i$ has
+    \termref[cd=cardinality,name=cardinality]{cardinality} $\power2i$.
+   \end{assertion}
+  \item
+    \begin{sproof}[id=size-lemma-pf,proofend=,for=size-lemma]{via induction over the depth $i$.}
+      \begin{spfcases}{We have to consider two cases}
+        \begin{spfcase}{$i=0$}
+          \begin{spfstep}[display=flow]
+            then $\livar{V}i=\set{\livar{v}r}$, where $\livar{v}r$ is the root, so
+            $\eq{\card{\livar{V}0},\card{\set{\livar{v}r}},1,\power20}$.
+          \end{spfstep}
+        \end{spfcase}
+        \begin{spfcase}{$i>0$}
+          \begin{spfstep}[display=flow]
+           then $\livar{V}{i-1}$ contains $\power2{i-1}$ vertexes 
+           \begin{justification}[method=byIH](IH)\end{justification}
+          \end{spfstep}
+          \begin{spfstep}
+           By the \begin{justification}[method=byDef]definition of a binary
+              tree\end{justification}, each $\inset{v}{\livar{V}{i-1}}$ is a leaf or has
+            two children that are at depth $i$.
+          \end{spfstep}
+          \begin{spfstep}
+           As $G$ is \termref[cd=balanced-binary-trees,name=balanced-binary-tree]{balanced} and $\gdepth{G}=n>i$, $\livar{V}{i-1}$ cannot contain
+            leaves.
+          \end{spfstep}
+          \begin{spfstep}[type=conclusion]
+           Thus $\eq{\card{\livar{V}i},{\atimes[cdot]{2,\card{\livar{V}{i-1}}}},{\atimes[cdot]{2,\power2{i-1}}},\power2i}$.
+          \end{spfstep}
+        \end{spfcase}
+      \end{spfcases}
+    \end{sproof}
+  \item 
+    \begin{assertion}[id=fbbt,type=corollary]	
+      A fully balanced tree of depth $d$ has $\power2{d+1}-1$ nodes.
+    \end{assertion}
+  \item
+      \begin{sproof}[for=fbbt,id=fbbt-pf]{}
+        \begin{spfstep}
+          Let $\defeq{G}{\tup{V,E}}$ be a fully balanced tree
+        \end{spfstep}
+        \begin{spfstep}
+          Then $\card{V}=\Sumfromto{i}1d{\power2i}= \power2{d+1}-1$.
+        \end{spfstep}
+      \end{sproof}
+    \end{itemize}
+  \end{frame}
+\begin{note}
+  \begin{omtext}[type=conclusion,for=binary-tree]
+    This shows that balanced binary trees grow in breadth very quickly, a consequence of
+    this is that they are very shallow (and this compute very fast), which is the essence of
+    the next result.
+  \end{omtext}
+\end{note}
+\end{module}
+
+%%% Local Variables: 
+%%% mode: LaTeX
+%%% TeX-master: "all"
+%%% End: \end{document}
+</textarea></form>
+    <script>
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {});
+    </script>
+
+    <p><strong>MIME types defined:</strong> <code>text/x-stex</code>.</p>
+
+    <p><strong>Parsing/Highlighting Tests:</strong> <a href="../../test/index.html#stex_*">normal</a>,  <a href="../../test/index.html#verbose,stex_*">verbose</a>.</p>
+
+  </body>
+</html>

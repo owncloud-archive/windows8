@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="100"
+   height="100"
+   viewBox="0 0 100 100"
+   enable-background="new 0 0 100 73"
+   xml:space="preserve"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="image.svg"><metadata
+   id="metadata13"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs11" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="779"
+   inkscape:window-height="480"
+   id="namedview9"
+   showgrid="false"
+   inkscape:zoom="1.6164384"
+   inkscape:cx="-10.485234"
+   inkscape:cy="61.429927"
+   inkscape:window-x="2176"
+   inkscape:window-y="320"
+   inkscape:window-maximized="0"
+   inkscape:current-layer="Layer_1" />
+<path
+   d="M 84.84422,73.088983 H 16.085746 V 24.525424 H 84.84422 V 73.088983 z M 21.586424,67.76695 H 79.343542 V 29.847458 H 21.586424 V 67.76695 z"
+   id="path3"
+   inkscape:connector-curvature="0"
+   style="fill:#7ab51f;fill-opacity:0.94117647" />
+<polygon
+   points="14,59 86,59 68,35 57,44 35,14 "
+   id="polygon5"
+   transform="matrix(0.68758474,0,0,0.66525423,16.085058,24.525424)"
+   style="fill:#7ab51f;fill-opacity:0.94117647" />
+<circle
+   cx="77"
+   cy="22"
+   r="7"
+   id="circle7"
+   sodipodi:cx="77"
+   sodipodi:cy="22"
+   sodipodi:rx="7"
+   sodipodi:ry="7"
+   transform="matrix(0.68758474,0,0,0.66525423,16.085058,24.525424)"
+   style="fill:#7ab51f;fill-opacity:0.94117647" />
+</svg>

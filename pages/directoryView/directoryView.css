@@ -1,0 +1,2378 @@
+﻿/*Alle Anzeigemodi*/
+
+#fileInfoFlyout {
+    border-color: #7AB51D; 
+    box-shadow: 1px 1px 9px #000000; 
+    background-color: #3E3E3B;
+    color: white;
+   margin-bottom: 23px;
+}
+
+#renameFlyout {
+    border-color: #7AB51D; 
+    box-shadow: 1px 1px 9px #000000; 
+    background-color: #3E3E3B;
+    color: white;
+    margin-bottom: 23px;
+    
+}
+
+#renameInput {
+    border-color: #7AB51D;
+    width: 250px;
+}
+
+   #renameButton {
+        background-color: #20A127;
+        border: solid 2px white;
+        color: white;
+    }
+
+    
+    #renameButton:hover {
+        background-color: #03CC11;
+        color: white;
+        border: solid 2px white;
+    }
+
+#deleteFlyout {
+    border-color: #7AB51D; 
+    box-shadow: 1px 1px 9px #000000; 
+    background-color: #3E3E3B;
+    color: white;
+    margin-bottom: 23px;
+}
+
+ #confirmDeleteButton {
+    -ms-grid-column: 2;
+   background-color: #D1251F;
+    border: solid 2px white;
+    color: white;
+}
+
+ #confirmDeleteButton:hover {
+        background-color: #FF3830;
+         border: solid 2px white;
+         color: white;
+    }
+
+
+#sortFlyout button:hover {
+        font-weight: bold;
+        
+    }
+
+    #sortFlyout button:active {
+        color: black;
+        
+
+    }
+
+    #sortFlyout {
+        width: 200px;
+        
+    }
+
+    #addFlyout {
+        border-color: #7AB51D; 
+        box-shadow: 1px 1px 9px #000000; 
+        background-color: #3E3E3B;
+        color: white !important;
+        margin-bottom: 23px;
+}
+
+     #addFlyout button{
+
+      
+        color: white;
+        background-color: transparent;
+}
+
+        #addFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+
+        }
+
+         #addFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+
+        }
+
+    #manageFlyout {
+        border-color: #7AB51D; 
+        box-shadow: 1px 1px 9px #000000; 
+        background-color: #3E3E3B;
+        color: white !important;
+        margin-bottom: 23px;
+}
+
+     #manageFlyout button{
+      
+        color: white;
+        background-color: transparent;
+}
+
+        #manageFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+
+        }
+
+         #manageFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+
+        }
+
+    #createFolderFlyout {
+        margin-bottom: 23px;
+        border-color: #7AB51D; 
+        box-shadow: 1px 1px 9px #000000; 
+        background-color: #3E3E3B;
+        color: white !important;
+        width: 267px;
+}
+
+     #createFolder {
+        background-color: #20A127;
+        border: solid 2px white;
+        color: white;
+    }
+
+    
+    #createFolder:hover {
+        background-color: #03CC11;
+        color: white;
+        border: solid 2px white;
+    }
+
+
+
+    
+
+@media screen and (-ms-view-state: fullscreen-landscape) {
+
+  
+ .directoryViewItem.isDeleted .directoryViewItemText {
+            /*background: #3E3E3B !important;*/
+            height:60px;
+            background-image: url(/images/ribbon.svg);
+            /*background-image: url(/images/ribbonTrash.svg);*/
+            
+        }
+
+
+
+    .directoryViewItem.isDeleted .directoryViewItemHeader {
+        width: 250px;
+    }
+
+    #moreButton {
+        float: right;
+        visibility: visible !important;
+
+    }
+
+    .fragment section [role=main] {
+        /*width: 100%;*/
+        
+    }
+
+    /*Entfernt den unetrsten Hintergrund aller Listenelemente*/
+    /*.win-listview :not(.win-footprint).win-container {
+        background-color: transparent;
+    }*/
+
+    .directoryView section[role=main] {
+        overflow: auto;
+        height: 100%;
+    }
+
+    .directoryView {
+        height: 100%;
+    }
+
+
+
+
+     body {
+        background-size: cover;
+        background-image: url(/images/directoryBackground/bottom_cloud_small.jpg);
+    }
+
+       #video_background {
+      position: absolute;
+      height: 1080px;
+      width: 1920px;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: -1000;
+  
+}
+
+
+    #variousControls {
+    }
+
+
+    #backgroundHolder {
+       
+    }
+
+
+
+    #syncButton {
+        position: absolute;
+        left: 100px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+    #syncButton:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+
+    #sortButton {
+        position: absolute;
+        left: 190px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+    #sortButton:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+
+    #clearSelectionButton {
+        position: absolute;
+        left: 280px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+    #clearSelectionButton:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+	
+    #totalHeader {
+        display: -ms-grid;
+        -ms-grid-rows: 20px 30px 60px;
+        -ms-grid-columns: 100%;
+        width: 100%;
+		position:relative;
+
+    }
+	
+    #changeLayout{
+		position: absolute;
+		top: 8px;
+		left: 10px;
+		margin-left: 0px;
+		
+		}
+
+
+
+
+    #changeToGridLayout {
+        position: absolute;
+        left: 0px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 20px;
+        height: 30px;
+        
+		/*-ms-flex-order: 1;*/
+        text-shadow: 0px 1px 3px black;
+    }
+
+    #changeToGridLayout:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+
+
+	
+	#changeToGridLayout:hover{
+		background-color: transparent;
+       
+       
+		}
+	
+    #changeToListLayout {
+        position: absolute;
+        left: 0px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 10px;
+		/*-ms-flex-order: 2;*/
+        text-shadow: 0px 1px 3px black;
+    }
+
+     #changeToListLayout:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+	
+	#changeToListLayout:hover{
+		background-color: transparent;
+		}
+
+ 
+    #emptyDirectory {
+        position: absolute;
+        top: 10px;
+        left: 350px;
+        font-size: 20px;
+        font-family: "Segoe UI Light";
+        font-weight: bold;
+        text-shadow: 0px 1px 3px black;
+     }
+
+
+
+
+     /*#showDeletedIsTrue {
+        position: absolute;
+        left: 370px;
+        top: 13px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 20px;
+        height: 30px;
+        
+		
+        text-shadow: 0px 1px 3px black;
+        visibility: hidden;
+        background-color: transparent;
+    }
+
+    #showDeletedIsTrue:hover {
+        
+        background-color: transparent;
+    }*/
+
+
+	
+
+
+
+    .progressContainer {
+		text-align: right;
+		-ms-grid-row: 2;
+        right: 20px;
+		margin-right: 20px;
+    }
+
+    #downloadProgressBar {
+        height: 20px;
+        color: white;
+        width: 196.38px;
+        margin-left: 8px;
+    }
+
+    #uploadProgressBar {
+        width: 195.57px;
+        height: 20px;
+        margin-left: 27.5px;
+        color: white;
+    }
+	
+	#downloadProgressBarLabel{
+		
+		
+		
+	}
+		
+	#uploadProgressBarLabel{
+		
+	}
+		
+
+
+
+    #innerHeader {
+        -ms-grid-row: 3;
+        -ms-grid-column: 1;
+        display: -ms-grid;
+       -ms-grid-columns: auto auto 1fr 1fr;
+        height: 100%;
+        position: relative;
+        width: 100%;
+        margin-left: 10px;
+    }
+
+    #operationPending {
+        height: 8px;
+        width: 275px;
+        color: white;
+        -ms-grid-column: 1;
+        width: 100%;
+    }
+
+    #navigationButtons {
+        -ms-grid-column: 1;
+        display: -ms-flexbox;
+        -ms-flex-direction: row;
+        text-shadow: 0px 1px 3px black;
+        
+    }
+
+    #backButton {
+        -ms-flex-order: 1;
+        text-shadow: 0px 1px 3px black; 
+
+    }
+
+     #backButton .win-commandring {
+         box-shadow: 0px 1px 3px black; 
+    }
+  
+
+    #forwardButton {
+        -ms-flex-order: 2;
+        text-shadow: 0px 1px 3px black; 
+		
+    }
+
+    #forwardButton .win-commandring {
+         box-shadow: 0px 1px 3px black; 
+    }
+
+    #pagetitle {
+        -ms-grid-column: 3;
+        font-size: 40px;
+        font-family: 'segoe ui Light';
+        text-shadow: 0px 1px 3px black;
+		margin-top: 20px;
+        text-overflow: ellipsis;
+		
+    }
+
+
+
+    #directoryProgressRing {
+        padding-top: 0px;
+        -ms-grid-column: 2;
+		/*Die Linke Margin ist nicht notwendig
+		Mit ihr wirkt der Platz links von dem Vorwärts-Button
+		etwas zu leer*/
+		/*margin-left: 20px;*/
+		/*Die rechte Margin sollte bleiben, da ohne diese
+		der Text 'Verzeichnis laden' zu nah an den Ordnernamen
+		heranrückt*/
+		margin-right: 20px;
+        padding-top: 10px;
+    }
+	
+	#loadingRing{
+		padding-left: 10px;
+		
+		}
+
+    
+    #directoryProgressRing .win-ring {
+        height: 30px;
+        width: 30px;
+        color: white;
+        -ms-flex-align: center;
+        text-align: center;
+        margin-left: 30px;
+    }
+	
+   .previewHeaderContainer {
+        -ms-grid-column: 4;
+        font-size: 30px;
+        font-family: 'segoe ui Light';
+        height: 100%;
+		margin-left: 20px;
+		margin-right: 10px;
+		margin-top: 30px;
+        text-shadow: 0px 1px 3px black;
+        text-overflow: ellipsis;
+       
+        
+
+    }
+
+    .pageSubheader {
+        /*position: absolute;*/
+        
+        margin-left: auto;
+        margin-right: 20px;
+        text-overflow: ellipsis;
+       
+        text-align: right;
+
+    }
+
+
+
+
+
+
+    .contentGrid {
+        display: -ms-flexbox;
+        -ms-flex-direction: row;
+        height: calc(100% - 130px);
+
+        /*height: 100%;*/
+        margin-left: 40px;
+        /*padding-right: 40px*/
+        
+        
+    }
+
+    #preview {
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+		-ms-flex-direction: row;
+        /*width: auto;*/
+        margin-left: 20px;
+        padding-right: 20px;
+		/*padding-right: 20px;*/
+        max-height: 100%;
+        /*overflow-y: auto;*/
+		/*height: auto;*/
+       
+    }
+
+    /*.previewGrid_class {
+        -ms-flex-order: 1;
+		display: -ms-flexbox;
+		-ms-flex-direction: row;
+        width: auto;
+    }*/
+
+    #previewTag {
+
+		-ms-flex-order: 1;
+         z-index: 0;
+        
+        
+        
+         
+    }
+
+        #previewTag h1 {
+            font-size: 28px;
+        }
+
+        #previewTag h2 {
+            font-size: 24px;
+        }
+
+        #previewTag h3 {
+            font-size: 20px;
+        }
+
+        #previewTag h4 {
+            font-size: 18px;
+        }
+
+        #previewTag h5 {
+            font-size: 16px;
+        }
+
+         
+
+    /*Dieser Tag führt dazu, dass das Bild/Video nicht zentriert ausgerichtet wird
+        Dem Element wird von default.css eine margin-left von "auto" gesetzt.*/
+    #previewTag > img {
+        margin-left: 0px;
+        -ms-touch-action: pan-y
+            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+       
+    }
+
+    /*displayImage wird dynamisch erzeugt. Das Element dieser ID*/
+    #displayImage {
+        box-shadow: 0px 1px 3px black; 
+        -ms-touch-action: pan-y
+            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+    }
+
+    #video {
+       overflow: hidden;
+    }
+    .audioplayer {
+        width: 500px;
+    }
+
+    .pdfPreview {
+        overflow: hidden;
+        -ms-touch-action: pan-y;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+		-ms-flex-order: 2;
+		display: -ms-flexbox;
+		-ms-flex-direction: column; 
+		max-height: 100%;
+        width: auto;
+        overflow: auto;
+        padding-right: 25px;
+        border: none !important;
+        /*box-shadow: 0px 1px 3px black;*/
+    }
+
+    
+        .pdfPreview canvas {
+            /*???*/
+           
+        }
+
+    canvas {
+         box-shadow: 0px 1px 3px black;
+         
+    }
+
+    #pdfControls div {
+        margin-left: 20px;
+        /*visibility: hidden;*/
+    }
+
+	#pdfControls{
+		-ms-flex-order: 3;
+        margin-left: auto;
+        margin-right: 0px;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		right: 0px;
+        /*background-color: #3E3E3B;*/
+        background-image: url(/images/verticalBar.svg);
+        background-size: cover;
+        height: 500px;
+        z-index: -10000;
+        box-shadow: 0px 1px 3px black; 
+
+		}
+		
+	#pdfBackForward{
+		-ms-flex-order: 1;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		
+		}
+		
+	#pdfZoom{
+		-ms-flex-order: 2;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		margin-bottom: 40px;
+		margin-top: 40px;
+		}
+		
+	#pdfJump{
+		-ms-flex-order: 3;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		}
+		/*Center the PageNum Input*/
+		#pdfPageNum{
+			margin-left: auto;
+			margin-right: auto;
+			}
+		
+	.pdfPreview{
+		-ms-grid-row: 2;
+        width: auto;
+		}
+
+    #pdfPageNum {
+	width: 20px;
+}
+
+    #code {
+		-ms-flex-order: 3;
+		/*height: 110px;
+        width: auto;*/
+        overflow: auto;
+        display: none;
+
+        
+    }
+	
+
+
+    /*Loading Indicator*/
+
+    #backForwardNavigation {
+        -ms-grid-row: 1;
+        display: -ms-flexbox;
+    }
+
+
+
+
+    /* overall list dimensions */
+    #directoryView {
+        /*margin: 0px 110px;*/
+        -ms-grid-row: 2;
+        height: 98.9%;
+        min-width: 380px;
+        background-color: transparent !important;
+
+
+    }
+
+        #directoryView .win-container {
+         margin: 5px;
+         box-shadow: 0px 1px 3px black; 
+    }
+
+            #directoryView .win-container:hover {
+                box-shadow: 0 0 10px #fff;
+            }
+
+   
+        
+
+
+
+    /* individual item dimensions */
+    #directoryView .directoryViewItem {
+        height: 60px;
+        width: 360px;
+        overflow: hidden;
+        /*border: 1px solid rgba(0,0,0,0.5);
+   box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), 
+       inset 0 10px rgba(255,255,255,0.2), 
+       inset 0 10px 20px rgba(255,255,255,0.25), 
+       inset 0 -15px 30px rgba(0,0,0,0.3);*/
+        display: -ms-grid;
+        -ms-grid-columns: auto auto;
+        
+
+    }
+
+        #directoryView .win-selectionborder  {
+           
+           background-color: #7AB51D;
+        }
+
+
+
+.win-container.win-selected .win-selectionborder {
+	border-color: #7AB51D !important;
+}
+.win-container.win-selected .win-selectioncheckmarkbackground {
+	border-top-color: #7AB51D;
+	border-right-color: #7AB51D;
+}
+
+
+
+
+
+
+    #directoryView .win-container {
+        margin-right: 25px;
+        margin-top: 7px;
+   }
+
+
+
+    /* image */
+    .directoryViewItem img.directoryViewItemImage {
+        -ms-grid-column: 1;
+        width: 60px;
+        height: 60px;
+     
+        /*padding: 10px;*/
+        /*background-size: cover;*/
+        background-color: white;
+
+    }
+
+    .directoryViewItem .directoryViewItemText {
+        padding-left: 10px;
+
+        -ms-grid-column: 2;
+        width: 290px;
+        height: 60px;
+        background-color: #009DD1;
+        
+        background-size: cover;
+        color: white;
+        text-overflow: ellipsis;
+        /*box-shadow: inset 0px 0px 50px 0px #ABABAB,5px 5px 5px 1px #242424;*/
+        /*text-shadow: 0px 1px 3px black;*/
+       
+      
+    }
+
+    
+
+    /* text line 1 */
+    .directoryViewItem .directoryViewItemHeader {
+        height: 30px;
+        font-size: 20px;
+    }
+
+    /* text line 2 */
+    .directoryViewItem .directoryViewItemSubHeader {
+        height: 25px;
+        font-size: 15px;
+    }
+
+
+    #directoryViewContainer {
+        -ms-grid-column: 1;
+        -ms-grid-row: 2;
+    }
+
+    #appbar {
+        background-image: url(/images/appBar/appBarBackground.svg);
+        /*background-color: #008E96;*/
+        background-size: cover;
+        height:100px;
+    }
+
+
+
+    /*Styling der Navigationsleiste*/
+    .navBarContent {
+        display: -ms-grid;
+        -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        float: left;
+    }
+
+    #navbar {
+        /*background-color: #28282a;*/
+        background-image: url(/images/navBar/appBarBackgroundInverse.svg);
+        background-size: cover;
+    }
+
+        #navbar button:hover {
+            background-color: #008E96;
+        }
+
+        #navbar button:active {
+            background-color: #006E89;
+        }
+
+    #navBarContentID button {
+        margin-top: 10px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        margin-left: 10px;
+        border: none;
+        height: 80px;
+        width: 151px;
+        text-align: left;
+        font-size: 15px;
+        color: white;
+        background-repeat: no-repeat;
+        background-color: #009DD1;
+    }
+
+    .navBarContent button:active {
+        border-color: white;
+        border: solid;
+        border-width: 1px;
+        background-color: rgba(255,255,255, 0.2);
+    }
+
+
+    .navBarContent span {
+        position: relative;
+        left: 0px;
+        top: 26px;
+        text-align: left;
+        background: center;
+    }
+
+    .one {
+        -ms-grid-column: 1;
+        background-image: url(/images/navBar/home.svg);
+        background-position: 19px -24px;
+        background-size: 110px;
+    }
+
+    .two {
+        -ms-grid-column: 4;
+        background-image: url(/images/navBar/favorite.svg);
+        background-position: 35px -6px;
+        background-size: 75px;
+        
+    }
+
+    .three {
+        -ms-grid-column: 5;
+        background-image: url(/images/navBar/history.svg);
+        background-position: 38px -2px;
+        background-size: 65px;
+        
+    }
+
+    .four {
+        -ms-grid-column: 6;
+        background-image: url(/images/navBar/recent.svg);
+        background-position: 43px -4px;
+        background-size: 65px;
+    }
+
+    .five {
+        -ms-grid-column: 7;
+        background-image: url(/images/navBar/news.svg);
+        background-position: 31px -11px;
+        background-size: 85px;
+    }
+
+    .six {
+        -ms-grid-column: 8;
+        background-image: url(/images/navBar/sharing.svg);
+        background-position: 8px -35px;
+        background-size: 130px;
+    }
+
+    .seven {
+        -ms-grid-column: 2;
+        background-image: url(/images/navBar/account.svg);
+        background-position: 38px -3px;
+        background-size: 67px;
+    }
+
+    .eight {
+        -ms-grid-column: 3;
+        background-image: url(/images/navBar/logout.svg);
+        background-position: 36px -10px;
+        background-size: 85px;
+    }
+}
+
+@media screen and (-ms-view-state: snapped) {
+
+   
+
+    #emptyDirectory {
+        position: absolute;
+        top: 170px;
+        left: 25px;
+        font-family: "Segoe UI Light";
+        
+        text-shadow: 0px 1px 3px black;
+     }
+
+    #moreButton {
+        float: right;
+        visibility: visible !important;
+    }
+
+
+    #codeArea {
+        display: none;
+    }
+
+    .directoryView section[role=main] {
+        overflow: auto;
+        
+    }
+
+    .directoryView {
+        height: calc(100% - 60px);
+    }
+
+    body {
+        background-size: cover;
+        background-image: url(/images/directoryBackground/bottom_cloud_small.jpg);
+    }
+
+    #video_background {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: -1000;
+    }
+
+ 
+    #backgroundHolder {
+    }
+
+    #totalHeader {
+        display: -ms-grid;
+        -ms-grid-rows: 20px 30px 60px;
+        -ms-grid-columns: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    /*Die Buttons für das ändern des Layouts
+        müssen ausgeblendet werden, da eine Öndeurng
+        der Ansicht, hin zum rasterlayout, nicht sinnvoll ist*/
+    #changeLayout {
+        display: none;
+    }
+
+    #changeToGridLayout {
+        display: none;
+    }
+
+
+        #changeToGridLayout:hover {
+            background-color: transparent;
+        }
+
+    #changeToListLayout {
+        position: absolute;
+        left: 0px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 10px;
+        /*-ms-flex-order: 2;*/
+        text-shadow: 0px 1px 3px black;
+    }
+
+        #changeToListLayout:hover {
+            background-color: transparent;
+        }
+
+
+
+    #syncButton {
+        position: absolute;
+        left: 10px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+        #syncButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+    #sortButton {
+        position: absolute;
+        left: 100px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+        #sortButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+            #clearSelectionButton {
+        position: absolute;
+        left: 190px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+            #clearSelectionButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+
+    .progressContainer {
+        text-align: right;
+        -ms-grid-row: 2;
+        right: 20px;
+        margin-right: 20px;
+        display: none;
+    }
+
+    #downloadProgressBar {
+        height: 20px;
+        color: white;
+        width: 196.38px;
+        margin-left: 8px;
+    }
+
+    #uploadProgressBar {
+        width: 195.57px;
+        height: 20px;
+        margin-left: 27.5px;
+        color: white;
+    }
+
+    #downloadProgressBarLabel {
+    }
+
+    #uploadProgressBarLabel {
+    }
+
+
+
+    #operationPending {
+        height: 8px;
+        color: white;
+        -ms-grid-row: 1;
+        -ms-grid-column: 1;
+        width: 100%;
+    }
+
+    #innerHeader {
+        -ms-grid-row: 3;
+        -ms-grid-column: 1;
+        display: -ms-grid;
+        -ms-grid-columns: auto auto;
+        height: 100%;
+        position: relative;
+        width: 100%;
+    }
+
+    #navigationButtons {
+        -ms-grid-column: 1;
+        display: -ms-flexbox;
+        -ms-flex-direction: row;
+        text-shadow: 0px 1px 3px black;
+    }
+
+    #backButton {
+        -ms-flex-order: 1;
+        text-shadow: 0px 1px 3px black;
+    }
+
+        #backButton .win-commandring {
+            box-shadow: 0px 1px 3px black;
+        }
+
+
+    #forwardButton {
+        -ms-flex-order: 2;
+        text-shadow: 0px 1px 3px black;
+    }
+
+        #forwardButton .win-commandring {
+            box-shadow: 0px 1px 3px black;
+        }
+
+    #pagetitle {
+        display: none;
+        /*-ms-grid-column: 3;
+        font-size: 40px;
+        font-family: 'segoe ui Light';
+        text-shadow: 0px 1px 3px black;
+		margin-top: 10px;*/
+    }
+
+    #directoryProgressRing {
+        padding-top: 0px;
+        -ms-grid-column: 2;
+        /*Die Linke Margin ist nicht notwendig
+		Mit ihr wirkt der Platz links von dem Vorwärts-Button
+		etwas zu leer*/
+        /*margin-left: 20px;*/
+        /*Die rechte Margin sollte bleiben, da ohne diese
+		der Text 'Verzeichnis laden' zu nah an den Ordnernamen
+		heranrückt*/
+        margin-right: 20px;
+    }
+
+    #loadingRing {
+        padding-left: 10px;
+    }
+
+    .previewHeaderContainer {
+        display: none;
+        /*height: 0px;
+        width: 0px;
+        display: none;
+        visibility: hidden;
+        color: transparent;
+        text-overflow: ellipsis;*/
+    }
+
+    .pageSubheader {
+        display: none;
+    }
+
+    #directoryProgressRing .win-ring {
+        height: 30px;
+        width: 30px;
+        color: white;
+        -ms-flex-align: center;
+        text-align: center;
+        margin-left: 30px;
+    }
+
+
+    .contentGrid {
+        display: -ms-grid;
+        -ms-grid-rows: 1fr auto;
+        -ms-grid-columns: 100%;
+        height: 100%;
+        /*margin-left: 10px;*/
+        /*padding-right: 40px*/
+    }
+
+
+
+    #preview {
+        -ms-grid-column: 1;
+        -ms-grid-row: 2;
+        -ms-flex-direction: row;
+        position: fixed;
+        max-width: 100%;
+        /*###############################################################*/
+        /*Wichtig! Ansonsten wird der PreviewTag nicht angezeigt 0.o*/
+        bottom: 10px;
+        /*###############################################################*/
+        right: 2px;
+        left: 2px;
+        display: none;
+        /*width: auto;*/
+        /*#############################################################################*/
+        /*margin-left: 20px;
+        padding-right: 10px;*/
+        /*#############################################################################*/
+        /*padding-right: 20px;*/
+        /*height: 100%;*/
+        /*height: auto;*/
+    }
+
+    /*.previewGrid_class {
+        -ms-flex-order: 1;
+		display: -ms-flexbox;
+		-ms-flex-direction: row;
+        width: auto;
+    }*/
+
+    .previewTag_class {
+        -ms-flex-order: 1;
+        z-index: 0;
+        bottom: 10px;
+    }
+
+
+    #previewTag > img {
+        
+    }
+
+
+    #displayImage {
+        box-shadow: 0px 1px 3px black;
+    }
+
+
+    #previewTag > video {
+        /*margin-left: 20px;*/
+        max-width: 100%;
+        max-height: 100%;
+        /*width: auto;
+        max-height: 99.4% ;*/
+    }
+
+    previewTag > audio {
+        width: 200px;
+    }
+
+    audio {
+        width: 100%;
+    }
+
+    #snapviewDiv {
+        -ms-flex-order: 4;
+        max-height: 200px;
+        max-width: 316px;
+    }
+
+    .pdfPreview {
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        height: 100%;
+        width: auto;
+        overflow: auto;
+        box-shadow: 0px 1px 3px black;
+    }
+
+        .pdfPreview img {
+            height: 100%;
+            width: 100%;
+            visibility: visible;
+        }
+
+
+
+    /*Schattierung der PDF-Anzeige*/
+    canvas {
+        box-shadow: 0px 1px 3px black;
+    }
+
+    #pdfControls div {
+        margin-left: 20px;
+        /*visibility: hidden;*/
+    }
+
+
+    #pdfControls {
+        position: absolute;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        right: 0px;
+        /*background-color: #3E3E3B;*/
+        background-image: url(/images/verticalBar.svg);
+        background-size: cover;
+        margin-left: 20px;
+        z-index: 10000;
+        box-shadow: 0px 1px 3px black;
+        display: none !important;
+    }
+
+    #pdfBackForward {
+        -ms-flex-order: 1;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+    }
+
+    #pdfZoom {
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        margin-bottom: 40px;
+        margin-top: 40px;
+    }
+
+    #pdfJump {
+        -ms-flex-order: 3;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+    }
+    /*Center the PageNum Input*/
+    #pdfPageNum {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .pdfPreview {
+        -ms-grid-row: 2;
+        width: auto;
+    }
+
+    #pdfPageNum {
+        width: 20px;
+    }
+
+
+    #code {
+        -ms-flex-order: 3;
+        /*height: 110px;
+        width: auto;*/
+        overflow: auto;
+        display: none;
+    }
+
+    #noCode {
+        /*box-shadow: 0px 1px 3px black;*/
+    }
+
+
+
+    /*Loading Indicator*/
+
+    #backForwardNavigation {
+        -ms-grid-row: 1;
+        display: -ms-flexbox;
+    }
+
+
+
+
+
+      .directoryViewItem.isDeleted .directoryViewItemText {
+            /*background: #3E3E3B !important;*/
+            height:60px;
+            background-image: url(/images/ribbonSnapview.svg);
+            /*background-image: url(/images/ribbonTrash.svg);*/
+            
+        }
+
+
+
+    .directoryViewItem.isDeleted .directoryViewItemHeader {
+        width: 180px;
+    }
+
+
+
+
+    /* overall list dimensions */
+    #directoryView {
+        /*margin: 0px 110px;*/
+        -ms-grid-row: 1;
+        height: calc(100% - 20px);
+        width: 100%;
+        margin-bottom: 20px;
+        background-color: transparent !important;
+    }
+
+        #directoryView .win-container {
+            margin: 5px;
+            box-shadow: 0px 1px 3px black;
+        }
+
+
+
+        /* individual item dimensions */
+        #directoryView .directoryViewItem {
+            height: 60px;
+            width: 100%;
+            overflow: hidden;
+            /*border: 1px solid rgba(0,0,0,0.5);
+   box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), 
+       inset 0 10px rgba(255,255,255,0.2), 
+       inset 0 10px 20px rgba(255,255,255,0.25), 
+       inset 0 -15px 30px rgba(0,0,0,0.3);*/
+            display: -ms-grid;
+            -ms-grid-columns: 60px 1fr;
+        }
+
+        #directoryView .win-selectionborder {
+            background-color: #7AB51D;
+        }
+
+
+    .win-container.win-selected .win-selectionborder {
+        border-color: #7AB51D;
+    }
+
+    .win-container.win-selected .win-selectioncheckmarkbackground {
+        border-top-color: #7AB51D;
+        border-right-color: #7AB51D;
+    }
+
+
+    #directoryView .win-container {
+        margin-right: 25px;
+        margin-top: 7px;
+    }
+
+
+
+    /* image */
+    .directoryViewItem img.directoryViewItemImage {
+        -ms-grid-column: 1;
+        width: 60px;
+        height: 60px;
+        /*padding: 10px;*/
+        /*background-size: cover;*/
+        background-color: white;
+    }
+
+    .directoryViewItem .directoryViewItemText {
+        -ms-grid-column: 2;
+        width: 100%;
+        height: 60px;
+        background-color: #009DD1;
+        background-size: cover;
+        color: white;
+        text-overflow: ellipsis;
+        /*box-shadow: inset 0px 0px 50px 0px #ABABAB,5px 5px 5px 1px #242424;*/
+        text-shadow: 0px 1px 3px grey;
+    }
+
+
+
+    /* text line 1 */
+    .directoryViewItem .directoryViewItemHeader {
+        margin-left: 10px;
+        height: 30px;
+        font-size: 20px;
+    }
+
+    /* text line 2 */
+    .directoryViewItem .directoryViewItemSubHeader {
+        margin-left: 10px;
+        height: 25px;
+        font-size: 15px;
+    }
+
+
+    #appbar {
+        background-image: url(/images/appBar/appBarBackground.svg);
+        /*background-color: #008E96;*/
+        background-size: cover;
+        
+    }
+
+    #showDeletedButton {
+        display: none;
+    }
+
+    #restoreFileButton {
+        display: none;
+    }
+
+    /*upload Button muss angezeigt werden*/
+
+    /*addFolder Button muss angezeigt werden*/
+
+    /*clearSelection Button muss angezeigt werden*/
+
+    #getTextFromImage {
+        display: none;
+    }
+
+    #historyButton {
+        display: none;
+    }
+
+    /*File Info muss angezeigt werden*/
+
+    #shareButtonAppbar {
+        display: none;
+    }
+
+    /*open Button kann angezeigt werden*/
+
+    /*download Buton kann eingeblendet werden*/
+
+    /*rename button kann eingeblendet werden*/
+
+    /*delet button kann eingeblendet werden*/
+
+
+
+
+
+    
+
+    #navbar {
+        
+        display: none;
+    }
+
+}
+
+
+@media screen and (-ms-view-state: filled) {
+
+  
+ .directoryViewItem.isDeleted .directoryViewItemText {
+            /*background: #3E3E3B !important;*/
+            height:60px;
+            background-image: url(/images/ribbon.svg);
+            /*background-image: url(/images/ribbonTrash.svg);*/
+            
+        }
+
+
+
+    .directoryViewItem.isDeleted .directoryViewItemHeader {
+        width: 250px;
+    }
+
+    #moreButton {
+        float: right;
+        visibility: visible !important;
+
+    }
+
+    .fragment section [role=main] {
+        /*width: 100%;*/
+        
+    }
+
+    /*Entfernt den unetrsten Hintergrund aller Listenelemente*/
+    /*.win-listview :not(.win-footprint).win-container {
+        background-color: transparent;
+    }*/
+
+    .directoryView section[role=main] {
+        overflow: auto;
+        height: 100%;
+    }
+
+    .directoryView {
+        height: 100%;
+    }
+
+
+
+
+     body {
+        background-size: cover;
+        background-image: url(/images/directoryBackground/bottom_cloud_small.jpg);
+    }
+
+       #video_background {
+      position: absolute;
+      height: 1080px;
+      width: 1920px;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: -1000;
+  
+}
+
+
+    #variousControls {
+    }
+
+
+    #backgroundHolder {
+       
+    }
+
+
+
+    #syncButton {
+        position: absolute;
+        left: 100px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+    #syncButton:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+
+    #sortButton {
+        position: absolute;
+        left: 190px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+    #sortButton:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+
+    #clearSelectionButton {
+        position: absolute;
+        left: 280px;
+        top: 8px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        text-shadow: 0px 1px 3px black;
+        background: transparent;
+    }
+
+    #clearSelectionButton:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+	
+    #totalHeader {
+        display: -ms-grid;
+        -ms-grid-rows: 20px 30px 60px;
+        -ms-grid-columns: 100%;
+        width: 100%;
+		position:relative;
+
+    }
+	
+    #changeLayout{
+		position: absolute;
+		top: 8px;
+		left: 10px;
+		margin-left: 0px;
+		
+		}
+
+
+
+
+    #changeToGridLayout {
+        position: absolute;
+        left: 0px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 20px;
+        height: 30px;
+        
+		/*-ms-flex-order: 1;*/
+        text-shadow: 0px 1px 3px black;
+    }
+
+    #changeToGridLayout:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+
+
+	
+	#changeToGridLayout:hover{
+		background-color: transparent;
+       
+       
+		}
+	
+    #changeToListLayout {
+        position: absolute;
+        left: 0px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 10px;
+		/*-ms-flex-order: 2;*/
+        text-shadow: 0px 1px 3px black;
+    }
+
+     #changeToListLayout:hover {
+        text-shadow: 0 0 10px #fff;
+    }
+	
+	#changeToListLayout:hover{
+		background-color: transparent;
+		}
+
+ 
+    #emptyDirectory {
+        position: absolute;
+        top: 10px;
+        left: 350px;
+        font-size: 20px;
+        font-family: "Segoe UI Light";
+        font-weight: bold;
+        text-shadow: 0px 1px 3px black;
+     }
+
+
+
+
+     /*#showDeletedIsTrue {
+        position: absolute;
+        left: 370px;
+        top: 13px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 20px;
+        height: 30px;
+        
+		
+        text-shadow: 0px 1px 3px black;
+        visibility: hidden;
+        background-color: transparent;
+    }
+
+    #showDeletedIsTrue:hover {
+        
+        background-color: transparent;
+    }*/
+
+
+	
+
+
+
+    .progressContainer {
+		text-align: right;
+		-ms-grid-row: 2;
+        right: 20px;
+		margin-right: 20px;
+    }
+
+    #downloadProgressBar {
+        height: 20px;
+        color: white;
+        width: 196.38px;
+        margin-left: 8px;
+    }
+
+    #uploadProgressBar {
+        width: 195.57px;
+        height: 20px;
+        margin-left: 27.5px;
+        color: white;
+    }
+	
+	#downloadProgressBarLabel{
+		
+		
+		
+	}
+		
+	#uploadProgressBarLabel{
+		
+	}
+		
+
+
+
+    #innerHeader {
+        -ms-grid-row: 3;
+        -ms-grid-column: 1;
+        display: -ms-grid;
+       -ms-grid-columns: auto auto 1fr 1fr;
+        height: 100%;
+        position: relative;
+        width: 100%;
+        margin-left: 10px;
+    }
+
+    #operationPending {
+        height: 8px;
+        width: 275px;
+        color: white;
+        -ms-grid-column: 1;
+        width: 100%;
+    }
+
+    #navigationButtons {
+        -ms-grid-column: 1;
+        display: -ms-flexbox;
+        -ms-flex-direction: row;
+        text-shadow: 0px 1px 3px black;
+        
+    }
+
+    #backButton {
+        -ms-flex-order: 1;
+        text-shadow: 0px 1px 3px black; 
+
+    }
+
+     #backButton .win-commandring {
+         box-shadow: 0px 1px 3px black; 
+    }
+  
+
+    #forwardButton {
+        -ms-flex-order: 2;
+        text-shadow: 0px 1px 3px black; 
+		
+    }
+
+    #forwardButton .win-commandring {
+         box-shadow: 0px 1px 3px black; 
+    }
+
+    #pagetitle {
+        -ms-grid-column: 3;
+        font-size: 40px;
+        font-family: 'segoe ui Light';
+        text-shadow: 0px 1px 3px black;
+		margin-top: 20px;
+        text-overflow: ellipsis;
+		
+    }
+
+
+
+    #directoryProgressRing {
+        padding-top: 0px;
+        -ms-grid-column: 2;
+		/*Die Linke Margin ist nicht notwendig
+		Mit ihr wirkt der Platz links von dem Vorwärts-Button
+		etwas zu leer*/
+		/*margin-left: 20px;*/
+		/*Die rechte Margin sollte bleiben, da ohne diese
+		der Text 'Verzeichnis laden' zu nah an den Ordnernamen
+		heranrückt*/
+		margin-right: 20px;
+        padding-top: 10px;
+    }
+	
+	#loadingRing{
+		padding-left: 10px;
+		
+		}
+
+    
+    #directoryProgressRing .win-ring {
+        height: 30px;
+        width: 30px;
+        color: white;
+        -ms-flex-align: center;
+        text-align: center;
+        margin-left: 30px;
+    }
+	
+   .previewHeaderContainer {
+        -ms-grid-column: 4;
+        font-size: 30px;
+        font-family: 'segoe ui Light';
+        height: 100%;
+		margin-left: 20px;
+		margin-right: 10px;
+		margin-top: 30px;
+        text-shadow: 0px 1px 3px black;
+        text-overflow: ellipsis;
+       
+        
+
+    }
+
+    .pageSubheader {
+        /*position: absolute;*/
+        
+        margin-left: auto;
+        margin-right: 20px;
+        text-overflow: ellipsis;
+       
+        text-align: right;
+
+    }
+
+
+
+
+
+
+    .contentGrid {
+        display: -ms-flexbox;
+        -ms-flex-direction: row;
+        height: calc(100% - 130px);
+
+        /*height: 100%;*/
+        margin-left: 40px;
+        /*padding-right: 40px*/
+        
+        
+    }
+
+    #preview {
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+		-ms-flex-direction: row;
+        /*width: auto;*/
+        margin-left: 20px;
+        padding-right: 20px;
+		/*padding-right: 20px;*/
+        max-height: 100%;
+        /*overflow-y: auto;*/
+		/*height: auto;*/
+       
+    }
+
+    /*.previewGrid_class {
+        -ms-flex-order: 1;
+		display: -ms-flexbox;
+		-ms-flex-direction: row;
+        width: auto;
+    }*/
+
+    #previewTag {
+
+		-ms-flex-order: 1;
+         z-index: 0;
+        
+        
+        
+         
+    }
+
+        #previewTag h1 {
+            font-size: 28px;
+        }
+
+        #previewTag h2 {
+            font-size: 24px;
+        }
+
+        #previewTag h3 {
+            font-size: 20px;
+        }
+
+        #previewTag h4 {
+            font-size: 18px;
+        }
+
+        #previewTag h5 {
+            font-size: 16px;
+        }
+
+         
+
+    /*Dieser Tag führt dazu, dass das Bild/Video nicht zentriert ausgerichtet wird
+        Dem Element wird von default.css eine margin-left von "auto" gesetzt.*/
+    #previewTag > img {
+        margin-left: 0px;
+        -ms-touch-action: pan-y
+            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+       
+    }
+
+    /*displayImage wird dynamisch erzeugt. Das Element dieser ID*/
+    #displayImage {
+        box-shadow: 0px 1px 3px black; 
+        -ms-touch-action: pan-y
+            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+    }
+
+    #video {
+       overflow: hidden;
+    }
+    .audioplayer {
+        width: 500px;
+    }
+
+    .pdfPreview {
+        overflow: hidden;
+        -ms-touch-action: pan-y;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+		-ms-flex-order: 2;
+		display: -ms-flexbox;
+		-ms-flex-direction: column; 
+		max-height: 100%;
+        width: auto;
+        overflow: auto;
+        padding-right: 25px;
+        border: none !important;
+        /*box-shadow: 0px 1px 3px black;*/
+    }
+
+    
+        .pdfPreview canvas {
+            /*???*/
+           
+        }
+
+    canvas {
+         box-shadow: 0px 1px 3px black;
+         
+    }
+
+    #pdfControls div {
+        margin-left: 20px;
+        /*visibility: hidden;*/
+    }
+
+	#pdfControls{
+		-ms-flex-order: 3;
+        margin-left: auto;
+        margin-right: 0px;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		right: 0px;
+        /*background-color: #3E3E3B;*/
+        background-image: url(/images/verticalBar.svg);
+        background-size: cover;
+        height: 500px;
+        z-index: -10000;
+        box-shadow: 0px 1px 3px black; 
+
+		}
+		
+	#pdfBackForward{
+		-ms-flex-order: 1;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		
+		}
+		
+	#pdfZoom{
+		-ms-flex-order: 2;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		margin-bottom: 40px;
+		margin-top: 40px;
+		}
+		
+	#pdfJump{
+		-ms-flex-order: 3;
+		display: -ms-flexbox;
+		-ms-flex-direction: column;
+		}
+		/*Center the PageNum Input*/
+		#pdfPageNum{
+			margin-left: auto;
+			margin-right: auto;
+			}
+		
+	.pdfPreview{
+		-ms-grid-row: 2;
+        width: auto;
+		}
+
+    #pdfPageNum {
+	width: 20px;
+}
+
+    #code {
+		-ms-flex-order: 3;
+		/*height: 110px;
+        width: auto;*/
+        overflow: auto;
+        display: none;
+
+        
+    }
+	
+
+
+    /*Loading Indicator*/
+
+    #backForwardNavigation {
+        -ms-grid-row: 1;
+        display: -ms-flexbox;
+    }
+
+
+
+
+    /* overall list dimensions */
+    #directoryView {
+        /*margin: 0px 110px;*/
+        -ms-grid-row: 2;
+        height: 98.9%;
+        min-width: 380px;
+        background-color: transparent !important;
+
+
+    }
+
+        #directoryView .win-container {
+         margin: 5px;
+         box-shadow: 0px 1px 3px black; 
+    }
+
+            #directoryView .win-container:hover {
+                box-shadow: 0 0 10px #fff;
+            }
+
+   
+        
+
+
+
+    /* individual item dimensions */
+    #directoryView .directoryViewItem {
+        height: 60px;
+        width: 360px;
+        overflow: hidden;
+        /*border: 1px solid rgba(0,0,0,0.5);
+   box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), 
+       inset 0 10px rgba(255,255,255,0.2), 
+       inset 0 10px 20px rgba(255,255,255,0.25), 
+       inset 0 -15px 30px rgba(0,0,0,0.3);*/
+        display: -ms-grid;
+        -ms-grid-columns: auto auto;
+        
+
+    }
+
+        #directoryView .win-selectionborder  {
+           
+           background-color: #7AB51D;
+        }
+
+
+
+.win-container.win-selected .win-selectionborder {
+	border-color: #7AB51D !important;
+}
+.win-container.win-selected .win-selectioncheckmarkbackground {
+	border-top-color: #7AB51D;
+	border-right-color: #7AB51D;
+}
+
+
+
+
+
+
+    #directoryView .win-container {
+        margin-right: 25px;
+        margin-top: 7px;
+   }
+
+
+
+    /* image */
+    .directoryViewItem img.directoryViewItemImage {
+        -ms-grid-column: 1;
+        width: 60px;
+        height: 60px;
+     
+        /*padding: 10px;*/
+        /*background-size: cover;*/
+        background-color: white;
+
+    }
+
+    .directoryViewItem .directoryViewItemText {
+        padding-left: 10px;
+
+        -ms-grid-column: 2;
+        width: 290px;
+        height: 60px;
+        background-color: #009DD1;
+        
+        background-size: cover;
+        color: white;
+        text-overflow: ellipsis;
+        /*box-shadow: inset 0px 0px 50px 0px #ABABAB,5px 5px 5px 1px #242424;*/
+        /*text-shadow: 0px 1px 3px black;*/
+       
+      
+    }
+
+    
+
+    /* text line 1 */
+    .directoryViewItem .directoryViewItemHeader {
+        height: 30px;
+        font-size: 20px;
+    }
+
+    /* text line 2 */
+    .directoryViewItem .directoryViewItemSubHeader {
+        height: 25px;
+        font-size: 15px;
+    }
+
+
+    #directoryViewContainer {
+        -ms-grid-column: 1;
+        -ms-grid-row: 2;
+    }
+
+    #appbar {
+        background-image: url(/images/appBar/appBarBackground.svg);
+        /*background-color: #008E96;*/
+        background-size: cover;
+        height:100px;
+    }
+
+
+
+    /*Styling der Navigationsleiste*/
+    .navBarContent {
+        display: -ms-grid;
+        -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        float: left;
+    }
+
+    #navbar {
+        /*background-color: #28282a;*/
+        background-image: url(/images/navBar/appBarBackgroundInverse.svg);
+        background-size: cover;
+    }
+
+        #navbar button:hover {
+            background-color: #008E96;
+        }
+
+        #navbar button:active {
+            background-color: #006E89;
+        }
+
+    #navBarContentID button {
+        margin-top: 10px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        margin-left: 10px;
+        border: none;
+        height: 80px;
+        width: 151px;
+        text-align: left;
+        font-size: 15px;
+        color: white;
+        background-repeat: no-repeat;
+        background-color: #009DD1;
+    }
+
+    .navBarContent button:active {
+        border-color: white;
+        border: solid;
+        border-width: 1px;
+        background-color: rgba(255,255,255, 0.2);
+    }
+
+
+    .navBarContent span {
+        position: relative;
+        left: 0px;
+        top: 26px;
+        text-align: left;
+        background: center;
+    }
+
+    .one {
+        -ms-grid-column: 1;
+        background-image: url(/images/navBar/home.svg);
+        background-position: 19px -24px;
+        background-size: 110px;
+    }
+
+    .two {
+        -ms-grid-column: 4;
+        background-image: url(/images/navBar/favorite.svg);
+        background-position: 35px -6px;
+        background-size: 75px;
+        
+    }
+
+    .three {
+        -ms-grid-column: 5;
+        background-image: url(/images/navBar/history.svg);
+        background-position: 38px -2px;
+        background-size: 65px;
+        
+    }
+
+    .four {
+        -ms-grid-column: 6;
+        background-image: url(/images/navBar/recent.svg);
+        background-position: 43px -4px;
+        background-size: 65px;
+    }
+
+    .five {
+        -ms-grid-column: 7;
+        background-image: url(/images/navBar/news.svg);
+        background-position: 31px -11px;
+        background-size: 85px;
+    }
+
+    .six {
+        -ms-grid-column: 8;
+        background-image: url(/images/navBar/sharing.svg);
+        background-position: 8px -35px;
+        background-size: 130px;
+    }
+
+    .seven {
+        -ms-grid-column: 2;
+        background-image: url(/images/navBar/account.svg);
+        background-position: 38px -3px;
+        background-size: 67px;
+    }
+
+    .eight {
+        -ms-grid-column: 3;
+        background-image: url(/images/navBar/logout.svg);
+        background-position: 36px -10px;
+        background-size: 85px;
+    }
+}
+
+
+
+
+
+
+
+
+

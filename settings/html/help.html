@@ -1,0 +1,76 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!doctype HTML>
+<html>
+    <head>
+        <title>Help flyout</title>
+        <script src="/settings/js/help.js"></script>
+         <link href="help.css" rel="stylesheet" />
+        <link href="//Microsoft.WinJS.1.0/css/ui-light.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- BEGINSETTINGSFLYOUT -->
+        <div data-win-control="WinJS.UI.SettingsFlyout" id="programmaticInvocationSettingsFlyout" aria-label="App Settings Flyout" data-win-options="{settingsCommandId:'help'}">
+            <!-- Use either 'win-ui-light' or 'win-ui-dark' depending on the contrast between the header title and background color -->
+            <div class="win-ui-light win-header" style="background-color:#009DD1; color: white; ">
+                <button type="button" onclick="WinJS.UI.SettingsFlyout.show()" class="win-backbutton" id="leaveSetting"></button>
+                <div class="win-label" lang="HELP">Hilfe</div> 
+                <!--<img src="/images/folder.svg" style="position: absolute; right: 40px;"/>-->
+            </div>
+            <div class="win-content">
+                <div class="win-settings-section">
+                    
+                    <div style="margin-right: 10px;"> 
+                        <h3 lang="AVAILABLEKEYSTROKES" id="helpDescription">Verfügbare Tastaturbefehle:</h3><br />
+                        <div id="keystrokeList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ENDSETTINGSFLYOUT -->
+    </body>
+</html>

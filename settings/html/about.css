@@ -1,0 +1,52 @@
+﻿#leaveSetting:active {
+    color: #009DD1;
+    background-color: white;
+    border-color: white;
+}
+
+#leaveSetting {
+    color: white;
+    border-color: white;
+}
+
+body {
+}
+
+.win-settingsflyout {
+    border: none;
+    /*box-shadow: -1px 1px 11px rgba(50, 50, 50, 0.75);*/
+    box-shadow: -1px 1px 11px rgba(50, 50, 50, 0.75);
+}
+
+#generalSettingsContent {
+    width: 100%;
+
+}
+
+.win-ui-light win-header {
+    color: white;
+}
+
+#languageSelection::selection {
+   background-color: #009DD1;
+   color: white;
+}
+
+#resetButton{
+
+    background-color: #D1251F;
+    color: white;
+    border: none;
+ 
+
+
+	}
+
+#resetButton:hover {
+    background-color: #FF3830;
+}
+
+#resetButton:active {
+    background-color: black;
+    
+}

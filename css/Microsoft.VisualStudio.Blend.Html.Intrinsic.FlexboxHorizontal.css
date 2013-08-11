@@ -1,0 +1,19 @@
+﻿.ms-flexbox
+{
+    display: -ms-flexbox;
+    -ms-flex-direction: row;
+}
+.ms-flexbox > div
+{
+    width: 200px;
+    height: 200px;
+}
+.ms-flexone
+{
+    background-color: Blue;
+}
+.ms-flextwo
+{
+    background-color: Gray;
+    /**/
+}

@@ -1,0 +1,119 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CodeMirror: Groovy mode</title>
+    <link rel="stylesheet" href="../../lib/codemirror.css">
+    <script src="../../lib/codemirror.js"></script>
+    <script src="../../addon/edit/matchbrackets.js"></script>
+    <script src="groovy.js"></script>
+    <link rel="stylesheet" href="../../doc/docs.css">
+    <style>.CodeMirror {border-top: 1px solid #500; border-bottom: 1px solid #500;}</style>
+  </head>
+  <body>
+    <h1>CodeMirror: Groovy mode</h1>
+
+<form><textarea id="code" name="code">
+//Pattern for groovy script
+def p = ~/.*\.groovy/
+new File( 'd:\\scripts' ).eachFileMatch(p) {f ->
+  // imports list
+  def imports = []
+  f.eachLine {
+    // condition to detect an import instruction
+    ln -> if ( ln =~ '^import .*' ) {
+      imports << "${ln - 'import '}"
+    }
+  }
+  // print thmen
+  if ( ! imports.empty ) {
+    println f
+    imports.each{ println "   $it" }
+  }
+}
+
+/* Coin changer demo code from http://groovy.codehaus.org */
+
+enum UsCoin {
+  quarter(25), dime(10), nickel(5), penny(1)
+  UsCoin(v) { value = v }
+  final value
+}
+
+enum OzzieCoin {
+  fifty(50), twenty(20), ten(10), five(5)
+  OzzieCoin(v) { value = v }
+  final value
+}
+
+def plural(word, count) {
+  if (count == 1) return word
+  word[-1] == 'y' ? word[0..-2] + "ies" : word + "s"
+}
+
+def change(currency, amount) {
+  currency.values().inject([]){ list, coin ->
+     int count = amount / coin.value
+     amount = amount % coin.value
+     list += "$count ${plural(coin.toString(), count)}"
+  }
+}
+</textarea></form>
+
+    <script>
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "text/x-groovy"
+      });
+    </script>
+
+    <p><strong>MIME types defined:</strong> <code>text/x-groovy</code></p>
+  </body>
+</html>

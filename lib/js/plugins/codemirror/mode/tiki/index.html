@@ -1,0 +1,127 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <title>CodeMirror: Tiki wiki mode</title>
+    <link rel="stylesheet" href="../../lib/codemirror.css">
+    <script src="../../lib/codemirror.js"></script>
+    <script src="tiki.js"></script>
+    <link rel="stylesheet" href="tiki.css">
+    <link rel="stylesheet" href="../../doc/docs.css">
+    <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+  </head>
+  <body style="padding: 20px;">
+    <h1>CodeMirror: Tiki wiki mode</h1>
+
+<div><textarea id="code" name="code">
+Headings
+!Header 1
+!!Header 2
+!!!Header 3
+!!!!Header 4
+!!!!!Header 5
+!!!!!!Header 6
+
+Styling
+-=titlebar=-
+^^ Box on multi
+lines
+of content^^
+__bold__
+''italic''
+===underline===
+::center::
+--Line Through--
+
+Operators
+~np~No parse~/np~
+
+Link
+[link|desc|nocache]
+
+Wiki
+((Wiki))
+((Wiki|desc))
+((Wiki|desc|timeout))
+
+Table
+||row1 col1|row1 col2|row1 col3
+row2 col1|row2 col2|row2 col3
+row3 col1|row3 col2|row3 col3||
+
+Lists:
+*bla
+**bla-1
+++continue-bla-1
+***bla-2
+++continue-bla-1
+*bla
++continue-bla
+#bla
+** tra-la-la
++continue-bla
+#bla
+
+Plugin (standard):
+{PLUGIN(attr="my attr")}
+Plugin Body
+{PLUGIN}
+
+Plugin (inline):
+{plugin attr="my attr"}
+</textarea></div>
+
+<script type="text/javascript">
+	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        mode: 'tiki',      
+        lineNumbers: true
+    });
+</script>
+
+</body>
+</html>

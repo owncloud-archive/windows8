@@ -1,0 +1,120 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CodeMirror: R mode</title>
+    <link rel="stylesheet" href="../../lib/codemirror.css">
+    <script src="../../lib/codemirror.js"></script>
+    <script src="r.js"></script>
+    <style>
+      .CodeMirror { border-top: 1px solid silver; border-bottom: 1px solid silver; }
+      .cm-s-default span.cm-semi { color: blue; font-weight: bold; }
+      .cm-s-default span.cm-dollar { color: orange; font-weight: bold; }
+      .cm-s-default span.cm-arrow { color: brown; }
+      .cm-s-default span.cm-arg-is { color: brown; }
+    </style>
+    <link rel="stylesheet" href="../../doc/docs.css">
+  </head>
+  <body>
+    <h1>CodeMirror: R mode</h1>
+    <form><textarea id="code" name="code">
+# Code from http://www.mayin.org/ajayshah/KB/R/
+
+# FIRST LEARN ABOUT LISTS --
+X = list(height=5.4, weight=54)
+print("Use default printing --")
+print(X)
+print("Accessing individual elements --")
+cat("Your height is ", X$height, " and your weight is ", X$weight, "\n")
+
+# FUNCTIONS --
+square <- function(x) {
+  return(x*x)
+}
+cat("The square of 3 is ", square(3), "\n")
+
+                 # default value of the arg is set to 5.
+cube <- function(x=5) {
+  return(x*x*x);
+}
+cat("Calling cube with 2 : ", cube(2), "\n")    # will give 2^3
+cat("Calling cube        : ", cube(), "\n")     # will default to 5^3.
+
+# LEARN ABOUT FUNCTIONS THAT RETURN MULTIPLE OBJECTS --
+powers <- function(x) {
+  parcel = list(x2=x*x, x3=x*x*x, x4=x*x*x*x);
+  return(parcel);
+}
+
+X = powers(3);
+print("Showing powers of 3 --"); print(X);
+
+# WRITING THIS COMPACTLY (4 lines instead of 7)
+
+powerful <- function(x) {
+  return(list(x2=x*x, x3=x*x*x, x4=x*x*x*x));
+}
+print("Showing powers of 3 --"); print(powerful(3));
+
+# In R, the last expression in a function is, by default, what is
+# returned. So you could equally just say:
+powerful <- function(x) {list(x2=x*x, x3=x*x*x, x4=x*x*x*x)}
+</textarea></form>
+    <script>
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {});
+    </script>
+
+    <p><strong>MIME types defined:</strong> <code>text/x-rsrc</code>.</p>
+
+    <p>Development of the CodeMirror R mode was kindly sponsored
+    by <a href="http://ubalo.com/">Ubalo</a>, who hold
+    the <a href="LICENSE">license</a>.</p>
+
+  </body>
+</html>

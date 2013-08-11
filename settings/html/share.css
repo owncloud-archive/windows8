@@ -1,0 +1,628 @@
+﻿.shareContent {
+    display: -ms-grid;
+    -ms-grid-rows: auto auto 1fr 100px;
+    -ms-grid-columns: 100%;
+    background: transparent;
+    background-image: url(/images/share/whiteBottom.jpg);
+    background-size: cover;
+    text-shadow: 0px 1px 3px black;
+    height: calc(100% - 80px);
+    
+}
+
+.win-settingsflyout {
+    border: none;
+    /*box-shadow: -1px 1px 11px rgba(50, 50, 50, 0.75);*/
+    box-shadow: -1px 1px 11px rgba(50, 50, 50, 0.75);
+}
+
+
+/*Erste Row  -  Freigabelink*/
+
+#shareLink {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-rows: auto 1fr;
+    -ms-grid-columns: 1fr 1fr;
+    margin-left: 20px;
+    margin-right: 20px;
+
+}
+
+#shareLinkTitle {
+    -ms-grid-column: 1;
+    -ms-grid-column-span: 2;
+    -ms-grid-row: 1;
+    text-shadow: 0px 1px 3px black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#publicShareLinkInput {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    width: 100%;
+    
+}
+
+#sendShareLink {
+    -ms-grid-column: 2;
+    -ms-grid-row: 2;
+    margin-left: 20px;
+    border: none;
+    background-color: #20A127;
+    border: solid 2px white;
+
+}
+
+ #sendShareLink:hover {
+        background-color: #03CC11;
+    }
+
+#sendShareLink:active {
+    background-color: white;
+    color: black;
+    border: solid 2px black;
+}
+
+/*Zweite Row  -  Rechte und Namenssuchfeld*/
+
+#rightsAndName {
+    -ms-grid-row: 2;
+    -ms-grid-column: 1;
+
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 1fr;
+    -ms-grid-rows: auto 1fr;
+    margin: 20px;
+}
+
+    #rightsAndName input#readPerm checkbox {
+        border: solid 2px black;
+
+    }
+
+#manageSharesTitle {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#shareTarget {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    height: 20px;
+    width: 100%;
+}
+
+#rights {
+    -ms-grid-column: 2;
+    -ms-grid-row: 2;
+    margin-left: 20px;
+    
+    
+}
+
+
+
+#displayResults {
+    -ms-grid-row: 3;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 1fr;
+    -ms-grid-rows: 1fr;
+    height: 100%;
+    margin-left: 20px;
+    margin-right: 20px;
+    
+    
+    
+}
+
+
+#searchResult {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 30px;
+    -ms-grid-rows: auto 1fr;
+    margin-bottom: 20px;
+    
+}
+
+#searchHeader {
+    -ms-grid-column: 1;
+    -ms-grid-row: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#searchUserProgressRing {
+    -ms-grid-row: 1;
+    -ms-grid-column: 2;
+	color: white;
+	height: 30px;
+	width: 30px;
+	margin-top: 10px;
+}
+
+
+
+
+#searchUserView {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    -ms-grid-column-span: 2;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 10px;
+    
+}
+
+#currentShares {
+    -ms-grid-row: 1;
+    -ms-grid-column: 2;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 30px;
+    -ms-grid-rows: auto 1fr;
+    margin-bottom: 20px;
+    margin-left: 20px;
+
+}
+
+#currentSharesTitle {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#shareProgressRing {
+    -ms-grid-row: 1;
+    -ms-grid-column: 2;
+}
+
+#shareProgressRing{
+	color: white;
+	height: 30px;
+	width: 30px;
+	margin-top: 10px;
+	}
+
+
+
+#userShareView {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    -ms-grid-column-span: 2;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 10px;
+}
+
+#userShareView .win-listview .win-viewport.win-vertical {
+    margin-bottom: 10px;  
+}
+
+
+
+#addDeleteSpan {
+    -ms-grid-row: 4;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 1fr;
+    height: 100px;
+}
+
+#addDeleteSpan button {
+        /*height: 100px;*/
+        /*border: none;*/
+        color: white;
+        border: none;
+        height: 100px;
+        font-size: 20px;
+        font-family: 'Segoe UI Light';
+
+        
+    }
+
+#addDeleteSpan button:active {
+        color: white;
+        background-color: black;
+    }
+
+#addUserButton {
+    -ms-grid-column: 1;
+   background-color: #20A127;
+}
+
+ #addUserButton:hover {
+        background-color: #03CC11;
+    }
+
+ #removeUserButton {
+    -ms-grid-column: 2;
+   background-color: #D1251F;
+}
+
+ #removeUserButton:hover {
+        background-color: #FF3830;
+    }
+
+#searchUserProgressRing {
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*Listview Template*/
+.userShareViewItem {
+    width: 100%;
+    height: 55px;
+    text-overflow: ellipsis;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr;
+    -ms-grid-rows: 30px 25px;
+    background-color: #7AB51D;
+}
+
+.userShareViewItem .userShareViewItemText {
+    -ms-grid-column: 1;
+    width: 100%;
+    height: 55px;
+    padding-left: 10px;
+    text-overflow: ellipsis;
+    background-size: cover;
+}
+
+.userShareViewItemText .userShareViewItemHeader {
+    height: 30px;
+    font-size: 20px;
+    
+}
+
+.userShareViewItemText .userShareViewItemSubHeader {
+    height: 25px;
+    font-size: 15px;
+}
+
+
+
+
+.searchUserItem {
+    width: 100%;
+    height: 30px;
+    text-overflow: ellipsis;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr;
+    -ms-grid-rows: 30px 30px;
+    background-color: #7AB51D;
+}
+
+.searchUserItem .searchUserItemText {
+    -ms-grid-column: 1;
+    width: 100%;
+    height: 30px;
+    padding-left: 10px;
+    text-overflow: ellipsis;
+    background-size: cover;
+}
+
+.searchUserItemText .searchUserItemHeader {
+    height: 30px;
+    font-size: 20px;
+    
+}
+
+
+
+
+
+
+
+
+.win-container.win-selected .win-selectionborder {
+	border-color: #7AB51D !important;
+}
+#searchUserView .win-container.win-selected .win-selectioncheckmarkbackground {
+	border: none;
+}
+
+#userShareView .win-container.win-selected .win-selectioncheckmarkbackground {
+	border: none;
+}
+
+#searchUserView .win-container{
+	 box-shadow: 0px 1px 3px black;
+}
+
+#userShareView .win-container{
+	 box-shadow: 0px 1px 3px black;
+}
+
+       #video_background {
+      position: absolute;
+      height: 1080px;
+      width: 1920px;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: -1000;
+  
+}
+
+@media screen and (-ms-view-state: snapped) {
+
+    #programmaticInvocationSettingsFlyout {
+        width: 320px !important;
+    }
+
+    .shareContent {
+    display: -ms-grid;
+    -ms-grid-rows: auto auto 1fr 50px;
+    -ms-grid-columns: 100%;
+    background: transparent;
+    background-image: url(/images/share/whiteBottom.jpg);
+   background-size: cover;
+    text-shadow: 0px 1px 3px black;
+    height: calc(100% - 80px);
+    
+}
+
+
+
+
+/*Erste Row  -  Freigabelink*/
+
+#shareLink {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-rows: auto 1fr auto;
+    -ms-grid-columns: 1fr;
+    margin-left: 20px;
+    margin-right: 20px;
+
+}
+
+#shareLinkTitle {
+    -ms-grid-column: 1;
+    
+    -ms-grid-row: 1;
+    text-shadow: 0px 1px 3px black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#publicShareLinkInput {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    width: 100%;
+    
+}
+
+#sendShareLink {
+    -ms-grid-column: 1;
+    -ms-grid-row: 3;
+    
+    border: none;
+    background-color: #20A127;
+    border: solid 2px white;
+    margin-right: -5px;
+    margin-left: 0px;
+    margin-top: 10px;
+}
+
+ #sendShareLink:hover {
+        background-color: #03CC11;
+    }
+
+#sendShareLink:active {
+    background-color: white;
+    color: black;
+    border: solid 2px black;
+}
+
+/*Zweite Row  -  Rechte und Namenssuchfeld*/
+
+#rightsAndName {
+    -ms-grid-row: 2;
+    -ms-grid-column: 1;
+
+    display: -ms-grid;
+    -ms-grid-columns: 1fr;
+    -ms-grid-rows: auto 1fr auto;
+    
+}
+
+    #rightsAndName input#readPerm checkbox {
+        border: solid 2px black;
+
+    }
+
+#manageSharesTitle {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#shareTarget {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    height: 20px;
+    width: 100%;
+}
+
+#rights {
+    -ms-grid-column: 1;
+    -ms-grid-row: 3;
+    margin-top: 10px;
+    
+    
+}
+
+
+
+#displayResults {
+    -ms-grid-row: 3;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr;
+    -ms-grid-rows: 1fr 1fr;
+    height: 100%;
+    margin-left: 20px;
+    margin-right: 20px;
+    
+    
+    
+}
+
+
+#searchResult {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    /*30px für den progress ring*/
+    -ms-grid-columns: 100px 20px;
+    -ms-grid-rows: auto 1fr;
+    margin-bottom: 20px;
+    
+}
+
+#searchHeader {
+    -ms-grid-column: 1;
+    -ms-grid-row: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#searchUserProgressRing {
+    -ms-grid-row: 1;
+    -ms-grid-column: 2;
+	color: white;
+	height: 20px;
+	width: 20px;
+	margin-bottom: 10px;
+    
+}
+
+
+
+
+#searchUserView {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+   -ms-grid-column-span: 2;
+    width: 289px;
+    height: 100%;
+    margin-bottom: 10px;
+    margin-left: -7px;
+    
+}
+
+#currentShares {
+    -ms-grid-row: 2;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-columns: 140px 20px;
+    
+    -ms-grid-rows: auto 1fr;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    /*margin-left: 20px;*/
+
+}
+
+#currentSharesTitle {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#shareProgressRing {
+    -ms-grid-row: 1;
+    -ms-grid-column: 2;
+}
+
+#shareProgressRing{
+	color: white;
+	height: 30px;
+	width: 30px;
+	margin-top: 10px;
+	}
+
+
+
+#userShareView {
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    -ms-grid-column-span: 2;
+    width: 289px;
+    height: 100%;
+    margin-bottom: 10px;
+    margin-left: -7px;
+}
+
+#userShareView .win-listview .win-viewport.win-vertical {
+    margin-bottom: 10px;  
+}
+
+#addDeleteSpan button {
+        /*height: 100px;*/
+        /*border: none;*/
+        color: white;
+        border: none;
+        height: 50px;
+        font-size: 15px;
+        font-family: 'Segoe UI Light';
+
+        
+    }
+
+#addDeleteSpan {
+    -ms-grid-row: 4;
+    -ms-grid-column: 1;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 1fr;
+    height: 50px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

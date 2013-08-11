@@ -1,0 +1,211 @@
+﻿ <!--
+ The Campus Cloud software is available under a dual license of MIT or GPL v3.0
+ 
+ Copyright (C) 2013
+ 	Benjamin Barann, Arne Cvetkovic, Patrick Janning, Simon Lansmann, 
+ 	David Middelbeck, Christoph Rieger, Tassilo Tobollik, Jannik Weichert
+ 
+ /********************************************************************************	
+ MIT License:
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+ 
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ See the MIT License for more details: http://opensource.org/licenses/MIT
+ /*******************************************************************************/
+ GPL License:
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CodeMirror: Common Lisp mode</title>
+    <link rel="stylesheet" href="../../lib/codemirror.css">
+    <script src="../../lib/codemirror.js"></script>
+    <script src="commonlisp.js"></script>
+    <style>.CodeMirror {background: #f8f8f8;}</style>
+    <link rel="stylesheet" href="../../doc/docs.css">
+  </head>
+  <body>
+    <h1>CodeMirror: Common Lisp mode</h1>
+    <form><textarea id="code" name="code">(in-package :cl-postgres)
+
+;; These are used to synthesize reader and writer names for integer
+;; reading/writing functions when the amount of bytes and the
+;; signedness is known. Both the macro that creates the functions and
+;; some macros that use them create names this way.
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun integer-reader-name (bytes signed)
+    (intern (with-standard-io-syntax
+              (format nil "~a~a~a~a" '#:read- (if signed "" '#:u) '#:int bytes))))
+  (defun integer-writer-name (bytes signed)
+    (intern (with-standard-io-syntax
+              (format nil "~a~a~a~a" '#:write- (if signed "" '#:u) '#:int bytes)))))
+
+(defmacro integer-reader (bytes)
+  "Create a function to read integers from a binary stream."
+  (let ((bits (* bytes 8)))
+    (labels ((return-form (signed)
+               (if signed
+                   `(if (logbitp ,(1- bits) result)
+                        (dpb result (byte ,(1- bits) 0) -1)
+                        result)
+                   `result))
+             (generate-reader (signed)
+               `(defun ,(integer-reader-name bytes signed) (socket)
+                  (declare (type stream socket)
+                           #.*optimize*)
+                  ,(if (= bytes 1)
+                       `(let ((result (the (unsigned-byte 8) (read-byte socket))))
+                          (declare (type (unsigned-byte 8) result))
+                          ,(return-form signed))
+                       `(let ((result 0))
+                          (declare (type (unsigned-byte ,bits) result))
+                          ,@(loop :for byte :from (1- bytes) :downto 0
+                                   :collect `(setf (ldb (byte 8 ,(* 8 byte)) result)
+                                                   (the (unsigned-byte 8) (read-byte socket))))
+                          ,(return-form signed))))))
+      `(progn
+;; This causes weird errors on SBCL in some circumstances. Disabled for now.
+;;         (declaim (inline ,(integer-reader-name bytes t)
+;;                          ,(integer-reader-name bytes nil)))
+         (declaim (ftype (function (t) (signed-byte ,bits))
+                         ,(integer-reader-name bytes t)))
+         ,(generate-reader t)
+         (declaim (ftype (function (t) (unsigned-byte ,bits))
+                         ,(integer-reader-name bytes nil)))
+         ,(generate-reader nil)))))
+
+(defmacro integer-writer (bytes)
+  "Create a function to write integers to a binary stream."
+  (let ((bits (* 8 bytes)))
+    `(progn
+      (declaim (inline ,(integer-writer-name bytes t)
+                       ,(integer-writer-name bytes nil)))
+      (defun ,(integer-writer-name bytes nil) (socket value)
+        (declare (type stream socket)
+                 (type (unsigned-byte ,bits) value)
+                 #.*optimize*)
+        ,@(if (= bytes 1)
+              `((write-byte value socket))
+              (loop :for byte :from (1- bytes) :downto 0
+                    :collect `(write-byte (ldb (byte 8 ,(* byte 8)) value)
+                               socket)))
+        (values))
+      (defun ,(integer-writer-name bytes t) (socket value)
+        (declare (type stream socket)
+                 (type (signed-byte ,bits) value)
+                 #.*optimize*)
+        ,@(if (= bytes 1)
+              `((write-byte (ldb (byte 8 0) value) socket))
+              (loop :for byte :from (1- bytes) :downto 0
+                    :collect `(write-byte (ldb (byte 8 ,(* byte 8)) value)
+                               socket)))
+        (values)))))
+
+;; All the instances of the above that we need.
+
+(integer-reader 1)
+(integer-reader 2)
+(integer-reader 4)
+(integer-reader 8)
+
+(integer-writer 1)
+(integer-writer 2)
+(integer-writer 4)
+
+(defun write-bytes (socket bytes)
+  "Write a byte-array to a stream."
+  (declare (type stream socket)
+           (type (simple-array (unsigned-byte 8)) bytes)
+           #.*optimize*)
+  (write-sequence bytes socket))
+
+(defun write-str (socket string)
+  "Write a null-terminated string to a stream \(encoding it when UTF-8
+support is enabled.)."
+  (declare (type stream socket)
+           (type string string)
+           #.*optimize*)
+  (enc-write-string string socket)
+  (write-uint1 socket 0))
+
+(declaim (ftype (function (t unsigned-byte)
+                          (simple-array (unsigned-byte 8) (*)))
+                read-bytes))
+(defun read-bytes (socket length)
+  "Read a byte array of the given length from a stream."
+  (declare (type stream socket)
+           (type fixnum length)
+           #.*optimize*)
+  (let ((result (make-array length :element-type '(unsigned-byte 8))))
+    (read-sequence result socket)
+    result))
+
+(declaim (ftype (function (t) string) read-str))
+(defun read-str (socket)
+  "Read a null-terminated string from a stream. Takes care of encoding
+when UTF-8 support is enabled."
+  (declare (type stream socket)
+           #.*optimize*)
+  (enc-read-string socket :null-terminated t))
+
+(defun skip-bytes (socket length)
+  "Skip a given number of bytes in a binary stream."
+  (declare (type stream socket)
+           (type (unsigned-byte 32) length)
+           #.*optimize*)
+  (dotimes (i length)
+    (read-byte socket)))
+
+(defun skip-str (socket)
+  "Skip a null-terminated string."
+  (declare (type stream socket)
+           #.*optimize*)
+  (loop :for char :of-type fixnum = (read-byte socket)
+        :until (zerop char)))
+
+(defun ensure-socket-is-closed (socket &amp;key abort)
+  (when (open-stream-p socket)
+    (handler-case
+        (close socket :abort abort)
+      (error (error)
+        (warn "Ignoring the error which happened while trying to close PostgreSQL socket: ~A" error)))))
+</textarea></form>
+    <script>
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {lineNumbers: true});
+    </script>
+
+    <p><strong>MIME types defined:</strong> <code>text/x-common-lisp</code>.</p>
+
+  </body>
+</html>
