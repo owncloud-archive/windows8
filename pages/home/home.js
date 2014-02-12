@@ -47,76 +47,48 @@
 (function () {
     "use strict";
 
-    //ListView Items der vorkonfigurierten Server
-    var listViewItems;
-
     var loginPage = WinJS.UI.Pages.define("/pages/home/home.html", {
-        // Diese Funktion wird immer aufgerufen, wenn ein Benutzer zu dieser Seite wechselt. Sie
-        // füllt die Seitenelemente mit den Daten der App auf.
+        /**
+        Initialize page when user switches to it
+        */
         ready: function (element, options) {
-            // Öffentlich verfügbare Funktionen definieren, z.B. für Tastaturbedienung
+            // Define publicly available functions
             cloud.pages.login.loginButtonEvent = this.loginButtonEvent;
+            cloud.pages.login.listViewItems = null; // ListView items of preconfigured server
 
-            //List-View initialisieren
+            // Initialize list view
             this.initListView();
 
-            //Appbar
-            var appbar = document.getElementById("appbar").winControl;
-            appbar.getCommandById("helpButton").addEventListener("click", cloud.functions.showHelpSettings, false);
-
-            //Sonstige AppDaten wiederherstellen
+            // Restore values after logout or restart (not password for security reasons)
             var username = Windows.Storage.ApplicationData.current.roamingSettings.values["username"];
-            var password = Windows.Storage.ApplicationData.current.roamingSettings.values["password"];
-
-            //Benutzerdaten wiederherstellen
-            if (username && password) {
-                document.getElementById("nameInput").value = username;
-                document.getElementById("passInput").value = password;
-            }
-
-            //Login merken
             var checked = Windows.Storage.ApplicationData.current.roamingSettings.values["saveLogin"];
-            if (checked) {
-                document.getElementById("loginCheckbox").checked = checked;
-            }
-
-            //Appdaten nach beenden wiederherstellen
             var server = Windows.Storage.ApplicationData.current.roamingSettings.values["manualCloudServer"];
             var documentFolder = Windows.Storage.ApplicationData.current.roamingSettings.values["manualDocumentPath"];
-            //var port = Windows.Storage.ApplicationData.current.roamingSettings.values["manualCloudPort"];
             var serverType = Windows.Storage.ApplicationData.current.roamingSettings.values["manualServerType"];
 
-            if (server) {
-                document.getElementById("manualCloudServer").value = server;
-            }
+            if (username)       document.getElementById("nameInput").value = username;
+            if (checked)        document.getElementById("loginCheckbox").checked = checked;
+            if (server)         document.getElementById("manualCloudServer").value = server;
+            if (documentFolder) document.getElementById("manualDocumentPath").value = documentFolder;
+            if (serverType)     document.getElementById("manualServerTypeSelection").value = serverType;
 
-            if (documentFolder) {
-                document.getElementById("manualDocumentPath").value = documentFolder;
-            }
-
-            //if (port) {
-                //document.getElementById("manualCloudPort").value = port;
-            //}
-
-            if (serverType) {
-                document.getElementById("manualServerTypeSelection").value = serverType;
-            }
-
-            //Navigation vorbereiten und Back-Button entfernen --> Standardnavigation deaktivieren
+            // Add event to appbar
+            var appbar = document.getElementById("appbar").winControl;
+            appbar.getCommandById("helpButton").addEventListener("click", cloud.functions.showHelpSettings, false);
+            
+            // Deactivate standard navigation button
             WinJS.Navigation.history.backStack = [];
             $("header[role=banner] .win-backbutton").attr("disabled", "disabled");
 
-            //Manuelle Felder vorbereiten
+            // Prepare manual fields
             this.refreshManualVisibility();
             this.updateDocumentPathPlaceholder();
 
-            //Registrieren Button
+            // Register events
             document.getElementById("registerButton").addEventListener("click", this.openRegisterFlyout, false);
-
-            //Vorschlag für Webdav.php Pfad
             document.getElementById("manualServerTypeSelection").addEventListener("change", this.updateDocumentPathPlaceholder, false);
 
-            // Tastatusbedienung
+            // Start keyboard context
             cloud.setKeystrokeContext({
                 context: "login",
                 allowGlobal: false,
@@ -126,63 +98,52 @@
             });
         },
 
-        //On-Klick Event für ListView (Speichert Serverkonfiguration und aktualisiert die Anzeige sofern ein manueller Server gewählt wurde)
+        /**
+        Event for click on listView element
+        Saves server configuration and refreshes view if manual server is selected
+        */
         updateServerSelection: function (eventInfo) {
-            var appData = Windows.Storage.ApplicationData.current;
-            var roamingSettings = appData.roamingSettings;
-
             var listView = document.getElementById("serverList").winControl;
             var indices = listView.selection.getIndices()[0];
 
-            //Sofern etwas angeklickt wurde...
+            var roamingSettings = Windows.Storage.ApplicationData.current.roamingSettings;
             if (listView.selection.count() > 0) {
-                var selectedItem = listViewItems.getAt(indices);
+                var selectedItem = cloud.pages.login.listViewItems.getAt(indices);
                 cloud.session.selectedServer = selectedItem.serverName;
                 cloud.session.selectedServerType = selectedItem.serverType;
                 roamingSettings.values["backendSelection"] = selectedItem.configName;
-            }
-                //Ansonsten setzte Variablen zurück
-            else {
+            } else {
+                // Reset variable
                 cloud.session.selectedServer = "";
                 cloud.session.selectedServerType = "";
                 roamingSettings.values["backendSelection"] = "";
             }
 
-            //Speichern der restlichen AppData
+            // Speichern der restlichen AppData
             roamingSettings.values["selectedServer"] = cloud.session.selectedServer;
             roamingSettings.values["selectedServerType"] = cloud.session.selectedServerType;
 
-            //Aktualisiere die Anzeige
+            // Refresh view
             loginPage.prototype.refreshManualVisibility();
         },
 
-        //Initiiere die ListView (horizontales Scrollen, Anlegen der Serverliste aus Config-File + manueller Server)
+        /**
+        Initialize list view element
+        */
         initListView: function (itemList) {
             var listView = document.getElementById("serverList").winControl;
 
-            //Vertikal Scrollen
+            // Vertical scrolling
             listView.layout = new WinJS.UI.ListLayout({
                 horizontal: false
             });
 
-            //Ereignishandler
+            // Register events
             listView.addEventListener("iteminvoked", this.updateServerSelection, false);
 
-            //Tile für manuelle Serverkonfiguration
-            var manual = [];
-            var items = [];
-            manual[0] = {
-                configName: "",
-                title: "Benutzerdefiniert",
-                text: "Manuelle Konfiguration des Servers",
-                picture: "images/homeListIcons/gear.png",
-                serverType: "manual",
-                serverName: "",
-                langKey: "SERVERCUSTOM",
-                langKeyDesc: "SERVERDESCRIPTIONCUSTOM",
-            };
+            // Get preconfigured servers from config
             var i = 0;
-            //Lade Serverobjekte aus Configdatei
+            var items = [];
             for (var serverObj in cloud.config.servers) {
                 items[i] = {
                     configName: cloud.config.servers[serverObj].name,
@@ -200,118 +161,86 @@
             //Nach Namen sortieren
             items.sort(cloud.helper.sortByParam("order"));
 
-            //Zusammenhängen der Server mit Benutzerdefiniert
-            var sortedList = items.concat(manual);
+            // Add tile for manual entry
+            items[i] = {
+                configName: "",
+                title: "Benutzerdefiniert",
+                text: "Manuelle Konfiguration des Servers",
+                picture: "images/homeListIcons/gear.png",
+                serverType: "manual",
+                serverName: "",
+                langKey: "SERVERCUSTOM",
+                langKeyDesc: "SERVERDESCRIPTIONCUSTOM",
+            };
+            
+            // Create list view from list
+            cloud.pages.login.listViewItems = new WinJS.Binding.List(items);
+            listView.itemDataSource = cloud.pages.login.listViewItems.dataSource;
 
-            //Anhängen der Liste an ListView
-            listViewItems = new WinJS.Binding.List(sortedList);
-            listView.itemDataSource = listViewItems.dataSource;
-
-            //Backend-Typ  wiederherstellen
+            // Restore backend type from appdata
             var serverSelection = Windows.Storage.ApplicationData.current.roamingSettings.values["backendSelection"];
             var selectedServerType = Windows.Storage.ApplicationData.current.roamingSettings.values["selectedServerType"];
+
             if (selectedServerType == "manual") {
-                //Letztes Element (manueller Server)
-                listView.selection.set(sortedList.length - 1);
+                // Mark last element
+                listView.selection.set(items.length - 1);
             } else if (serverSelection) {
-                var id = 0;
-                //Suche nach TileID zur Markierung --> Wichtig, da neue Server dazu kommen können, und diese durch die alphabetische Sortierung nicht immer die gleiche position haben
-                for (; id < listViewItems.length;) {
-                    if (listViewItems.getAt(id).configName != serverSelection) {
-                        id++;
-                    } else {
-                        //Wähle Tile aus  
+                // Search tileID of restored item. Important as new servers might be added in the meantime, thus having other position
+                for (var id = 0; id < cloud.pages.login.listViewItems.length; id++) {
+                    if (cloud.pages.login.listViewItems.getAt(id).configName == serverSelection) {
                         listView.selection.set(id);
                         break;
                     }
-                }    
+                }
             }
         },
 
-        //Event des Loginbuttons
+        /**
+        Login button event
+        */
         loginButtonEvent: function (eventInfo) {
+            // Show progress ring as user feedback
             document.getElementById("loginProgressRing").style.visibility = 'visible';
 
-            //LOGIN-Daten auslesen
-            var username = document.getElementById("nameInput").value;
-            var password = document.getElementById("passInput").value;
-            //Vermeide Login mit leeren Input Feldern
-            if (username && password) {
-                var authObj = new Object({ username: username, password: password });
+            // Read user input
+            var authObj = new Object({
+                username: document.getElementById("nameInput").value,
+                password: document.getElementById("passInput").value
+            });
 
-                //Crash vermeiden der entsteht sofern kein Server ausgewählt wurde
-                if ((cloud.session.selectedServer && cloud.session.selectedServer != "") || cloud.session.selectedServerType == "manual") {
-                    //BACKEND-TYP wählen...
-                    var manualCloudServer = document.getElementById("manualCloudServer").value;
-                    var manualDocumentPath = document.getElementById("manualDocumentPath").value;
-                    //var manualCloudPort = document.getElementById("manualCloudPort").value;
-                    var manualServerType = document.getElementById("manualServerTypeSelection").value;
+            var serverObj = new Object({
+                manualCloudServer : document.getElementById("manualCloudServer").value,
+                manualDocumentPath : document.getElementById("manualDocumentPath").value,
+                manualServerType : document.getElementById("manualServerTypeSelection").value
+            });
 
-                    //Fehlerhafte Konfiguration des manuellen Servers
-                    if (cloud.session.selectedServerType == "manual" && (manualCloudServer == "" || !manualServerType || manualDocumentPath == "")) {
-                        loginPage.prototype.loginError();
-                    } else {
-                        //Server auslesen
-                        var serverObj = new Object({
-                            selectedServerType: cloud.session.selectedServerType,
-                            selectedServer: cloud.session.selectedServer,
-                            manualCloudServer: manualCloudServer,
-                            manualServerTypeSelection: manualServerTypeSelection,
-                            manualDocumentPath : manualDocumentPath,
-                            //manualCloudPort: document.getElementById("manualCloudPort").value,
-                            manualServerType: manualServerType
-                        });
-
-                        cloud.functions.login(authObj, serverObj, loginPage.prototype.loginSuccess, loginPage.prototype.loginError);
-                    }
-                } else {
-                    //Keine Serverselektion
-                    loginPage.prototype.loginError();
-                }
-            } else {
-                //Kein Benutzername oder PW
-                loginPage.prototype.loginError();
-            }
+            cloud.functions.login(authObj, serverObj, loginPage.prototype.loginSuccess, loginPage.prototype.loginError);
         },
 
-        //Event sofern Login erfolgreich war
+        /**
+        Event if login was successful
+        */
         loginSuccess: function (e) {
-            try { // Gegen doppelte Login-Versuche
-                //Loginstatus auf true setzten
-                cloud.setLoggedIn({ loginStatus: true });
+            // Try to avoid double login attempts
+            try {
+                var roamingSettings = Windows.Storage.ApplicationData.current.roamingSettings;
 
-                console.log("loginstatus: " + cloud.isLoggedIn());
-
-                // Daten abfragen
-                var username = document.getElementById("nameInput").value;
-                var password = document.getElementById("passInput").value;
-                var manualCloudServer = document.getElementById("manualCloudServer").value;
-                var manualDocumentPath = document.getElementById("manualDocumentPath").value;
-                //var manualCloudPort = document.getElementById("manualCloudPort").value;
-                var manualServerType = document.getElementById("manualServerTypeSelection").value;
-
-                // Speichern des Benutzernamen und des PWs über mehrere Sessions
-                var savePassword = document.getElementById("loginCheckbox").checked;
-                var appData = Windows.Storage.ApplicationData.current;
-                var roamingSettings = appData.roamingSettings;
-
-                // Speichern vermeiden, wenn eventuell falsche Daten eingegeben und durch Windows-Popup nachgefragt wurden
-                if (savePassword && e === "FULLSUCCESS") {
-                    roamingSettings.values["username"] = username;
-                    roamingSettings.values["password"] = password;
-                    roamingSettings.values["saveLogin"] = savePassword;
+                // Only save user inputs on full success 
+                // Partial success indicates that correct credentials were set but maybe in a Windows Popup which is out of reach
+                if (document.getElementById("loginCheckbox").checked && e === "FULLSUCCESS") {
+                    roamingSettings.values["username"] = document.getElementById("nameInput").value;
+                    roamingSettings.values["password"] = document.getElementById("passInput").value;
+                    roamingSettings.values["saveLogin"] = document.getElementById("loginCheckbox").checked;
 
                     //Autologin für den nächsten Appstart aktivieren
                     cloud.session.tryAutoLogin = cloud.isLoggedIn();
                     roamingSettings.values["loginStatus"] = cloud.session.tryAutoLogin;
 
                     //Speichern der Servereinstellungen in Appdaten
-                    roamingSettings.values["manualCloudServer"] = manualCloudServer;
-                    roamingSettings.values["manualDocumentPath"] = manualDocumentPath;
-                    //roamingSettings.values["manualCloudPort"] = manualCloudPort;
-                    roamingSettings.values["manualServerType"] = manualServerType;
-                }
-                else {
+                    roamingSettings.values["manualCloudServer"] = document.getElementById("manualCloudServer").value;
+                    roamingSettings.values["manualDocumentPath"] = document.getElementById("manualDocumentPath").value;
+                    roamingSettings.values["manualServerType"] = document.getElementById("manualServerTypeSelection").value;
+                } else {
                     roamingSettings.values["password"] = "";
                 }
 
@@ -329,58 +258,38 @@
             }
         },
 
-        //Es gab einen Loginfehler
-        loginError: function (e) {
+        /**
+        An error occurred while trying to log in.
+        @param reason   (string)    Reason for which login failed (should be the error string identifier for simplicity reasons)
+        */
+        loginError: function (reason) {
+            // Stop login progress bar
             document.getElementById("loginProgressRing").style.visibility = 'hidden';
-            //Zeige Loginfehler für
-            //Kein ausgewählter Server
-            if ((!cloud.session.selectedServer || cloud.session.selectedServer == "") && cloud.session.selectedServerType != "manual") {
-                cloud.functions.showMessageDialog("NOSERVERSELECTED");
-                //Manuelle Serverkonfiguration
-            } else if (cloud.session.selectedServerType == "manual") {
-                //Kein angegebener Serverport
-                //if (document.getElementById("manualCloudPort").value == "") {
-                    //cloud.functions.showMessageDialog("NOSERVERPORTINSERT");
-                //}
-                //Keine angegebene Serveradresse
-                if (document.getElementById("manualCloudServer").value == "") {
-                    cloud.functions.showMessageDialog("NOSERVERINSERT");
-                } else if (!(document.getElementById("manualCloudServer").value.indexOf('http://') == 0)
-                    && !(document.getElementById("manualCloudServer").value.indexOf('https://') == 0)) {
-                    cloud.functions.showMessageDialog("INVALIDSERVER");
-                } else if (document.getElementById("manualDocumentPath").value == "") {
-                    cloud.functions.showMessageDialog("NODOCUMENTPATHINSERT");
-                }
-                else {
-                    cloud.functions.showMessageDialog("LOGINERROR");
-                }
-                //Kein angegebener Nutzername
-            } else if (document.getElementById("nameInput").value == "") {
-                cloud.functions.showMessageDialog("NOUSERNAMEINSERT");
-                //Kein angegebenes Passwort
-            } else if (document.getElementById("passInput").value == "") {
-                cloud.functions.showMessageDialog("NOPASSWORDINSERT");
-            } else if (e == "NOCONNECTION") {
-                cloud.functions.showMessageDialog("NOCONNECTION");
+
+            // Show error (specific or generic)
+            if (typeof reason !== "undefined" && reason != "") {
+                cloud.functions.showMessageDialog(reason);
             } else {
                 cloud.functions.showMessageDialog("LOGINERROR");
             }
         },
 
-        //Aktualisieren der Sichtbarkeiten der manuellen Felder
+        /**
+        Refresh visibility of manual fields
+        */
         refreshManualVisibility: function (eventInfo) {
-            //Manuelle Felder ein- / ausblenden
             var manualConfig = document.getElementById("manualConfig");
 
             if (cloud.session.selectedServerType == "manual") {
                 manualConfig.style.display = 'block';
-            }
-            else {
+            } else {
                 manualConfig.style.display = 'none';
             }
-
         },
 
+        /**
+        Refresh caption of manual field for relative path according to server type
+        */
         updateDocumentPathPlaceholder: function(eventInfo) {
             if (document.getElementById("manualServerTypeSelection").value == 1) {
                 document.getElementById("manualDocumentPath").placeholder = cloud.translate("MANUALWEBDAVPATH");
@@ -389,8 +298,10 @@
             }
         },
 
+        /**
+        Show flyout for information on registration
+        */
         openRegisterFlyout: function (eventInfo) {
-            //Zeige Flyout
             WinJS.UI.SettingsFlyout.showSettings("register", "/settings/html/register.html");
         },
     });

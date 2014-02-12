@@ -84,6 +84,12 @@
             var resetButton = document.getElementById("resetButton");
             resetButton.addEventListener("click", this.resetAllSettings, false);
 
+            if (cloud.isLoggedIn) {
+                $('#showIntroTour').show().on("click", this.showTour);
+            } else {
+                $('#showIntroTour').hide();
+            }
+
             //Übersetzung aktualisieren
             cloud.functions.translateApp();
 
@@ -96,7 +102,7 @@
             var roamingSettings = appData.roamingSettings;
 
             roamingSettings.values["autoScroll"] = autoscrollCheckbox.checked;
-    },
+        },
 
         unload: function () {
             // Remove the handlers for dismissal
@@ -136,15 +142,18 @@
             }
         },
 
+        showTour: function(){
+            cloud.vars.roamingSettings.values["showIntroTour"] = true;
+            WinJS.Navigation.navigate("/pages/directoryView/directoryView.html");
+        },
+
         resetAllSettings: function () {
             cloud.functions.resetSettings();
-            //Leere Session Variablen --> Verhindere Dauer-Crash sofern ein Server gewählt wurde, alle Daten zurückgesetzt wurden und anschließend ohne neue Wahl des Servers ein Login stattfindet
-            //In diesem Fall wird ein Autologin versucht ohne dass ein BackendTyp in den Appdaten vorhanden ist...
-            //Daher Login wie angedacht verhindern sofern keine Serverauswahl getroffen wurde
+
+            // Reset session variables to avoid infinite crah on autologin
             cloud.session.selectedServer = "";
             cloud.session.selectedServerType
         },
-
     });
 
     function handleAltLeft(evt) {

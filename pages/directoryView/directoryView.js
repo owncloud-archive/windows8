@@ -44,38 +44,26 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  /*******************************************************************************/
-// Eine Einführung zur Seitensteuerelementvorlage finden Sie in der folgenden Dokumentation:
-// http://go.microsoft.com/fwlink/?LinkId=232511
 (function () {
     "use strict";
-
-    //Wenn Sie eine deklarative Bindung vornehmen (wie im vorherigen Beispiel), sollten Sie die WinJS.Binding.optimizeBindingReferences-Eigenschaft im App-Code immer auf true festlegen. (Tun Sie das nicht, können die Bindungen in Ihrer App zu Arbeitsspeicherverlust führen.)//
     WinJS.Binding.optimizeBindingReferences = true;
+    
+    // Shortcut variables
+    var self;
+    var listView; // listView winControl element
 
-    //Inhalte des aktuellen Verzeichnisses
-    var listViewItems;
-
-    //Errorhandling für Multi-Vorgänge
+    // Error handling for multiple transfers
     var deleteError = false;
     var restoreError = false;
     var downloadError = false;
     var uploadError = false;
-	
-	//Initialisierung neuer Geste
-    var newGesture;
 
-    //appViewState nicht verändern!
     var appViewState = Windows.UI.ViewManagement.ApplicationViewState;
-    var lastLayout;
-
-    //Code Editor / Preview
-    cloud.pages.directoryView.editor = null;
 
     var directoryView = WinJS.UI.Pages.define("/pages/directoryView/directoryView.html", {
-        // Diese Funktion wird immer aufgerufen, wenn ein Benutzer zu dieser Seite wechselt. Sie
-        // füllt die Seitenelemente mit den Daten der App auf.
+        // Initialize view
         ready: function (element, options) {
-            // Felder
+            // Make variables public
             cloud.pages.directoryView.downloadProgressBarLabel = document.getElementById("downloadProgressBarLabel");
             cloud.pages.directoryView.downloadProgressBar = document.getElementById("downloadProgressBar");
             cloud.pages.directoryView.uploadProgressBarLabel = document.getElementById("uploadProgressBarLabel");
@@ -88,9 +76,18 @@
             cloud.pages.directoryView.pdfZoomInButton = document.getElementById("pdfZoomInButton");
             cloud.pages.directoryView.pdfPageNumDOM = document.getElementById("pdfPageNum");
 
+            cloud.pages.directoryView.editor = null;
+            cloud.pages.directoryView.pdfDoc = null;
+            cloud.pages.directoryView.pdfPageNum = null;
+            cloud.pages.directoryView.newGesture = true;
+
             cloud.pages.directoryView.currentSortType = false;
-            cloud.pages.directoryView.currentListLayout = false;
-            // Funktionen
+            cloud.pages.directoryView.listViewItems = null; // ListView items of files and folders
+            cloud.pages.directoryView.restoreError = false;
+            cloud.pages.directoryView.deleteError = false;
+            cloud.pages.directoryView.moveError = false;
+            cloud.pages.directoryView.moveErrorType = null;
+            
             cloud.pages.directoryView.updateAppbar = this.updateAppBar;
             cloud.pages.directoryView.navigateBackEvent = this.navigateBackEvent;
             cloud.pages.directoryView.navigateForwardEvent = this.navigateForwardEvent;
@@ -101,9 +98,10 @@
             cloud.pages.directoryView.sortBySizeDesc = this.sortBySizeDesc;
             cloud.pages.directoryView.displayDeleted = this.displayDeleted;
             cloud.pages.directoryView.restoreFileButtonEvent = this.restoreFileButtonEvent;
-            cloud.pages.directoryView.showHistory = this.showHistory;
+            cloud.pages.directoryView.showHistoryFlyout = this.showHistoryFlyout;
             cloud.pages.directoryView.cameraUpload = this.cameraUpload;
             cloud.pages.directoryView.uploadLocalFile = this.uploadLocalFile;
+            cloud.pages.directoryView.uploadFileInternal = this.uploadFile;
             cloud.pages.directoryView.uploadSharedFile = this.uploadSharedFile;
             cloud.pages.directoryView.createFolder = this.createFolder;
             cloud.pages.directoryView.deleteFileButtonEvent = this.deleteFileButtonEvent;
@@ -112,146 +110,127 @@
             cloud.pages.directoryView.downloadAndSaveFileButtonEvent = this.downloadAndSaveFileButtonEvent;
             cloud.pages.directoryView.renameFile = this.renameFile;
             cloud.pages.directoryView.sortByFlex = this.sortByFlex;
-            cloud.pages.directoryView.openShareMenu = this.openShareMenu,
+            cloud.pages.directoryView.openShareFlyout = this.openShareFlyout,
             cloud.pages.directoryView.cancelFileMover = this.leaveFileMover;
-            cloud.pages.directoryView.changeToGridLayout = this.changeToGridLayout;
-            cloud.pages.directoryView.changeToListLayout = this.changeToListLayout;
+            cloud.pages.directoryView.toggleLayout = this.toggleLayout;
+            cloud.pages.directoryView.displayLayout = this.displayLayout;
             cloud.pages.directoryView.pdfNavNext = cloud.functions.pdfGoNext;
             cloud.pages.directoryView.pdfNavBack = cloud.functions.pdfGoPrevious;
             cloud.pages.directoryView.pdfZoomIn = cloud.functions.pdfZoomIn;
             cloud.pages.directoryView.pdfZoomOut = cloud.functions.pdfZoomOut;
-            cloud.pages.directoryView.setPDFContext = this.setPDFContext;
+            cloud.pages.directoryView.pdfGoToPage = cloud.functions.pdfGoToPage;
+            cloud.pages.directoryView.setKeyboardContextPDF = this.setKeyboardContextPDF;
             cloud.pages.directoryView.updatePreview = this.updatePreview;
             cloud.pages.directoryView.restore = this.restoreFileButtonEvent;
             cloud.pages.directoryView.recognizeTextFromPicture = this.recognizeTextFromPicture;
+            cloud.pages.directoryView.setKeyboardContextDirectoryView = this.setKeyboardContextDirectoryView;
+            
+            // Prepare initial appearance
+            document.getElementById("pdfPreview").style.maxHeight = document.getElementById("contentGrid").clientHeight;
+            document.getElementById("pdfControls").style.display = "none";
+            document.getElementById("pdfPreview").style.display = "none";
 
+            // Fill variables
+            listView = document.getElementById("directoryView").winControl;
+            self = this;
 
-            cloud.pages.directoryView.pdfGoToPage = function () {
-                var pageNum = cloud.pages.directoryView.pdfPageNumDOM.value;
-                if (pageNum >= 1 && pageNum <= cloud.pages.directoryView.pdfDoc.numPages) {
-                    cloud.pages.directoryView.pdfPageNum = pageNum;
-                    cloud.functions.renderPage(pageNum, cloud.pages.directoryView.pdfCurrentZoom);
-                }
-            };
-
-            //PDF Steuerelemente
-            $(cloud.pages.directoryView.pdfBackButton).addClass("invisible");
-            $(cloud.pages.directoryView.pdfNextButton).addClass("invisible");
-            $(cloud.pages.directoryView.pdfGoToPageButton).addClass("invisible");
-            $(cloud.pages.directoryView.pdfZoomOutButton).addClass("invisible");
-            $(cloud.pages.directoryView.pdfZoomInButton).addClass("invisible");
-            $(cloud.pages.directoryView.pdfPageNumDOM).addClass("invisible");
-
-            document.getElementById("pdfControls").style.visibility = "hidden";
-            document.getElementById("pdfPreview").style.visibility = "hidden";
-
-            //Selektion leere Button immer ausblenden
-            $('#clearSelectionButton').addClass("invisible");
-            $('#emptyDirectory').addClass("invisible");
-
-            //Sessiondaten wiederherstellen
-            //Gespeicherte Sortierung wiederherstellen
+            /* Restore session data */
+            // List sort type
             if (WinJS.Application.sessionState.currentSortType) {
                 cloud.pages.directoryView.currentSortType = WinJS.Application.sessionState.currentSortType;
             } else {
-                //Wenn es keine Sessiondaten über die Sortierreihenfolge gibt, wird nach dem namen sortiert
-                cloud.pages.directoryView.currentSortType = "name";
+                cloud.pages.directoryView.currentSortType = "name"; // default
             }
 
-            //ListLayout wiederherstellen
-            var appData = Windows.Storage.ApplicationData.current;
-            var roamingSettings = appData.roamingSettings;
-            if (roamingSettings.values["currentLayout"]) {
-                cloud.pages.directoryView.currentLayout = roamingSettings.values["currentLayout"];
-                //Ansichtsänderungsbuttons ausblenden
-                document.getElementById("changeToGridLayout").style.visibility = "visible";
-                document.getElementById("changeToListLayout").style.visibility = "hidden";
+            // DirectoryView layout 
+            if (cloud.vars.roamingSettings.values["currentLayout"]) {
+                cloud.pages.directoryView.currentLayout = cloud.vars.roamingSettings.values["currentLayout"];
             } else {
-                cloud.pages.directoryView.currentLayout = "GridLayout";
-                document.getElementById("changeToGridLayout").style.visibility = "hidden";
-                document.getElementById("changeToListLayout").style.visibility = "visible";
+                cloud.pages.directoryView.currentLayout = "GridLayout"; //default on startup
             }
+            this.displayLayout();
 
-            //APPBAR
+            // Other appearance
+            $('#clearSelectionButton').addClass("invisible");
+            $('#emptyDirectory').addClass("invisible");
+
+            // Initialize app bar
             var appBarDiv = document.getElementById("appbar");
             var appbar = document.getElementById("appbar").winControl;
-            //Verberge Appbar Knöpfe
-            appbar.hideCommands(appBarDiv.querySelectorAll('button'));
 
-            /*###############################################################################################*/
-
+            // Register events to change height according to appbar state (otherwise scrollbar issues)
             $(appbar).on('beforehide', function () {
                 var viewstateAppbar = Windows.UI.ViewManagement.ApplicationView.value;
-                if (viewstateAppbar == Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-                }
-                else {
+                if (viewstateAppbar != Windows.UI.ViewManagement.ApplicationViewState.snapped) {
                     $('.directoryView section[role=main]').css('height', '100%');
                     $('.contentGrid').css('height', 'calc(100% - 130px)');
                 }
             });
             $(appbar).on('beforeshow', function () {
                 var viewstateAppbar = Windows.UI.ViewManagement.ApplicationView.value;
-                if (viewstateAppbar == Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-
-                }
-                else {
+                if (viewstateAppbar != Windows.UI.ViewManagement.ApplicationViewState.snapped) {
                     $('.directoryView section[role=main]').css('height', 'calc(100% - 100px)');
                     $('.contentGrid').css('height', 'calc(100% - 30px)');
                 }
-
             });
-            /*###############################################################################################*/
 
-            ////////////////////////////KONTEXTWAHL////////////////////////////
-            //Filepicker (=An die App soll geteilt werden)
-            if (cloud.context.fileMover.isFileMover || cloud.context.isShareTarget) { //Reine Ordneransicht mit Appbar Knöpfen
+            ////////////////////////////CONTEXTS////////////////////////////
+            // Set default values
+            navbar.disabled = false;
+            appbar.disabled = false;
+            appbar.sticky = false;
+
+            // Filepicker (= send content to this app)
+            if (cloud.context.fileMover.isFileMover || cloud.context.isShareTarget) {
+                self.resetAppBar();
+
+                // Show only directory structure and appbar
                 document.getElementById("syncButton").style.display = "none";
                 document.getElementById("changeLayout").style.display = "none";
                 document.getElementById("sortButton").style.display = "none";
-
                 navbar.disabled = true;
 
-                //Appbar dauerhaft einblenden
+                // Force app bar
                 appbar.sticky = true;
                 appbar.addEventListener("afterhide", function () { appbar.show(); });
                 appbar.show();
 
-                if (cloud.context.fileMover.isFileMover) {  //Datei soll verschoben werden
+                // Set buttons and keyboard according to context
+                if (cloud.context.fileMover.isFileMover) {
                     appbar.showCommands(appBarDiv.querySelectorAll('.fileCopied'));
 
-                    //Dateiverschieben Tastatur-Kontext
                     cloud.setKeystrokeContext({
                         context: "fileMover",
                         actions: {
                             home: cloud.pages.directoryView.goToHomePage,
                             navigateBack: cloud.pages.directoryView.navigateBackEvent,
                             navigateForward: cloud.pages.directoryView.navigateForwardEvent,
-                            paste: directoryView.prototype.pasteObject,
+                            paste: self.pasteObject,
                             cancel: cloud.pages.directoryView.cancelFileMover,
                         }
                     });
-                } else if (cloud.context.isShareTarget) { //App wurde als Freigabeziel gewählt und Datei soll hochgeladen werden
+                } else if (cloud.context.isShareTarget) {
+                    // This app is share target of other app to upload file
                     appbar.showCommands(appBarDiv.querySelectorAll('.upload'));
-                    //document.getElementById("takePictureButton").style.display = "none";
 
-                    //Dateiverschieben Tastatur-Kontext
                     cloud.setKeystrokeContext({
                         context: "shareTarget",
                         actions: {
                             home: cloud.pages.directoryView.goToHomePage,
                             navigateBack: cloud.pages.directoryView.navigateBackEvent,
                             navigateForward: cloud.pages.directoryView.navigateForwardEvent,
-                            upload: directoryView.prototype.uploadSharedFile,
+                            upload: self.uploadSharedFile,
                         }
                     });
                 }
-            } else if (cloud.context.isSavePicker) { //FileSavePicker (FilePicker Buttons one Appbar)
+
+            } else if (cloud.context.isSavePicker) {
+                // FileSavePicker without app bar
                 appbar.disabled = true;
                 navbar.disabled = true;
 
                 cloud.context.pickerContext.addEventListener("targetfilerequested", this.onTargetFileRequested, false);
 
-                //Dateiverschieben Tastatur-Kontext
                 cloud.setKeystrokeContext({
                     context: "savePicker",
                     actions: {
@@ -260,12 +239,12 @@
                         navigateForward: cloud.pages.directoryView.navigateForwardEvent,
                     }
                 });
-            } else if (cloud.context.isOpenPicker) { //FileOpenPicker (FilePicker Buttons one Appbar)
 
+            } else if (cloud.context.isOpenPicker) {
+                //FileOpenPicker without app bar
                 appbar.disabled = true;
                 navbar.disabled = true;
 
-                //Dateiverschieben Tastatur-Kontext
                 cloud.setKeystrokeContext({
                     context: "openPicker",
                     actions: {
@@ -274,197 +253,189 @@
                         navigateForward: cloud.pages.directoryView.navigateForwardEvent,
                     }
                 });
-            } else { //Normaler Kontext --> Dateibrowser
-                appbar.disabled = false;
+            } else {
+                // Normal context: File browser
+                this.initializeDirectoryViewContext();
 
-                ///////////Ereignishandler///////////
-
-                //Freigeben von Inhalten aus DirectoryView
-                var dataTransferManager = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
-                dataTransferManager.addEventListener("datarequested", this.dataRequested);
-
-                document.getElementById("pdfPageNum").addEventListener("click", function () {
-                    cloud.setKeystrokeContext({
-                        context: "pdfPageNum",
-                        actions: {
-                            home: cloud.pages.directoryView.goToHomePage,
-                            zoomIn: cloud.pages.directoryView.pdfZoomIn,
-                            zoomOut: cloud.pages.directoryView.pdfZoomOut,
-                            pageBtn: cloud.pages.directoryView.pdfGoToPage,
-                            navigateBack: cloud.pages.directoryView.navigateBackEvent,
-                            navigateForward: cloud.pages.directoryView.navigateForwardEvent,
-                            deleteFileButtonEvent: function () { document.getElementById('deleteFileButtonAppbar').click(); },
-                        }
-                    });
-                });
-                document.getElementById("pdfPageNum").addEventListener("focusout", function () {
-                    cloud.pages.directoryView.setPDFContext();
-                });
-
-                //////////Tastatur-Kontexte//////////////
-                // Standard-Kontext im Dateibrowser
-                this.setDirectoryViewContext();
-
-                // Objekt umbenennen Tastatur-Kontext
-                document.getElementById("renameFlyout").addEventListener("beforeshow", function () {
-                    cloud.setKeystrokeContext({
-                        context: "directoryRename",
-                        actions: {
-                            //Hier ist scheinbar (anders als beim delete Flyout) ein Shotcut nötig, da sonst das Bestätigen mit Enter nicht möglich ist...
-                            renameConfirm: cloud.pages.directoryView.renameFile,
-                        }
-                    });
-                }, false);
-                document.getElementById("renameFlyout").addEventListener("afterhide", function () { cloud.getPreviousKeystrokeContext(); }, false);
-                //EventListener hier nicht nötig, da Keyboard Shortcut gesetzt wird und dort der Listener hinzugefügt wird
-                //document.getElementById("renameButton").addEventListener("click", this.renameFile, false);
-
-                // Objekt löschen Tastatur-Kontext
-                document.getElementById("deleteFlyout").addEventListener("beforeshow", function () {
-                    cloud.setKeystrokeContext({
-                        context: "directoryDelete",
-                        actions: {
-                            //Nicht nötig, da einziger Button im Flyout bereits durch Enter ausgelöst werden kann --> addEventListener dafür nötig
-                            //deleteConfirm: cloud.pages.directoryView.deleteFileButtonEvent,
-                        }
-                    });
-                }, false);
-                document.getElementById("deleteFlyout").addEventListener("afterhide", function () { cloud.getPreviousKeystrokeContext(); }, false);
-                document.getElementById("confirmDeleteButton").addEventListener("click", this.deleteFileButtonEvent, false);
-
-                // Ordner erstellen Tastatur-Kontext
-                document.getElementById("createFolderFlyout").addEventListener("beforeshow", function () {
-                    cloud.setKeystrokeContext({
-                        context: "directoryCreateFolder",
-                        actions: {
-                            //Nicht nötig, da einziger Button im Flyout bereits durch Enter ausgelöst werden kann --> addEventListener dafür nötig
-                            //folderCreateConfirm: cloud.pages.directoryView.createFolder,
-                        }
-                    });
-                }, false);
-                document.getElementById("createFolderFlyout").addEventListener("afterhide", function () { cloud.getPreviousKeystrokeContext(); }, false);
-                document.getElementById("createFolder").addEventListener("click", this.createFolder, false);
-
-                //Fokus wieder auf das oberste Element setzten, nachdem Appbar versteckt wurde
-                appbar.addEventListener("afterhide", this.setListViewFocus);
-
-                //MediaPlayer Control Events
-                // Declare a variable that you will use as an instance of an object
-                var mediaControls;
-
-                // Assign the button object to mediaControls
-                mediaControls = Windows.Media.MediaControl;
-
-                // Add an event listener for the Play, Pause Play/Pause toggle button
-                mediaControls.addEventListener("playpausetogglepressed", this.playpausetoggle, false);
-                mediaControls.addEventListener("playpressed", this.playbutton, false);
-                mediaControls.addEventListener("pausepressed", this.pausebutton, false);
-				
-				//Gesten Initialisierung
-                //Ziel für die Gestensteuerung setzen
-                this.setTarget("pdfPreview");
-                
-                //Flag für neue Geste
-                newGesture = true;
-				
-                //Aktuallisisere die Appbar 6 Sekunden nach Abschluss der Initialisierung um auf getFunctionality zu warten
-                //Try nötig, da bei schnellem Logout sonst die App Crasht
-                setTimeout(function () { try { cloud.pages.directoryView.updateAppbar } catch (e) { } }, 6000)
+                // Refresh appbar 6 seconds after initialization to wait for getFunctionality
+                // Use TRY to avoid app crash after fast logout
+                // TODO find better way
+                setTimeout(function () { try { cloud.pages.directoryView.updateAppbar } catch (e) { /* do nothing */ } }, 6000);
             }
 
             
-
-            ///////Allgemeine Initialisierung (für alle Kontexte)///////
-
-            document.getElementById("changeToGridLayout").addEventListener("click", this.changeToGridLayout, false);
-            document.getElementById("changeToListLayout").addEventListener("click", this.changeToListLayout, false);
-
-            //Verhindern von Anzeigeflakern der Vorschau
+            /* General initialization for all contexts */
+            document.getElementById("toggleLayout").addEventListener("click", this.toggleLayout, false);
+            
+            // Avoid flickering in document preview
             document.getElementById("previewHeader").style.visibility = 'hidden';
             document.getElementById("previewTag").style.visibility = 'hidden';
-            //Der PreviewHeaderContainer existiert nicht mehr
             document.getElementById("previewHeaderContainer").style.visibility = 'hidden';
             document.getElementById("backButton").style.visibility = 'hidden';
             document.getElementById("forwardButton").style.visibility = 'hidden';
 
-            //Verbergen des allgemeinen Ladebalkens
+            // Hide transfer progress bar
             document.getElementById("operationPending").style.visibility = 'hidden';
 
-            //List-View initialisieren
+            // Initialize list view
             this.initListView();
             document.getElementById("directoryProgressRing").style.visibility = 'visible';
-            directoryView.prototype.loadFolder();
+            this.loadFolder();
 
-            // Navigation vorbereiten und Button entfernen
+            // Prepare navigation and remove windows navigation button
             WinJS.Navigation.history.backStack = [];
             $("header[role=banner] .win-backbutton").attr("disabled", "disabled");
 
-            //SortierButton Events
-            document.getElementById("sortButton").addEventListener("click", this.showSortFlyout, false);
+            // Sort button event
+            document.getElementById("sortButton").addEventListener("click", this.openSortFlyout, false);
         },
 
         unload: function () {
             var dataTransferManager = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dataTransferManager.removeEventListener("datarequested", this.dataRequested);
 
-            if (cloud.context.isSavePicker) { //FileSavePicker
+            if (cloud.context.isSavePicker) {
                 cloud.context.pickerContext.removeEventListener("targetfilerequested", this.onTargetFileRequested, false);
             }
         },
 
-        //Appcontext auf DirectoryView-Startcontext setzen
-        setDirectoryViewContext: function () {
-            cloud.setKeystrokeContext({
+        // initialize default directoryView context
+        initializeDirectoryViewContext: function () {
+            // Share content out of directoryView
+            var dataTransferManager = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
+            dataTransferManager.addEventListener("datarequested", this.dataRequested);
+
+            // Register general event listeners which do not depend on a context
+            document.getElementById("pdfPageNum").addEventListener("click", function () {
+                cloud.setKeystrokeContext({
+                    context: "pdfPageNum",
+                    actions: {
+                        home: cloud.pages.directoryView.goToHomePage,
+                        zoomIn: cloud.pages.directoryView.pdfZoomIn,
+                        zoomOut: cloud.pages.directoryView.pdfZoomOut,
+                        pageBtn: cloud.pages.directoryView.pdfGoToPage,
+                        navigateBack: cloud.pages.directoryView.navigateBackEvent,
+                        navigateForward: cloud.pages.directoryView.navigateForwardEvent,
+                        deleteFileButtonEvent: function () { document.getElementById('deleteFileButtonAppbar').click(); },
+                    }
+                });
+            });
+
+            document.getElementById("pdfPageNum").addEventListener("focusout", function () {
+                cloud.pages.directoryView.setKeyboardContextPDF();
+            });
+
+            /*document.getElementById("deleteFlyout").addEventListener("beforeshow", function () {
+                cloud.setKeystrokeContext({
+                    context: "directoryDelete",
+                    actions: {
+                        // Not necessary as Enter key will automatically call the button
+                        // deleteConfirm: cloud.pages.directoryView.deleteFileButtonEvent,
+                    }
+                });
+            }, false);
+            document.getElementById("deleteFlyout").addEventListener("afterhide", function () {
+                    cloud.getPreviousKeystrokeContext(); // Not necessary due to above
+            }, false);*/
+
+            document.getElementById("confirmDeleteButton").addEventListener("click", this.deleteFileButtonEvent, false);
+            
+
+            document.getElementById("renameFlyout").addEventListener("beforeshow", function () {
+                cloud.setKeystrokeContext({
+                    context: "directoryRename",
+                    actions: {
+                        renameConfirm: cloud.pages.directoryView.renameFile, // In contrast to delete flyout it is necessary here
+                    }
+                });
+            }, false);
+
+            document.getElementById("renameFlyout").addEventListener("afterhide", function () {
+                cloud.getPreviousKeystrokeContext();
+            }, false);
+            
+            document.getElementById("createFolderFlyout").addEventListener("beforeshow", function () {
+                cloud.setKeystrokeContext({
+                    context: "directoryCreateFolder",
+                    actions: {
+                        // Not necessary as Enter key will automatically call the button
+                        //folderCreateConfirm: cloud.pages.directoryView.createFolder,
+                    }
+                });
+            }, false);
+
+            document.getElementById("createFolderFlyout").addEventListener("afterhide", function () {
+                cloud.getPreviousKeystrokeContext();
+            }, false);
+            document.getElementById("createFolder").addEventListener("click", this.createFolder, false);
+
+            // Reset focus on top element after hiding app bar
+            appbar.addEventListener("afterhide", this.setListViewFocus);
+
+            // Initialize MediaPlayer
+            Windows.Media.MediaControl.addEventListener("playpausetogglepressed", this.playpausetoggle, false);
+            Windows.Media.MediaControl.addEventListener("playpressed", this.playbutton, false);
+            Windows.Media.MediaControl.addEventListener("pausepressed", this.pausebutton, false);
+
+            // Initialize gestures and set first keyboard context to normal mode
+            this.setGestureTarget("pdfPreview");
+
+            // Check if an introduction tour should be shown 
+            cloud.debug("Show a tour? " + cloud.vars.roamingSettings.values["showIntroTour"]);
+           // cloud.vars.roamingSettings.values["showIntroTour"] = true; /**** TODO remove after testing ****/
+            if (cloud.vars.roamingSettings.values["showIntroTour"] == null || cloud.vars.roamingSettings.values["showIntroTour"] == true) {
+                cloud.pages.introTour.startTour();
+            } else {
+                this.setKeyboardContextDirectoryView();
+            };
+        },
+
+        setKeyboardContextDirectoryView: function () {
+               cloud.setKeystrokeContext({
                 context: "directoryStart",
                 actions: {
-                    home: cloud.pages.directoryView.goToHomePage,
-                    logout: cloud.functions.logout,
-                    account: cloud.functions.showAccountSettings,
-                    navigateBack: cloud.pages.directoryView.navigateBackEvent,
-                    navigateForward: cloud.pages.directoryView.navigateForwardEvent,
+                    home:           cloud.pages.directoryView.goToHomePage,
+                    logout:         cloud.functions.logout,
+                    account:        cloud.functions.showAccountSettings,
+                    navigateBack:   cloud.pages.directoryView.navigateBackEvent,
+                    navigateForward:cloud.pages.directoryView.navigateForwardEvent,
                     clearSelection: cloud.pages.directoryView.clearSelection,
-                    refresh: cloud.pages.directoryView.loadFolder,
-                    sortByName: cloud.pages.directoryView.sortByName,
+                    refresh:        cloud.pages.directoryView.loadFolder,
+                    sortByName:     cloud.pages.directoryView.sortByName,
                     sortBySizeDesc: cloud.pages.directoryView.sortBySizeDesc,
                     displayDeleted: cloud.pages.directoryView.displayDeleted,
-                    restoreFile: cloud.pages.directoryView.restoreFileButtonEvent,
-                    showHistory: cloud.pages.directoryView.showHistory,
-                    cameraUpload: cloud.pages.directoryView.cameraUpload,
-                    upload: cloud.pages.directoryView.uploadLocalFile,
-                    moveObject: cloud.pages.directoryView.moveObject,
-                    openFile: cloud.pages.directoryView.openFileButtonEvent,
-                    download: cloud.pages.directoryView.downloadAndSaveFileButtonEvent,
-                    ocr: cloud.pages.directoryView.recognizeTextFromPicture,
+                    restoreFile:    cloud.pages.directoryView.restoreFileButtonEvent,
+                    showHistory:    cloud.pages.directoryView.showHistoryFlyout,
+                    cameraUpload:   cloud.pages.directoryView.cameraUpload,
+                    upload:         cloud.pages.directoryView.uploadLocalFile,
+                    moveObject:     cloud.pages.directoryView.moveObject,
+                    openFile:       cloud.pages.directoryView.openFileButtonEvent,
+                    download:       cloud.pages.directoryView.downloadAndSaveFileButtonEvent,
+                    ocr:            cloud.pages.directoryView.recognizeTextFromPicture,
                     rename: function () {
-                        var listView = document.getElementById("directoryView").winControl;
                         if (listView.selection.count() == 1) {
                             document.getElementById('renameButtonAppbar').click();
                         }
                     },
-                    share: cloud.pages.directoryView.openShareMenu,
+                    share: cloud.pages.directoryView.openShareFlyout,
                     showFileInfo: function () {
-                        var listView = document.getElementById("directoryView").winControl;
                         if (listView.selection.count() == 1) {
-                            var indices = listView.selection.getIndices();
-                            if (listViewItems.getAt(indices[0]).fileType != "folder") {
+                            if (self.getSelectedItem().fileType != "folder") {
                                 document.getElementById('fileInfoButtonAppbar').click();
                             }
                         }
                     },
                     deleteFileButtonEvent: function () {
-                        var listView = document.getElementById("directoryView").winControl;
                         if (listView.selection.count() == 1) {
                             document.getElementById('deleteFileButtonAppbar').click();
                         }
                     },
                     createFolder: function () { document.getElementById('addFolderButtonAppbar').click(); },
-                    //createFolder: function () { document.getElementById('newFolderButton').click(); },
                 }
             });
         },
 
-        //Appcontext auf PDFContext setzen
-        setPDFContext: function () {
+        setKeyboardContextPDF: function () {
             cloud.setKeystrokeContext({
                 context: "pdf",
                 actions: {
@@ -484,7 +455,7 @@
                     sortBySizeDesc: cloud.pages.directoryView.sortBySizeDesc,
                     displayDeleted: cloud.pages.directoryView.displayDeleted,
                     restoreFile: cloud.pages.directoryView.restoreFileButtonEvent,
-                    showHistory: cloud.pages.directoryView.showHistory,
+                    showHistory: cloud.pages.directoryView.showHistoryFlyout,
                     cameraUpload: cloud.pages.directoryView.cameraUpload,
                     upload: cloud.pages.directoryView.uploadLocalFile,
                     moveObject: cloud.pages.directoryView.moveObject,
@@ -492,36 +463,39 @@
                     download: cloud.pages.directoryView.downloadAndSaveFileButtonEvent,
                     ocr: cloud.pages.directoryView.recognizeTextFromPicture,
                     rename: function () {
-                        var listView = document.getElementById("directoryView").winControl;
                         if (listView.selection.count() == 1) {
                             document.getElementById('renameButtonAppbar').click();
                         }
                     },
-                    share: cloud.pages.directoryView.openShareMenu,
+                    share: cloud.pages.directoryView.openShareFlyout,
                     showFileInfo: function () {
-                        var listView = document.getElementById("directoryView").winControl;
                         if (listView.selection.count() == 1) {
-                            var indices = listView.selection.getIndices();
-                            if (listViewItems.getAt(indices[0]).fileType != "folder") {
+                            if (self.getSelectedItem().fileType != "folder") {
                                 document.getElementById('fileInfoButtonAppbar').click();
                             }
                         }
                     },
                     deleteFileButtonEvent: function () {
-                        var listView = document.getElementById("directoryView").winControl;
                         if (listView.selection.count() == 1) {
                             document.getElementById('deleteFileButtonAppbar').click();
                         }
                     },
                     createFolder: function () { document.getElementById('addFolderButtonAppbar').click(); },
-                    //Buttons oben links
-                    //createFolder: function () { document.getElementById('newFolderButton').click(); },
                 }
             });
         },
 
-        ///////AUDIO & VIDEO CONTROLLS///////
-        // The event handler for the play/pause button
+        // Retrieve the selected item from the listView
+        getSelectedItem: function () {
+            var indices = listView.selection.getIndices();
+            if (indices.length > 0) {
+                return cloud.pages.directoryView.listViewItems.getAt(indices[0]);
+            } else {
+                return [];
+            }
+        },
+
+        // Event handler for the play/pause button
         playpausetoggle: function () {
             if (mediaControls.isPlaying === true) {
                 document.getElementById("audiotag").pause();
@@ -532,35 +506,31 @@
             }
         },
 
-        // The event handler for the pause button
+        // Event handler for the pause button
         pausebutton: function () {
             document.getElementById("audiotag").pause();
             document.getElementById("videotag").pause();
         },
 
-        // The event handler for the play button
+        // Event handler for the play button
         playbutton: function () {
             document.getElementById("audiotag").play();
             document.getElementById("videotag").play();
         },
 
-        ///////AUDIO & VIDEO CONTROLLS ENDE///////
-
-        //Teilen von Inhalten an andere Apps (Charmbar-Share-Button-Event)
+        // Sharing content to other apps through charmbar share button
         dataRequested: function (e) {
-            //Lade Datei Temporär runter sofern diese noch nicht in der aktuellen Ansicht vorhanden ist
-            //Durch das übergeben von request erkennt die downloadFileTemporary-Funktion, dass das request-Objekt genutzt werden soll um nach Abschluss des Downloads die Datei an die Charmbar weiter zu geben
-            //Außerdem wird der Titel und die Beschreibung der geteilten Datei über das request-Objekt an die Charmbar übergeben
-            directoryView.prototype.downloadFileTemporary(function () { }, function () { }, e.request);
+            // Download file temporarily. Parameter e.request allows the downloadFileTemporary function to pass the file
+            // to the charm bar after completion together with title and description
+            self.downloadFileTemporary(function () { }, function () { }, e.request);
         },
 
         /////// FILE SAVE PICKER STUFF ///////
 
-        //Empfangen von Dateien aus anderen Apps indem diese App als Speicherort ausegwählt wird
-        //http://msdn.microsoft.com/de-de/library/windows/apps/windows.storage.pickers.provider.targetfilerequestedeventargs
+        // Get file from other apps by selecting this app as target to save to
+        // http://msdn.microsoft.com/de-de/library/windows/apps/windows.storage.pickers.provider.targetfilerequestedeventargs
         onTargetFileRequested: function (e) {
             var deferral;
-            //Warten bis unsere App eine leere Datei für die Quell-App bereitgestellt hat
             deferral = e.request.getDeferral();
 
             // Create a file to provide back to the Picker
@@ -568,11 +538,11 @@
 
                 // Assign the resulting file to the targetFile property and complete the deferral to indicate success
                 e.request.targetFile = file;
-                //Datei wurde bereitgestellt, Quellapp kann Datei nun beschreiben
+                // File was provided, source app can now write file
                 deferral.complete();
 
-                //Warte darauf, dass Datei wirklich fertig bereitgestellt wurde und lade sie danach hoch
-                directoryView.prototype.checkFileComplete(file);
+                // Wait for completion and upload file afterwards
+                self.checkFileComplete(file);
 
             }, function () {
                 // Display a dialog indicating to the user that a corrective action needs to occur
@@ -585,27 +555,38 @@
             });
         },
 
-        //Prüfen ob Datei von der Quellapp komplett bereitgestellt wurde und Lade diese erst nach Abschluss hoch --> Leider teilt diese uns das nicht mit...
-        //Problem war: Der FileSavePicker ist nicht darauf ausgelegt auf Dateien zu warten und danach noch was mit dieser Datei zu machen.
-        //Der Picker geht normalerweise davon aus, dass sobald ein Speicherort in der App ausgewählt wurde (hier eine temporäre Datei unserer App)
-        //die Operation abgeschlossen ist. Bei uns muss aber erst nach Abschluss der Bereitstellung von der Quellapp (z.B: mit vorherigem Download)
-        //der Upload durchgeführt werden. Ohne diese Funktion würde eine leere Datei hochgeladen.
-        checkFileComplete: function (file) {
-            directoryView.prototype.sleep(2000);
+        /* 
+        Check if a file provided by another app is completly written to location -> No notification will happen!
+        Problem: FileSavePicker normally doesn't wait for files to be written and perform actions afterwards! Normally, 
+        selecting a target location (here, a temporary file) completes the operation. But we have to wait for a complete file
+        otherwise an empty or corrupted file gets uploaded.
+        To avoid infinite sleep for empty files, limit the amount of iterations
+        TODO find a better way?
+        */
+        checkFileComplete: function (file, remaining) {
+            // Check init and exit to avoid loop
+            if (remaining == null) {
+                remaining = 5;
+            } else if (remaining == 0) {
+                return;
+            }
+
+            // Delay and upload if file is not empty
+            self.sleep(2000);
             file.getBasicPropertiesAsync().then(
                 function (basicProperties) {
                     if (basicProperties.size > 0) {
-                        directoryView.prototype.uploadFile(cloud.getNavigationPathCurrent(), file, basicProperties.size, function () { }, function () { });
+                        self.uploadFile(cloud.getNavigationPathCurrent(), file, basicProperties.size, function () { }, function () { });
                     } else {
-                        directoryView.prototype.checkFileComplete(file);
+                        self.checkFileComplete(file, --remaining);
                     }
                 },
                 function () {
-                    directoryView.prototype.checkFileComplete(file);
+                    self.checkFileComplete(file, --remaining);
                 });
         },
 
-        //Ermöglicht Verzögerung bei Ready-Check im FileSavePicker
+        // Delay processing
         sleep: function (millis) {
             var date = new Date();
             var curDate = null;
@@ -613,21 +594,16 @@
             do { curDate = new Date(); }
             while (curDate - date < millis);
         },
-
-        ///////FILE SAVE PICKER STUFF ENDE///////
-
-
+        ///////END FILE SAVE PICKER STUFF///////
 
         ///////FILE OPEN PICKER STUFF/////// 
-        //Selection-Changed Event --> Fürgt im FileOpenPicker Dateien zum Basket hinzu
+        // Special selection-Changed Event to add files to a basket in the FileOpenPicker
         addFileToBasket: function () {
-            var listView = document.getElementById("directoryView").winControl;
             if (listView.selection.count() == 1) {
-                var indices = listView.selection.getIndices();
-                var selectedItem = listViewItems.getAt(indices[0]);
+                var selectedItem = self.getSelectedItem();
                 if (selectedItem.fileType != "folder" && !selectedItem.deleted) {
-                    //Lade Datei temorär herunter
-                    directoryView.prototype.downloadFileTemporary(
+                    // Download files temporarily
+                    self.downloadFileTemporary(
                         function (fileToAdd) {
                             // Programmatically add the file to the basket 
                             // Only supported FileTypes will work
@@ -657,844 +633,672 @@
                 }
             }
         },
+        ///////END FILE OPEN PICKER STUFF/////// 
 
-        ///////FILE OPEN PICKER STUFF ENDE/////// 
-
-        /*#############################################       Layout ändern - Anfang         ##############################################*/
-
-        //##################################################################################
-        //UNUSED: Parallax Scrolling - Später implementieren
-        attachParallax: function (listQuery) {
-            var listViewDOM = document.querySelector(listQuery);
-            var listView = listViewDOM.winControl;
-            var backGroundHolder = document.querySelector("#body");
-            document.querySelector(listQuery + " .win-viewport").addEventListener("scroll", function (e) {
-                setImmediate(function () {
-                    backGroundHolder.style["background-position-x"] =
-                     -((listViewDOM.scrollLeft / listViewDOM.scrollWidth) *
-                        listViewDOM.clientWidth * 0.2) + "px";
-                });
-            });
-        },
-
+        // Change layout according to display style
         updateLayout: function (element, viewState, lastViewState) {
             var listView = element.querySelector("#directoryView").winControl;
-            if (lastViewState !== viewState) {
-                if (viewState === appViewState.snapped) {
-                    //this.initializeLayout(listView, viewState);
-                    directoryView.prototype.changeToListLayout();
-                    document.getElementById("sectionWrap").style.height = 100 + "%";
-                    document.getElementById("contentGrid").style.height = 100 + "%";
-                    
 
-                }
-                else {
-                    /*Wiederherstellen des letzten aktiven Layout in der
-                    landscape- oder filled-Ansicht.*/
-                    if (lastLayout == "GridLayout") {
-                        cloud.pages.directoryView.currentLayout = "GridLayout";
-                        directoryView.prototype.changeToGridLayout();
-                    }
+            if (lastViewState === viewState) return; // nothing to change
 
-                    else {
-                        cloud.pages.directoryView.currentLayout = "ListLayout";
-                        directoryView.prototype.changeToListLayout();
-                    }
-                    document.getElementById("sectionWrap").style.height = "calc(100% - 100px)";
-                    document.getElementById("contentGrid").style.height = "calc(100% - 30px)";
-                }
+            if (viewState === appViewState.snapped) {
+                // Always list layout in snapped view
+                cloud.pages.directoryView.currentLayout = "ListLayout";
             }
-
-        },
-        
-        //Gridlayout für Verzeichnisansicht
-        changeToGridLayout: function (eventInfo) {
-            var currentState = Windows.UI.ViewManagement.ApplicationView.value;
-            var listView = document.getElementById("directoryView").winControl;
-            listView.layout = new WinJS.UI.GridLayout;
-
-
-            //In Session Daten Speichern
-            var appData = Windows.Storage.ApplicationData.current;
-            var roamingSettings = appData.roamingSettings;
-
-            cloud.pages.directoryView.currentLayout = "GridLayout";
-            roamingSettings.values["currentLayout"] = cloud.pages.directoryView.currentLayout;
-
-            if (currentState != appViewState.snapped) {
-                lastLayout = "GridLayout";
-            }
-
-            //Anpassen der Preview auf die neuen Maße
-            directoryView.prototype.updatePreview();
-            document.getElementById("changeToGridLayout").style.visibility = "hidden";
-            document.getElementById("changeToListLayout").style.visibility = "visible";
+            // Apply
+            cloud.pages.directoryView.displayLayout();
         },
 
-        //Listlayout für Verzeichnisansicht
-        changeToListLayout: function (eventInfo) {
-            var currentState = Windows.UI.ViewManagement.ApplicationView.value;
-            var listView = document.getElementById("directoryView").winControl;
-            listView.layout = new WinJS.UI.ListLayout({
-                horizontal: false
-            });
-
-            //In Session Daten Speichern
-            var appData = Windows.Storage.ApplicationData.current;
-            var roamingSettings = appData.roamingSettings;
-            cloud.pages.directoryView.currentLayout = "ListLayout";
-            roamingSettings.values["currentLayout"] = cloud.pages.directoryView.currentLayout;
-
-            if (currentState != appViewState.snapped) {
-                lastLayout = "ListLayout";
-            }
-
-
-            //Anpassen der Preview auf die neuen Maße
-            directoryView.prototype.updatePreview();
-
-            document.getElementById("changeToGridLayout").style.visibility = "visible";
-            document.getElementById("changeToListLayout").style.visibility = "hidden";
-
-           
-        },
-        /*#############################################       Layout ändern - ENDE         ##############################################*/
-
-
-        //Initiiere die ListView
-        initListView: function () {
-            var listView = document.getElementById("directoryView").winControl;
-
-            //Normaler File Browser Kontext
-            if (!cloud.context.isOpenPicker && !cloud.context.isSavePicker && !cloud.context.fileMover.isFileMover && !cloud.context.isShareTarget) {
-                // Event Handler registrieren
-                listView.addEventListener("selectionchanged", directoryView.prototype.selectionChangedEvent);
-
-                //Layout auswählen
-                if (cloud.pages.directoryView.currentLayout == "GridLayout") {
-                    directoryView.prototype.changeToGridLayout();
-
-                    document.getElementById("changeToGridLayout").style.visibility = "hidden";
-                    document.getElementById("changeToListLayout").style.visibility = "visible";
-
-                } else if (cloud.pages.directoryView.currentLayout == "ListLayout") {
-                    directoryView.prototype.changeToListLayout();
-
-                    document.getElementById("changeToGridLayout").style.visibility = "visible";
-                    document.getElementById("changeToListLayout").style.visibility = "hidden";
-                }
+        /*
+        Switch between ListLayout and GridLayout (considering context constraints)
+        */
+        toggleLayout: function(){
+            if (Windows.UI.ViewManagement.ApplicationViewState === appViewState.snapped ||
+                cloud.context.isShareTarget) {
+                // Always list layout in snapped view or share target
+                cloud.pages.directoryView.currentLayout = "ListLayout";
+            } else if (cloud.context.isOpenPicker || cloud.context.isSavePicker || cloud.context.fileMover.isFileMover) {
+                // Always grid layout in these contexts
+                cloud.pages.directoryView.currentLayout = "GridLayout";
             } else {
-                //Nur Einzelselektion sofern es ein FilePicker ist & keine mehrfach Selektion erlauben
+                var changeTo = cloud.pages.directoryView.currentLayout == "GridLayout" ? "ListLayout" : "GridLayout";
+                cloud.pages.directoryView.currentLayout = changeTo;
+            }
+            // Apply
+            cloud.pages.directoryView.displayLayout();
+        },
+
+        /*
+        Apply a given layout (ListLayout or GridLayout) provided in cloud.pages.directoryView.currentLayout
+        */
+        displayLayout: function () {
+            var changeTo = cloud.pages.directoryView.currentLayout;
+            var currentViewState = Windows.UI.ViewManagement.ApplicationView.value;
+            
+            //Save to session data
+            cloud.vars.roamingSettings.values["currentLayout"] = cloud.pages.directoryView.currentLayout;
+            
+            if (changeTo == "GridLayout" && currentViewState != appViewState.snapped) { // no grid layout in Snapview possible
+                // Switch symbol
+                document.getElementById("toggleLayout").innerText = ""; // list symbol
+                
+                // New layout
+                listView.layout = new WinJS.UI.GridLayout;
+                
+                // Resize
+               //XXX document.getElementById("sectionWrap").style.height = "100%";
+               // document.getElementById("contentGrid").style.height = "100%";
+
+            } else if (changeTo == "ListLayout") {
+                // Switch symbol
+                document.getElementById("toggleLayout").innerText = ""; // grid symbol
+
+                // New layout
+                listView.layout = new WinJS.UI.ListLayout({ horizontal: false });
+
+                // Resize
+             //XXX   document.getElementById("sectionWrap").style.height = "calc(100% - 100px)";
+             //   document.getElementById("contentGrid").style.height = "calc(100% - 30px)";
+            }
+
+            self.updatePreview();
+        },
+
+        // Initialize list of files and folders
+        initListView: function () {
+            if (!cloud.context.isOpenPicker && !cloud.context.isSavePicker && !cloud.context.fileMover.isFileMover && !cloud.context.isShareTarget) {
+                // Normal file browser context    
+                listView.addEventListener("selectionchanged", self.selectionChangedEvent);
+            } else {
+                // Only allow single selection in file pickers
                 listView.selectionMode = WinJS.UI.SelectionMode.single;
                 listView.swipeBehavior = WinJS.UI.SwipeBehavior.none;
 
-                if (cloud.context.isShareTarget) {
-                    //Automatisch ListLayout im ShareTarget --> Schmale Ansicht
-                    directoryView.prototype.changeToListLayout();
-                } else if (cloud.context.isOpenPicker || cloud.context.isSavePicker || cloud.context.fileMover.isFileMover) {
-                    //automatisch GridView wählen
-                    directoryView.prototype.changeToGridLayout();
-
-                    if (cloud.context.isOpenPicker) {
-                        //Eigenes Selectionchanged Event beim Open Picker --> Datei Temporär herunterladen und in Basket packen
-                        listView.addEventListener("selectionchanged", directoryView.prototype.addFileToBasket);
-                    }
-                }
+                // Change layout according to context
+                cloud.pages.directoryView.toggleLayout(); 
             }
-            //Navigationsevent registrieren
-            listView.addEventListener("iteminvoked", directoryView.prototype.invokeDirectoryItem, false);
+
+            if (cloud.context.isOpenPicker) {
+                // Special selectionchanged event: download file temporarily and add to basket
+                listView.addEventListener("selectionchanged", self.addFileToBasket);
+            }
+
+            // Always register navigation event
+            listView.addEventListener("iteminvoked", self.invokeDirectoryItem, false);
         },
 
-        //Fokus standartmäßig auf das erste Element der ListView setzen
+        // Set focus on first element of the listview element
         setListViewFocus: function () {
-            var listView = document.getElementById("directoryView").winControl;
-
-            //Erstes Element der listView focussieren
             listView.currentItem = { index: 0, hasFocus: true, showFocus: true }
         },
 
-        //Zeige gelöschte Dateien an
+        // Show deleted files and folders
         displayDeleted: function () {
             if (cloud.hasFunctionality({ functionkey: "getDeletedFiles" })) {
-                document.getElementById('appbar').winControl.hide();
-                document.getElementById('navbar').winControl.hide();
-
                 if (cloud.context.showDeletedFiles) {
                     cloud.context.showDeletedFiles = false;
-                    /*Verzeichnis aktualisieren. Nachdem gelöschte Dateien ausgeblendet werden
-                    gibt es ein Problem mit der Anzeige, welche zu diesem Zeitpunkt (in dem 
-                    die gelöschten Dateien ausgeblendet werden) noch die Breite hat, wie in dem Zustand
-                    wenn diese angezeigt werden.. Im Klartext gibt es also ansonsten rechts ne übelst große Lücke*/
-                    directoryView.prototype.loadFolder();
                     document.getElementById("showDeletedButton").style.textShadow = "";
-
-
                 } else {
                     cloud.context.showDeletedFiles = true;
                     document.getElementById("showDeletedButton").style.textShadow = "0 0 10px #fff";
-                    
                 }
-
-                //Selektionen leeren
-                cloud.pages.directoryView.selectedDirectoryContent = [];
-                WinJS.Application.sessionState.selectedDirectoryContent = [];
-
-                directoryView.prototype.loadFolder();
+                self.loadFolder();
             }
         },
 
-        //Lade den Inhalt des aktuell in der Back-Liste an erster Stelle stehenden Ordners
-        loadFolder: function () {
-            document.getElementById("directoryProgressRing").style.visibility = 'visible';
-            //Entscheiden ob gelöschte angezeigt werden
-            if (cloud.context.showDeletedFiles) {
-                var showDeleted = "both";
-            } else {
-                var showDeleted = "onlyCurrent";
+        /*
+        Fetch content of the current folder (first element of back navigation stack)
+        @param keepselection    (boolean)   *optional* keep the current selection
+        @param asyncLastPath    (string)    *optional* load folder after an asynchronous operation. Refreshes the view only if the originally displayed folder is still shown
+        */
+        loadFolder: function (keepselection, asyncLastPath) {
+            // Do nothing if the path has changed after an asynchronous operation
+            if (asyncLastPath && asyncLastPath != cloud.getNavigationPathCurrent()) {
+                return;
             }
-            //Ordnerinhalt laden
+
+            document.getElementById("directoryProgressRing").style.visibility = 'visible';
+
+            // Decide whether to show deleted files
+            var showDeleted = cloud.context.showDeletedFiles ? "both" : "onlyCurrent";
+
+            // Clear selection
+            if (keepselection !== true) {
+                cloud.pages.directoryView.selectedDirectoryContent = [];
+                WinJS.Application.sessionState.selectedDirectoryContent = [];
+            }
+
+            // Fetch folder content
             cloud.getDirectoryContent({
                 path: cloud.getNavigationPathCurrent(),
                 sortBy: cloud.pages.directoryView.currentSortType,
                 deletedFiles: showDeleted
             },
-                directoryView.prototype.reloadListView,
-                function (error) {
-                    if (error === "no such element") {
-                        //Es gab einen Fehler bei der Navigation --> Zurücksetzten zum root Verzeichnis
-                        cloud.resetNavigation();
-                        directoryView.prototype.loadFolder();
-                        cloud.functions.showMessageDialog("NOSUCHELEMENT");
-                    }
-                    document.getElementById("directoryProgressRing").style.visibility = 'hidden';
-                    cloud.showError();
-                });
+            self.reloadListView /* success */,
+            function (error) { /* error */
+                if (error === "NOSUCHELEMENT") {
+                    // Navigation error, reset to root directory
+                    cloud.resetNavigation();
+                    self.loadFolder();
+                    cloud.functions.showMessageDialog("NOSUCHELEMENT");
+                }
+                document.getElementById("directoryProgressRing").style.visibility = 'hidden';
+                cloud.showError();
+            });
         },
 
-        //Update der ListView Inhalte abhängig vom aktuellen Verzeichnis
+        // Fill ListView element if fetching data (in loadFolder) was successful
         reloadListView: function (directoryContent) {
-            //Loading Indicator anzeigen
-            document.getElementById("directoryProgressRing").style.visibility = 'visible';
-            var listView = document.getElementById("directoryView").winControl;
-            //Auslesen der Inhalte des aktuellen Ordners
             var items = [];
 
-            var index = 0;
-
             if (directoryContent.length == 0) {
-                //Zeige Nachricht im SPAN an wenn Verzeichnis leer ist
+                // Show message if directory is empty
                 $('#emptyDirectory').removeClass("invisible");
             } else {
-                //Überführen der Verzeichnisinhalte in Listview
                 $('#emptyDirectory').addClass("invisible");
+
+                // Transfer content to listview element
                 for (var i in directoryContent) {
-                    //Wenn es ein Ordner ist
+                    // Adapt directory content properties
+                    directoryContent[i].sizeText = directoryContent[i].bestText;
+                    directoryContent[i].hasTemporaryFile = false;
+                    directoryContent[i].deletedClass = directoryContent[i].deleted ? "directoryViewItem isDeleted" : "directoryViewItem";
+                    
                     if (directoryContent[i].isDir) {
-                        items[index] = {
-                            title: directoryContent[i].fileName,
-                            sizeText: "",
-                            fileName: directoryContent[i].fileName,
-                            path: directoryContent[i].path,
-                            dirName: directoryContent[i].dirName,
-                            fileType: "folder",
-                            sizeNum: 0,
-                            bNum: directoryContent[i].bNum,
-                            picture: cloud.getFileIcon({ fileType: "folder" }),
-                            hasTemporaryFile: false,
-                            temporaryFile: null,
-                            date: null,
-                            deleted: directoryContent[i].deleted,
-                            deletedId: directoryContent[i].deletedId,
-                            deletedClass: directoryContent[i].deleted ? "directoryViewItem isDeleted" : "directoryViewItem",
-                        };
-                        index++;
-                    }
-                        //Andere Dateitypen
-                        //Nur anzeigen wenn es nicht um eine reine Ordnerauswahl geht
-                    else if (!cloud.context.isSavePicker && !cloud.context.isShareTarget && !cloud.context.fileMover.isFileMover) {
+                        // If it is a folder add it directly
+                        items.push(directoryContent[i]);
+
+                    } else if (!cloud.context.isSavePicker && !cloud.context.isShareTarget && !cloud.context.fileMover.isFileMover) {    
+                        // Show files only if we are not in a folder selection context
+
+                        // FileOpenPicker: Only show files that are supported by the calling app
                         var supportedFileType = false;
+                        
+                        // http://msdn.microsoft.com/en-US/library/windows/apps/windows.storage.pickers.provider.fileopenpickerui.allowedfiletypes
                         if (cloud.context.isOpenPicker) {
-                            //Wenn es ein FileOpenPicker ist, dürfen nur Dateien angezeigt werden, die von der Anfragenden App unterstützt werden
-                            //http://msdn.microsoft.com/en-US/library/windows/apps/windows.storage.pickers.provider.fileopenpickerui.allowedfiletypes
-                            if (cloud.context.pickerContext.allowedFileTypes[0] == "*") {
-                                //Sofern alle Dateitypen zugelassen sind --> Alle anzeigen
-                                supportedFileType = true;
-                            } else {
-                                //Ansonsten teste für jede Datei, ob diese in allowedFileTypes enthalten ist
-                                for (var idx = 0; idx <= cloud.context.pickerContext.allowedFileTypes.size - 1; idx++) {
-                                    //Wenn Dateityp unterstützt wird
-                                    if (cloud.context.pickerContext.allowedFileTypes[idx] == directoryContent[i].fileType.toLowerCase()) {
-                                        supportedFileType = true;
-                                        break;
-                                    } else if (cloud.context.pickerContext.allowedFileTypes[idx] == "*") {
-                                        //Sofern "*" in allowedFileTypes, werden alle Dateitypen unterstützt
-                                        supportedFileType = true;
-                                        break;
-                                    }
+                            for (var idx = 0; idx <= cloud.context.pickerContext.allowedFileTypes.length - 1; idx++) {
+                                // Loop through allowed files types for match or "*"
+                                if (cloud.context.pickerContext.allowedFileTypes[idx] == "*" ||
+                                    cloud.context.pickerContext.allowedFileTypes[idx] == directoryContent[i].fileType.toLowerCase()) {
+                                    supportedFileType = true;
+                                    break;
                                 }
                             }
-                            //Sonst ist es der normale DirectoryView Kontext und alle Dateitypen können angezeigt werden
                         } else {
+                            // Normal directoryView context, all types allowed
                             supportedFileType = true;
                         }
 
                         if (supportedFileType) {
-                            items[index] = {
-                                title: directoryContent[i].fileName + directoryContent[i].fileType.toLowerCase(),
-                                sizeText: directoryContent[i].bestText,
-                                fileName: directoryContent[i].fileName,
-                                path: directoryContent[i].path,
-                                dirName: directoryContent[i].dirName,
-                                fileType: directoryContent[i].fileType.toLowerCase(),
-                                sizeNum: directoryContent[i].bestNum,
-                                bNum: directoryContent[i].bNum,
-                                picture: cloud.getFileIcon({ fileType: directoryContent[i].fileType.toLowerCase() }),
-                                hasTemporaryFile: false,
-                                temporaryFile: null,
-                                date: directoryContent[i].date,
-                                deleted: directoryContent[i].deleted,
-                                deletedId: directoryContent[i].deletedId,
-                                deletedClass: directoryContent[i].deleted ? "directoryViewItem isDeleted" : "directoryViewItem",
-                            };
-                            index++;
+                            items.push(directoryContent[i]);
                         }
                     }
                 }
             }
 
-            //Übertragen der Title-Liste in ListView
-            listViewItems = new WinJS.Binding.List(items);
+            // Create listView element from items
+            cloud.pages.directoryView.listViewItems = new WinJS.Binding.List(items);
+            listView.itemDataSource = cloud.pages.directoryView.listViewItems.dataSource;
+            self.setListViewFocus();
 
-            //ListView Listeninhalt übergeben
-            listView.itemDataSource = listViewItems.dataSource;
-            directoryView.prototype.setListViewFocus();
-            //Selektion wiederherstellen (ggf. aus Session Selektionen übernommen) --> Löst updatePreview aus
+            // Restore selection (from session selection)
             if (items.length > 0 && !cloud.context.isSavePicker && !cloud.context.isShareTarget && !cloud.context.fileMover.isFileMover) {
                 if (cloud.pages.directoryView.selectedDirectoryContent != []) {
                     listView.selection.set(cloud.pages.directoryView.selectedDirectoryContent);
                 }
             }
 
-            //Seitentitel aktualisieren
+            // Refresh page title
             var title = document.getElementById("pagetitle");
             var path = cloud.helper.convertPath({ path: cloud.getNavigationPathCurrent(), isDir: true });
-            //Wenn ein Ordner gewählt werden muss Überschrift zur Ordnerwahl ergänzen
+            $(title).parent().removeClass("folderview");
+
             if (cloud.context.isSavePicker || cloud.context.fileMover.isFileMover) {
+                // If folder needs to be selected
                 title.innerText = cloud.translate("CHOOSEDIRECTORY") + path.fileName;
+                $(title).parent().addClass("folderview"); // Need to CSS-resize header (title)
             } else if (cloud.context.isShareTarget) {
-                title.innerText = cloud.shareOperation.data.properties.title + " hochladen";
+                title.innerText = cloud.shareOperation.data.properties.title + cloud.translate("UPLOADSTUB");
+                $(title).parent().addClass("folderview"); // Need to CSS-resize header (title)
             } else {
                 title.innerText = path.fileName;
             }
 
-            //Button anzeigen oder ausblenden (im Root ausblenden)
-            if (!cloud.navigationHasPrevious()) {
-                document.getElementById("backButton").style.visibility = 'hidden';
-            } else {
+            // Hide and show navigation buttons
+            if (cloud.navigationHasPrevious()) {
                 document.getElementById("backButton").style.visibility = 'visible';
-            }
-
-            //Vorwärtsbutton anzeigen
-            if (!cloud.navigationHasNext()) {
-                document.getElementById("forwardButton").style.visibility = 'hidden';
             } else {
+                document.getElementById("backButton").style.visibility = 'hidden';
+            }
+            if (cloud.navigationHasNext()) {
                 document.getElementById("forwardButton").style.visibility = 'visible';
+            } else {
+                document.getElementById("forwardButton").style.visibility = 'hidden';
             }
 
-            //Appbar neu laden, da sonst in leeren Ordnern die Appbar immer noch für eine einzelne Ordner Selektion angezeigt wird
+            // Update app bar
             if (!cloud.context.isSavePicker && !cloud.context.isShareTarget && !cloud.context.fileMover.isFileMover && !cloud.context.isOpenPicker) {
-                directoryView.prototype.updateAppBar();
+                self.updateAppBar();
             }
 
-            //Loading Indicator ausblenden
+            // Hide progess ring
             document.getElementById("directoryProgressRing").style.visibility = 'hidden';
         },
 
-        //Navigation
-        //Linksklick auf Ordner öffnet diesen, ansonsten wurde eine Datei selektiert oder deselektiert --> Aktualisiere Preview
+        // Handle click on listview element. Open folder on click or refresh preview on selection/unselection
         invokeDirectoryItem: function (eventInfo) {
-            var listView = document.getElementById("directoryView").winControl;
-            var indices = listView.selection.getIndices();
+            var selectedItem = cloud.pages.directoryView.listViewItems.getAt(eventInfo.detail.itemIndex);
+                
+            if (selectedItem.fileType == "folder") {
+                // Navigate
+                cloud.navigationGotoPath({ path: selectedItem.path });
 
-            //Sofern etwas angeklickt wurde...
-            if (listView.selection.count() == 1) {
-                var selectedItem = listViewItems.getAt(indices[0]);
-                //Ordner öffnen --> NAVIGIEREN
-                if (selectedItem.fileType == "folder") {
-                    cloud.navigationGotoPath({ path: selectedItem.path });
+                // Update session data storage
+                WinJS.Application.sessionState.navigationListBackwards = cloud.getNavigationListBack();
+                WinJS.Application.sessionState.navigationListForwards = cloud.getNavigationListForward();
 
-                    //Navigationslisten der Session aktuellisieren
-                    WinJS.Application.sessionState.navigationListBackwards = cloud.getNavigationListBack();
-                    WinJS.Application.sessionState.navigationListForwards = cloud.getNavigationListForward();
+                // Load content
+                self.loadFolder();
 
-                    //Selektionen leeren
-                    cloud.pages.directoryView.selectedDirectoryContent = [];
-                    WinJS.Application.sessionState.selectedDirectoryContent = [];
-
-                    //Navigieren zum Ordner -> reloadListView
-                    directoryView.prototype.loadFolder();
-                } else if (!selectedItem.deleted) { //Vorschau aktuallisieren sofern es keine gelöschte Datei ist
-                    if (!cloud.context.isOpenPicker && !cloud.context.isSavePicker && !cloud.context.isShareTarget && !cloud.context.fileMover.isFileMover) {
-                        directoryView.prototype.updatePreview();
-                    }
-                }
+            } else if (!cloud.context.isOpenPicker && !cloud.context.isSavePicker && !cloud.context.isShareTarget && !cloud.context.fileMover.isFileMover) {
+                // File was invoked: Select manually and refresh preview
+                listView.selection.set([eventInfo.detail.itemIndex]);
+                self.selectionChangedEvent();
+                self.updatePreview();
             }
         },
 
-        //Selektion ändert sich sofer der Benutzer eine Datei selektiert oder einen Ordner zur Navigation auswählt
+        // Handle selection/deselection of listView elements
         selectionChangedEvent: function (eventInfo) {
-            //TODO: Sofern es eine Navigation ist wird kurz ein Ordner Selektiert. Diese Selektion soll kein Update der Appbar auslösen!
             if (!cloud.context.isSavePicker && !cloud.context.isShareTarget && !cloud.context.fileMover.isFileMover) {
-                directoryView.prototype.updateAppBar();
+                // Adapt app bar functions to current selection
+                self.updateAppBar();
 
-                //Speichern der Selektion in Sessiondaten
-                var listView = document.getElementById("directoryView").winControl;
+                // Update session data storage
                 var indices = listView.selection.getIndices();
-                //Speichern der Auswahl in SessionDaten
                 WinJS.Application.sessionState.selectedDirectoryContent = indices;
                 cloud.pages.directoryView.selectedDirectoryContent = indices;
             }
         },
 
-        //Fileinfos in Appbar aktualisieren
+        // Update file information in app bar
         updateFileInfo: function (selectedItem) {
             if (selectedItem.fileType != "folder" && !selectedItem.deleted) {
                 document.getElementById("fileInfoName").innerText = selectedItem.title;
-                document.getElementById("fileInfoPath").innerText = selectedItem.dirName;
+                document.getElementById("fileInfoPath").innerText = selectedItem.dirName == "" ? "/" : selectedItem.dirName;
                 document.getElementById("fileInfoDateCreated").innerText = selectedItem.date;
-                document.getElementById("fileInfoSize").innerText = selectedItem.sizeText;
+                document.getElementById("fileInfoSize").innerText = selectedItem.bestText;
             }
         },
 
-        //Dateinamen in das Flyout der Appbar eintragen
+        // Prepare rename flyout in app bar to preset current filename
         updateRenameField: function (selectedItem) {
             document.getElementById('renameInput').innerText = selectedItem.fileName;
         },
 
-        //Dateivorschau aktualisieren --> Auslesen der Dateiinfos sofern eine Datei ausgewählt (gedownloaded) wurde
+        // File preview
         updatePreview: function () {
-            var listView = document.getElementById("directoryView").winControl;
-            var previewHeader = document.getElementById("previewHeader");
-            var previewTag = document.getElementById("previewTag");
-            var previewHeaderContainer = document.getElementById("previewHeaderContainer");
-            //document.getElementById("preview").style.width = "490px";
-            
+            if (listView.selection.count() != 1) {
+                // File preview makes only sense on single selected files
+                return;
+            }
 
-            //Wenn es kein Ordner ist --> Vorschau aktualisieren
-            if (listView.selection.count() == 1) {
-                var indices = listView.selection.getIndices();
-                var selectedItem = listViewItems.getAt(indices[0]);
-                //Vorschau bei Ordnern und gelöschten Dateien nicht vorgesehen
-                if (selectedItem.fileType != "folder" && !selectedItem.deleted) {
-                    //Prüfen ob Dateivorschau möglich ist
-                    if (cloud.config && cloud.config.fileTypes && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()]
-                        && typeof cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType !== "undefined") {
+            // File preview not possible for folders or deleted files
+            var selectedItem = self.getSelectedItem();
+            if (selectedItem.fileType == "folder" || selectedItem.deleted) {
+                return;
+            }
 
-                        //Wordpreview ohne Download
-                        if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "word" && cloud.hasFunctionality({ functionkey: "hasPreviewDocx" })) {
-                            cloud.functions.showNotification(cloud.translate("ATTENTION"), cloud.translate("NOIMAGEINWORD"), "/images/notifications/warning.png");
-                            //Vorschau auf neue Anzeige vorbereiten
-                            directoryView.prototype.preparePreview(selectedItem);
+            // Check if filetype allows preview
+            if (!cloud.config || !cloud.config.fileTypes || !cloud.config.fileTypes[selectedItem.fileType.toLowerCase()]
+                || typeof cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType === "undefined") {
+                return;
+            }
 
-                            //HTML der Vorschau dynamisch einfügen
-                            directoryView.prototype.setFilePreviewHTML(selectedItem, null);
-                        //Sonstige Vorschauelemente
-                        } else if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType != "word") {
-                            //Datei temporär herunterladen, sofern diese in der aktuellen Ansicht noch nicht verfügbar ist
-                            try{
-                                directoryView.prototype.downloadFileTemporary(
-                                function (targetFile) {
-                                    //Sofern es keine leere Datei ist, die ohnehin nicht angezeigt werden kann
-                                    //Tritt auf, wenn die Datei ohnehin leer ist oder wenn sie auf Grund eines falsch codierten Dateinamens nicht vollständig heruntergeladen werden kann
-                                    targetFile.getBasicPropertiesAsync().then(
-                                        function (basicProperties) {
-                                            if (basicProperties.size > 0) {
-                                                //Vorschau auf neue Anzeige vorbereiten
-                                                directoryView.prototype.preparePreview(selectedItem);
+            // Word preview if plugin exists on server (requires no file download yet)
+            if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "word" && cloud.hasFunctionality({ functionkey: "hasPreviewDocx" })) {
+                // Notify users about restriction
+                cloud.functions.showNotification(cloud.translate("ATTENTION"), cloud.translate("NOIMAGEINWORD"), "/images/notifications/warning.png");
 
-                                                //HTML der Vorschau dynamisch einfügen
-                                                directoryView.prototype.setFilePreviewHTML(selectedItem, targetFile);
-                                            } else {
-                                                cloud.functions.showMessageDialog("CORRUPTEDFILEERROR");
-                                            }
-                                        });
-                                },
-                                function () {
-                                    return; //tue nix
-                                    //Wenn es einen Fehler gab, soll einfach die alte Datei weiter angezeigt werden
-                                    //Ansonsten einfach ausblenden
-                                });
-                            } catch (e) {
-                                /* catch download of non-existent files */
-                            }
-                        }
-                    }
-                }
+                // Prepare preview and insert content
+                self.preparePreview(selectedItem);
+                self.setFilePreviewHTML(selectedItem, null);
+
+            // Other preview types require temporary download of the file
+            } else if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType != "word") {
+                try {
+                    self.downloadFileTemporary(
+                    function (targetFile) {
+                        targetFile.getBasicPropertiesAsync().then(
+                            function (basicProperties) {
+                                if (basicProperties.size > 0) {
+                                    // Prepare preview and insert content
+                                    self.preparePreview(selectedItem);
+                                    self.setFilePreviewHTML(selectedItem, targetFile);
+                                } else {
+                                    // File is empty or cannot be read due to download problems with incorrectly encoded file names
+                                    cloud.functions.showMessageDialog("CORRUPTEDFILEERROR");
+                                }
+                            });
+                    },
+                    function () {
+                        cloud.functions.showMessageDialog("CORRUPTEDFILEERROR"); /* file download failed */
+                    });
+                } catch (e) { /* catch download of non-existent files: do nothing */ }
             }
         },
 
-        //Preview auf neue Dateivorschau vorbereiten (Einblenden bzw. löschen des alten Previews)
+        // Prepare preview area for new file preview
         preparePreview: function (selectedItem) {
-            document.getElementById("previewHeader").innerText = selectedItem.title;
+            // Reset appearance
+            document.getElementById("previewHeader").innerText = (selectedItem) ? selectedItem.title : "";
             document.getElementById("previewHeader").style.visibility = 'visible';
-            document.getElementById("previewTag").style.visibility = 'visible';
             document.getElementById("previewHeaderContainer").style.visibility = 'visible';
 
+            document.getElementById("previewTag").style.visibility = 'visible';
             document.getElementById("previewTag").innerHTML = "";
-            document.getElementById("code").textContent = "";
+            document.getElementById("previewTag").style.width = "";
+            document.getElementById("previewTag").style.backgroundColor = "";
+            document.getElementById("previewTag").style.padding = "";
+            document.getElementById("previewTag").style.overflowY = "";
+            document.getElementById("previewTag").style.backgroundImage = "";
 
-            //EDITOR VERBERGEN
+            document.getElementById("code").textContent = "";
+            document.getElementById("code").style.maxWidth = "";
+
+            $('#pdfPreview > canvas').remove();
+            $('#previewTag > canvas').remove();
+            $('#pdfPreview > img').remove();
+            document.getElementById("pdfPreview").style.display = "none";
+            document.getElementById("pdfControls").style.display = "none";
+
+            // Avoid multiple editors
             if (cloud.pages.directoryView.editor) {
-                // Löscht Editor falls vorhanden
                 cloud.pages.directoryView.editor.toTextArea();
-                //Geht das so?
                 cloud.pages.directoryView.editor = null;
             }
-        },
-
-        protoTypeTimer: function (interval, calls, onend) {
-            var count = 0;
-            var payloadFunction = this;
-            var startTime = new Date();
-            var callbackFunction = function () {
-                return payloadFunction(startTime, count);
-            };
-            var endFunction = function () {
-                if (onend) {
-                    onend(startTime, count, calls);
-                }
-            };
-            var timerFunction = function () {
-                count++;
-                if (count < calls && callbackFunction() != false) {
-                    window.setTimeout(timerFunction, interval);
-                } else {
-                    endFunction();
-                }
-            };
-            timerFunction();
+            
+            // Return to standard context
+            this.setKeyboardContextDirectoryView();
         },
 
         setFilePreviewHTML: function (selectedItem, targetFile) {
-                var previewHTML = "";
+            var previewHTML;
+            var previewTagWidth;
+            var previewType = cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType;
 
-                //App in den normalen Kontext zurück führen.
-                this.setDirectoryViewContext();
-                var currentState = Windows.UI.ViewManagement.ApplicationView.value;
+            // No preview in SnapView
+            var currentState = Windows.UI.ViewManagement.ApplicationView.value;
+            if (currentState === Windows.UI.ViewManagement.ApplicationViewState.snapped) {
+                return;
+            }
 
+            // Create source object (not necessary for word preview)
+            if (targetFile) {
+                var fileSrcBlob = URL.createObjectURL(targetFile, { oneTimeOnly: true });
+            }
 
-                if (targetFile) {
-                    var fileSrcBlob = URL.createObjectURL(targetFile, { oneTimeOnly: true });
-                } //Sonst nicht benötigt --> Word-Preview        
+            /***** pictures *****/
+            if (previewType == "image") {
 
-                ////////PDF////////
-                // Vorschau-Elemente löschen
-                $('#pdfPreview > canvas').remove();
-                $('#previewTag > canvas').remove();
-            
-            
-                document.getElementById("code").style.maxWidth = "";
-                document.getElementById("previewTag").style.width = "";
-                document.getElementById("pdfPreview").style.width = "";
-
-                $('#pdfPreview > img').remove();
-                /*Falls word angezeigt wurd wird der Hintergrund wieder resettet*/
-                if (document.getElementById("previewTag").style.backgroundColor !== "") {
-                    document.getElementById("previewTag").style.backgroundColor = "";
-                    document.getElementById("previewTag").style.padding = "";
-                    document.getElementById("previewTag").style.overflowY = "";
-                    document.getElementById("previewTag").style.backgroundImage = "";
-                }
-            
-            
-
-                //Steuerelemente verbergen
-                //PDF Steuerelemente
-                $(cloud.pages.directoryView.pdfBackButton).addClass("invisible");
-                $(cloud.pages.directoryView.pdfNextButton).addClass("invisible");
-                $(cloud.pages.directoryView.pdfGoToPageButton).addClass("invisible");
-                $(cloud.pages.directoryView.pdfZoomOutButton).addClass("invisible");
-                $(cloud.pages.directoryView.pdfZoomInButton).addClass("invisible");
-                $(cloud.pages.directoryView.pdfPageNumDOM).addClass("invisible");
-
-                document.getElementById("pdfControls").style.visibility = "hidden";
-                document.getElementById("pdfPreview").style.visibility = "hidden";
-
-                //PDF-Controls
-                if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "reader") {
-                    this.setPDFContext();
-                    document.getElementById("pdfControls").style.display = "block";
-                    document.getElementById("pdfPreview").style.display = "block";
-
-                }
-                else {
-                    document.getElementById("pdfControls").style.display = "none";
-                    document.getElementById("pdfPreview").style.display = "none";
-                }
-
-                //Bildervorschau
-                if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "image") {
-                    if (typeof cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport !== "undefined"
-                    && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport == true) {
-                        if (cloud.hasFunctionality({ functionkey: "fileee" })) {
-                            cloud.getFileeeContent({ path: selectedItem.path }, function (fileee) {
-                           
-                                if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-
-                                    //Code auslesen
-                                    if (fileee.content != "" && fileee.content != "null") {
-                                        document.getElementById("code").textContent = fileee.content;
-                                        document.getElementById("code").style.maxWidth = document.getElementById("contentGrid").clientWidth - 520 + "px";
-
-                                        //Editor konfigurieren
-                                        cloud.pages.directoryView.editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-                                            mode: "",
-                                            styleActiveLine: true,
-                                            lineNumbers: true,
-                                            lineWrapping: true,
-                                            readOnly: true,
-                                            theme: "monokai", //http://codemirror.net/demo/theme.html
-                                        
-
-                                        });
-                                    }
-                                }
-                            }, function () { });
-                        }
-                    }
-
-                    previewHTML = "<img id=\"displayImage\" src=" + fileSrcBlob + " />";
-                
-
-                    var tmpBild = $('<img id="displayImage" src="' + fileSrcBlob + '" />"');
-                    var ratio;
-
-
-                    if (cloud.pages.directoryView.currentLayout == "GridLayout" && currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-
-                        //Die nachfolgende Konsolenausgabe bloß nicht löschen
-                        // Ohne diese schafft es das Programm nicht die naturalWidth und naturalHeight
-                        // in der nachfolgenden If-Abfrage zu berechnen. Das Problem tritt nur im Simulator auf
-
-                        //Workaround #1
-                        //console.log(tmpBild[0].width);
-
-                        //Workaround #2 --> Better
-                        var abbruch = false;
-                        while (!abbruch) {
-
-                            if (tmpBild[0].naturalWidth) {
-                                abbruch = true;
-                            }
-                        }
-                        this.setTarget("previewTag");
-
-                        if (tmpBild[0].naturalHeight < tmpBild[0].naturalWidth) {
-                            console.log(tmpBild[0].naturalWidth);
-                            ratio = tmpBild[0].naturalWidth / tmpBild[0].naturalHeight;
-                            //picture touch controle workarround: komplett neue 3 Zeilen
-                            //document.getElementById("preview").style.maxWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
-                            //document.getElementById("preview").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
-                            //document.getElementById("previewTag").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
-                            //picture touch controle workarround: MaxWidth wieder statt width
-                            document.getElementById("previewTag").style.maxWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
-                        }
-                        else if (tmpBild[0].naturalHeight > tmpBild[0].naturalWidth) {
-
-                            ratio = tmpBild[0].naturalWidth / tmpBild[0].naturalHeight;
-                            //picture touch controle workarround: komplett neue 3 Zeilen
-                            //document.getElementById("preview").style.maxWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
-                            //document.getElementById("preview").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
-                            //document.getElementById("previewTag").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
-                            //picture touch controle workarround: MaxWidth wieder statt width
-                            document.getElementById("previewTag").style.maxWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
-                        }
-                        else {
-
-                            document.getElementById("previewTag").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
-                            //picture touch controle workarround: komplett neue 2 Zeilen
-                            //document.getElementById("preview").style.maxWidth = document.getElementById("contentGrid").clientHeight + "px";
-                            //document.getElementById("preview").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
-                            //picture touch controle workarround: MaxWidth wieder statt width
-                            document.getElementById("previewTag").style.maxWidth = document.getElementById("contentGrid").clientHeight + "px";
-                        }
-
-                        //var ratio = tmpBild.naturalWidth/tmpBild.naturalHeight;
-                        //document.getElementById("previewTag").style.width = tmpBild[0].naturalWidth + "px";
-                    } else if (cloud.pages.directoryView.currentLayout == "ListLayout") {
-                        if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-                            document.getElementById("previewTag").style.width = document.body.clientWidth - 490 + "px";
-                        }
-                    }
-
-                    //Videovorschau
-                } else if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "video") {
-                    previewHTML = "<video id='video' controls=\"\" src=\"" + fileSrcBlob + "\" type=\"video/" + "></video>";
-
-                    //Audio
-                } else if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "audio") {
-                    if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-                
-                        previewHTML = "<audio class=\"audioplayer\" controls=\"controls\" src=\"" + fileSrcBlob + "\"></audio>";
-                    }
-                    //Codepreview
-                } else if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "code") {
-
-                    /*Da die Code-Anzeige in der Snapview keinen Sinn macht, wird dem Benutzer die Anzeige
-                    asugegeben, dass er doch bitte in eine andere Ansicht wechseln solle*/
-                    if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-                 
-                        //Code auslesen
-                        Windows.Storage.FileIO.readTextAsync(targetFile).then(function (contents) {
-                            document.getElementById("code").textContent = contents;
+                // Show OCR content next to picture if currently not in Snapview and if functionality is given through plugin
+                if (cloud.hasFunctionality({ functionkey: "fileee" }) && 
+                    cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport === true) {
+                    
+                    // Retrieve text content
+                    cloud.getFileeeContent({ path: selectedItem.path }, function (fileee) {
+                        if (fileee.content != "" && fileee.content != "null") {
+                            document.getElementById("code").textContent = fileee.content;
+                            document.getElementById("code").style.maxWidth = document.getElementById("contentGrid").clientWidth - 520 + "px";
 
                             //Editor konfigurieren
-                            var codeType = cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].codeType;
                             cloud.pages.directoryView.editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-                                mode: codeType,
+                                mode: "",
                                 styleActiveLine: true,
                                 lineNumbers: true,
                                 lineWrapping: true,
                                 readOnly: true,
-                                theme: "monokai", //http://codemirror.net/demo/theme.html
-
+                                theme: "monokai",
                             });
-                        });
-                    }
-                    //PDF
-                } else if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "reader") {
-                    if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-
-                        //PDF Steuerelemente anzeigen
-                        $(cloud.pages.directoryView.pdfBackButton).removeClass("invisible");
-                        $(cloud.pages.directoryView.pdfNextButton).removeClass("invisible");
-                        $(cloud.pages.directoryView.pdfPageNumDOM).removeClass("invisible");
-                        $(cloud.pages.directoryView.pdfZoomOutButton).removeClass("invisible");
-                        $(cloud.pages.directoryView.pdfZoomInButton).removeClass("invisible");
-                        $(cloud.pages.directoryView.pdfGoToPageButton).removeClass("invisible");
-                        document.getElementById("pdfControls").style.visibility = "visible";
-                        document.getElementById("pdfPreview").style.visibility = "visible";
-                        document.getElementById("pdfPreview").style.maxHeight = document.getElementById("contentGrid").clientHeight;
-
-
-                        //Erste Seite Rendern und anzeigen
-                        cloud.functions.showPDF(targetFile);
-                    }
-
-
-                
-                    //Word-Preview
-                }
-                else if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "word") {
-                    if (cloud.hasFunctionality({ functionkey: "hasPreviewDocx" })) {
-                        cloud.getFileFulltext(
-                            {
-                                path: selectedItem.path,
-                                fileType: selectedItem.fileType
-                            },
-                        function (htmlText) {
-                            if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-                         
-                                //success
-                                document.getElementById("previewTag").innerHTML = toStaticHTML(htmlText);
-                                document.getElementById("previewTag").style.backgroundColor = "#272822";
-                                document.getElementById("previewTag").style.color = "white";
-                                document.getElementById("previewTag").style.overflowY = "auto";
-                                document.getElementById("previewTag").style.padding = "20px";
-                                //document.getElementById("previewTag").style.boxShadow = "0px 1px 3px black";
-                           
-                                document.getElementById("previewTag").style.maxWidth = document.body.clientWidth - 500 + "px";
-                                document.getElementById("previewTag").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
-                            
-
-                            }
-                        },
-                        function () {
-                            //error
-                            console.log("ERROR");
-                        });
-                    }
-                }
-
-                if (cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].previewType == "reader") {
-                    if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-                        document.getElementById("pdfPreview").innerHTML = toStaticHTML(previewHTML);
-                    }
-                    else {
-                   
-                    }
-                }
-                else {
-                    document.getElementById("previewTag").innerHTML = toStaticHTML(previewHTML);
-                }
-
-                //while (document.getElementById("canvas").clientHeight < document.getElementById("contentGrid").clientHeight) {
-                //    cloud.pages.directoryView.pdfCurrentZoom += 0.1;
-
-                //}
-
-
-                /*#######################             Video - Anfang         #############################*/
-                // Nachträglich videocontainer skalieren
-                if ($('#previewTag video').size() > 0) {
-                    $('#previewTag video').bind("loadedmetadata", function () {
-                        var width = this.videoWidth;
-                        var height = this.videoHeight;
-
-                        if (cloud.pages.directoryView.currentLayout == "GridLayout") {
-                            if (height < width) {
-                                ratio = width / height;
-                                document.getElementById("video").style.maxWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
-
-                            }
-                            else if (height > width) {
-                                ratio = width / height;
-                                document.getElementById("video").style.maxWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
-
-                            }
-                            else {
-                                document.getElementById("video").style.maxHeight = document.getElementById("contentGrid").clientHeight
-                                document.getElementById("video").style.maxWidth = document.getElementById("contentGrid").clientHeight
-                            }
-                            //var ratio = tmpBild.naturalWidth/tmpBild.naturalHeight;
-                            //document.getElementById("previewTag").style.width = tmpBild[0].naturalWidth + "px";
-                        } else if (cloud.pages.directoryView.currentLayout == "ListLayout") {
-
-                            if (currentState !== Windows.UI.ViewManagement.ApplicationViewState.snapped) {
-
-                                document.getElementById("video").style.maxWidth = document.body.clientWidth - 475 + "px";
-                                document.getElementById("video").style.maxHeight = document.getElementById("contentGrid").clientHeight - 130 + "px";
-                            }
                         }
-
-
-                        /*#######################             Video - Ende         #############################*/
-                    });
-
-                }    
-                // Scrollen zur Vorschau
-                if (Windows.Storage.ApplicationData.current.roamingSettings.values["autoScroll"] && cloud.pages.directoryView.currentLayout == "GridLayout") {
-                    $.scrollTo(0);
-                    setTimeout("$('#sectionWrap').scrollTo($('#previewTag'), 800, { axis: 'x' })", 200);
+                    }, function () { /* error, do nothing */ });
                 }
-            
+
+                // Create picture element
+                previewHTML = $('<img id="displayImage" src="' + fileSrcBlob + '" />"');
+                
+                // Different appearance according to current layout
+                if (cloud.pages.directoryView.currentLayout == "GridLayout") {
+                    // Problem in Visual Studio simulator to calculate naturalWidth and naturalHeight
+                    // Workaround #1: console.log(tmpPic[0].width);
+                    // Workaround #2:
+                    var cancel = false;
+                    while (!cancel) {
+                        if (previewHTML[0].naturalWidth) cancel = true;
+                    }
+
+                    // Resize container according to dimensions to avoid empty space when preview content changes
+                    var ratio = previewHTML[0].naturalWidth / previewHTML[0].naturalHeight;
+                    previewTagWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
+
+                } else if (cloud.pages.directoryView.currentLayout == "ListLayout") {
+                    previewTagWidth = document.body.clientWidth - 490 + "px";
+                }
+
+                // Set size
+                document.getElementById("previewTag").style.width = previewTagWidth;
+
+                // Add preview element to DOM
+                $('#previewTag').append(previewHTML);
+
+            /***** video player *****/
+            } else if (previewType == "video") {
+                previewHTML = "<video id='video' controls=\"\" src=\"" + fileSrcBlob + "\" type=\"video/" + "></video>";
+
+                // Add preview element to DOM
+                $('#previewTag').append(toStaticHTML(previewHTML));
+
+                $('#video').bind("loadedmetadata", function () {
+                    var width = this.videoWidth;
+                    var height = this.videoHeight;
+
+                    // Resize container according to dimensions to avoid empty space when preview content changes
+                    if (cloud.pages.directoryView.currentLayout == "GridLayout") {
+
+                        // Resize container according to dimensions to avoid empty space when preview content changes
+                        var ratio = width / height;
+                        document.getElementById("video").style.maxWidth = document.getElementById("contentGrid").clientHeight * ratio + "px";
+
+                    } else if (cloud.pages.directoryView.currentLayout == "ListLayout") {
+
+                        document.getElementById("video").style.maxWidth = document.body.clientWidth - 475 + "px";
+                        document.getElementById("video").style.maxHeight = document.getElementById("contentGrid").clientHeight - 130 + "px";
+                    }
+                });
+
+
+            /***** audio player *****/
+            } else if (previewType == "audio") {
+                previewHTML = "<audio class=\"audioplayer\" controls=\"controls\" src=\"" + fileSrcBlob + "\"></audio>";
+                
+                // Add preview element to DOM
+                $('#previewTag').append(toStaticHTML(previewHTML));
+
+            /***** code preview *****/
+            } else if (previewType == "code") {
+ 
+                // Retrieve text
+                Windows.Storage.FileIO.readTextAsync(targetFile).then(function (contents) {
+                    document.getElementById("code").textContent = contents;
+
+                    // Configure editor
+                    var codeType = cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].codeType;
+                    cloud.pages.directoryView.editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                        mode: codeType,
+                        styleActiveLine: true,
+                        lineNumbers: true,
+                        lineWrapping: true,
+                        readOnly: true,
+                        theme: "monokai",
+                    });
+                });
+
+            /***** PDF *****/
+            } else if (previewType == "reader") {
+
+                document.getElementById("pdfControls").style.display = "block";
+                document.getElementById("pdfPreview").style.display = "block";
+                
+                this.setKeyboardContextPDF();
+
+                // Show first page
+                cloud.functions.showPDF(targetFile);
+    
+            /***** word preview *****/
+            } else if (previewType == "word") {
+
+                if (cloud.hasFunctionality({ functionkey: "hasPreviewDocx" })) {
+                    cloud.getFileFulltext(
+                        {
+                            path: selectedItem.path,
+                            fileType: selectedItem.fileType
+                        },
+                    function (htmlText) { /* success */
+                        document.getElementById("previewTag").style.backgroundColor = "#272822";
+                        document.getElementById("previewTag").style.color = "white";
+                        document.getElementById("previewTag").style.overflowY = "auto";
+                        document.getElementById("previewTag").style.padding = "20px";
+                        document.getElementById("previewTag").style.maxWidth = document.body.clientWidth - 500 + "px";
+                        document.getElementById("previewTag").style.maxHeight = document.getElementById("contentGrid").clientHeight + "px";
+
+                        previewHTML = $('<span>' + htmlText + '</span>');
+
+                        // Add preview element to DOM
+                        $('#previewTag').append(previewHTML);
+                    },
+                    function () { /* error, do nothing */ });
+                }
+            }
+
+            // Scroll to preview element
+            if (cloud.vars.roamingSettings.values["autoScroll"] && cloud.pages.directoryView.currentLayout == "GridLayout") {
+                setTimeout("$('#sectionWrap').scrollTo($('#previewTag'), 800, { axis: 'x' })", 200);
+            }
         },
 
-
-        //Appbar Funktionen abhängig von Selektion ein und ausblenden
+        // Show and hide appbar commands depending on current selection
         updateAppBar: function () {
             var appBarDiv = document.getElementById("appbar");
             var appbar = document.getElementById('appbar').winControl;
-            var listView = document.getElementById("directoryView").winControl;
-            var count = listView.selection.count();
 
-            directoryView.prototype.showGeneralAppbar(appbar, appBarDiv);
-            appbar.hideCommands(appBarDiv.querySelectorAll('.restore'));
-            appbar.hideCommands(appBarDiv.querySelectorAll('.singleSelectNoFolder'));
-            appbar.hideCommands(appBarDiv.querySelectorAll('.manage'));
-            appbar.hideCommands(appBarDiv.querySelectorAll('.multiSelect'));
+            // Reset all app bar commands
+            self.resetAppBar();
+            
+            /* Show general commands that are independent of current selection */
+            $('#clearSelectionButton').removeClass("invisible");
+            appbar.showCommands(appBarDiv.querySelectorAll('.general'));
+            if (cloud.hasFunctionality({ functionkey: "getDeletedFiles" })) {
+                appbar.showCommands(appBarDiv.querySelectorAll('.showDeleted'));
+            }
+
+            var selectionContent = cloud.functions.analyzeSelection(listView.selection);
+
+            /* Show commands for single selection */
+            if (selectionContent.size == 1) {
+                var selectedItem = selectionContent.allItems[0];
+
+                if (selectionContent.containsDeletedItems) {
+                    // Commands for deleted file
+                    appbar.showCommands(appBarDiv.querySelectorAll('.restore'));
+
+                } else {
+                    // Existing items can be moved, renamed, deleted and shared unless they are located within the "Shared" folder (or the folder itself!)
+                    if (!selectionContent.containsSharedItems) {
+
+                        appbar.showCommands(appBarDiv.querySelectorAll('.manage'));
+                        document.getElementById("renameButtonAppbar").winControl.hidden = false;
+                        document.getElementById("renameHR").winControl.hidden = false;
+                        document.getElementById("moveHR").winControl.hidden = false;
+                        document.getElementById("moveFileButton").winControl.hidden = false;
+                        document.getElementById("deleteHR").winControl.hidden = false;
+                        document.getElementById("deleteFileButtonAppbar").winControl.hidden = false;
+
+                        if (cloud.hasFunctionality({ functionkey: "getPublicLink" }) || cloud.hasFunctionality({ functionkey: "shareFile" })) {
+                            document.getElementById("shareButtonAppbar").winControl.hidden = false;
+                            document.getElementById("shareHR").winControl.hidden = false;
+                        }
+                    }
+
+                    // File type specific commands
+                    if (selectionContent.containsFolders) {
+                        // Nothing folder-specific yet
+
+                    } else {
+                        // Single selection actions for all other files, e.g. Download, history, open file
+                        appbar.showCommands(appBarDiv.querySelectorAll('.singleSelectNoFolder'));
+                        appbar.showCommands(appBarDiv.querySelectorAll('.download'));
+       
+                        if (cloud.config && cloud.config.fileTypes && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()]
+                        && typeof cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport !== "undefined"
+                        && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport == true) {
+                            if (cloud.hasFunctionality({ functionkey: "fileee" })) {
+                                document.getElementById("ocrButton").winControl.hidden = false;
+                            }
+                        }
+
+                        if (cloud.hasFunctionality({ functionkey: "getFileHistory" })) {
+                            document.getElementById("historyButton").winControl.hidden = false;
+                            document.getElementById("historyHR").winControl.hidden = false;
+                        }
+                    }
+
+                    // Update app bar flyouts for file information and rename field (set values)
+                    self.updateFileInfo(selectedItem);
+                    self.updateRenameField(selectedItem);
+                }
+
+                // Show app bar
+                appbar.sticky = true;
+                appbar.show();
+
+            /* Multiselect */
+            } else if (selectionContent.size > 1) {
+                
+                // Only deleted files are selected
+                if (selectionContent.containsDeletedItems && !selectionContent.containsSharedItems && !selectionContent.containsNormalItems) {
+                    appbar.showCommands(appBarDiv.querySelectorAll('.restore'));
+
+                // Only normal files are selected
+                } else if (selectionContent.containsNormalItems && !selectionContent.containsSharedItems && !selectionContent.containsDeletedItems) {
+                    appbar.showCommands(appBarDiv.querySelectorAll('.manage'));
+                    appbar.showCommands(appBarDiv.querySelectorAll('.multiSelect'));
+                    document.getElementById("deleteHR").winControl.hidden = false;
+                    document.getElementById("deleteFileButtonAppbar").winControl.hidden = false;
+                    document.getElementById("moveHR").winControl.hidden = false;
+                    document.getElementById("moveFileButton").winControl.hidden = false;
+
+                    if (!selectionContent.containsFolders) {
+                        appbar.showCommands(appBarDiv.querySelectorAll('.download'));
+                    }
+                }
+
+                appbar.sticky = true;
+                appbar.show();
+
+            /* No selection */
+            } else {
+                appbar.hide();
+                appbar.sticky = false;
+            }
+        },
+
+        resetAppBar: function () {
+            var appBarDiv = document.getElementById("appbar");
+            var appbar = document.getElementById('appbar').winControl;
+
+            // Reset all app bar commands
+            appbar.hideCommands(appBarDiv.querySelectorAll('button'));
             $('#clearSelectionButton').addClass("invisible");
-            appbar.hideCommands(appBarDiv.querySelectorAll('.download'));
             document.getElementById("moveHR").winControl.hidden = true;
             document.getElementById("moveFileButton").winControl.hidden = true;
             document.getElementById("renameButtonAppbar").winControl.hidden = true;
@@ -1506,220 +1310,78 @@
             document.getElementById("historyButton").winControl.hidden = true;
             document.getElementById("historyHR").winControl.hidden = true;
             document.getElementById("ocrButton").winControl.hidden = true;
-            appbar.hideCommands(appBarDiv.querySelectorAll('.fileCopied'));
-
-            //Nur ein Element ausgewält
-            if (count == 1) {
-                var indices = listView.selection.getIndices();
-                var selectedItem = listViewItems.getAt(indices[0]);
-
-                //Allgemein bei Selektion
-                $('#clearSelectionButton').removeClass("invisible");
-                appbar.hideCommands(appBarDiv.querySelectorAll('.multiSelect'));
-
-                //Gelöschte Datei
-                if (selectedItem.deleted) {
-                    appbar.showCommands(appBarDiv.querySelectorAll('.restore'));
-                } else {
-                    //Verberge Umbenennebutton wenn es der "Shared" Ordner ist, oder es sich um Elemente im Shared Ordner handelt (können nicht unbenannt werden)
-                    if (selectedItem.path != "/Shared" && selectedItem.path.indexOf("/Shared") == -1) {
-                        document.getElementById("renameButtonAppbar").winControl.hidden = false;
-                        document.getElementById("renameHR").winControl.hidden = false;
-                    }
-
-                    //Spezifisch für bestimmte Dateitypen
-                    if (selectedItem.fileType == "folder") {
-
-                        //Sofern es der Ordner nicht der Ordner "Shared" ist, kann der Ordner verschoben, gelöscht oder geteilt werden
-                        if (selectedItem.path != "/Shared") {
-                            appbar.showCommands(appBarDiv.querySelectorAll('.manage'));
-                            document.getElementById("moveHR").winControl.hidden = false;
-                            document.getElementById("moveFileButton").winControl.hidden = false;
-                            document.getElementById("deleteHR").winControl.hidden = false;
-                            document.getElementById("deleteFileButtonAppbar").winControl.hidden = false;
-
-                            //Dateifreigabe
-                            if (cloud.hasFunctionality({ functionkey: "getPublicLink" }) || cloud.hasFunctionality({ functionkey: "shareFile" })) {
-                                document.getElementById("shareButtonAppbar").winControl.hidden = false;
-                                document.getElementById("shareHR").winControl.hidden = false;
-                            }
-                        }
-                    } else { //Alle anderen Dateitypen
-                        //Andere Elemente können immer verschoben und meist auch geteilt werden
-                        appbar.showCommands(appBarDiv.querySelectorAll('.manage'));
-                        appbar.showCommands(appBarDiv.querySelectorAll('.singleSelectNoFolder'));
-                        appbar.showCommands(appBarDiv.querySelectorAll('.download'));
-                        document.getElementById("moveHR").winControl.hidden = false;
-                        document.getElementById("moveFileButton").winControl.hidden = false;
-                        document.getElementById("deleteHR").winControl.hidden = false;
-                        document.getElementById("deleteFileButtonAppbar").winControl.hidden = false;
-
-                        //Dateifreigabe
-                        if (cloud.hasFunctionality({ functionkey: "getPublicLink" }) || cloud.hasFunctionality({ functionkey: "shareFile" })) {
-                            document.getElementById("shareButtonAppbar").winControl.hidden = false;
-                            document.getElementById("shareHR").winControl.hidden = false;
-                        }
-
-                        if (cloud.config && cloud.config.fileTypes && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()]
-                        && typeof cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport !== "undefined"
-                        && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport == true) {
-                            if (cloud.hasFunctionality({ functionkey: "fileee" })) {
-                                document.getElementById("ocrButton").winControl.hidden = false;
-                            }
-                        }
-
-                        //Dateihistorie
-                        if (cloud.hasFunctionality({ functionkey: "getFileHistory" })) {
-                            document.getElementById("historyButton").winControl.hidden = false;
-                            document.getElementById("historyHR").winControl.hidden = false;
-                        }
-                    }
-
-                    //Flyouts der Appbar anpassen
-                    directoryView.prototype.updateFileInfo(selectedItem);
-                    directoryView.prototype.updateRenameField(selectedItem);
-                }
-
-                appbar.sticky = true;
-                appbar.show();
-
-                //Mehrere Dateien selektiert
-            } else if (count > 1) {
-                //Prüfe ob gemischt gelöschte und nicht gelöschte Dateien gewählt wurden
-                var selectedDeletedFile = false;
-                var selectedNormalFile = false;
-                if (cloud.context.showDeletedFiles) {
-                    var indices = listView.selection.getIndices();
-                    for (var i = 0; i < listView.selection.count() ; i++) {
-
-                        var selectedItem = listViewItems.getAt(indices[i]);
-                        if (selectedItem.deleted) {
-                            selectedDeletedFile = true;
-                        } else {
-                            selectedNormalFile = true;
-                        }
-                    }
-                } else {
-                    //Multiselekt für normalen Kontext ohne gelöschte Dateien
-                    selectedNormalFile = true;
-                }
-
-                //Allgemeine Appbar Einstellungen --> auch gemixt
-                $('#clearSelectionButton').removeClass("invisible");
-                document.getElementById("moveHR").winControl.hidden = false;
-                document.getElementById("moveFileButton").winControl.hidden = false;
-
-                if (selectedDeletedFile && !selectedNormalFile) {
-                    //Nur gelöschte Dateien gewählt
-                    appbar.showCommands(appBarDiv.querySelectorAll('.restore'));
-                } else if (!selectedDeletedFile && selectedNormalFile) {
-                    //Nur nicht gelöschte Dateien gewählt
-                    appbar.showCommands(appBarDiv.querySelectorAll('.manage'));
-                    appbar.showCommands(appBarDiv.querySelectorAll('.multiSelect'));
-                    appbar.showCommands(appBarDiv.querySelectorAll('.download'));
-                    document.getElementById("deleteHR").winControl.hidden = false;
-                    document.getElementById("deleteFileButtonAppbar").winControl.hidden = false;
-                }
-
-                appbar.sticky = true;
-                appbar.show();
-
-                //Keine Selektion
-            } else {
-                // Verbergen aller Selektionsrelevanter AppBar Buttons
-                appbar.hide();
-                appbar.sticky = false;
-            }
         },
 
-        //Allgemeine / globale Buttons einglenden
-        showGeneralAppbar: function (appbar, appBarDiv) {
-            var cloudCanRestore = cloud.hasFunctionality({ functionkey: "getDeletedFiles" });
-
-            //Sofern Cloud wiederherstellen kann anzeigen, sonst nicht
-            if (cloudCanRestore) {
-                appbar.showCommands(appBarDiv.querySelectorAll('.showDeleted'));
-
-            } else {
-                appbar.hideCommands(appBarDiv.querySelectorAll('.showDeleted'));
-            }
-            appbar.showCommands(appBarDiv.querySelectorAll('.general'));
-        },
-
-        //Beim Zurücknavigieren wird der Verzeichnisstack um das letzte Element erleichtert
+        // Remove last element from stack when navigating back
         navigateBackEvent: function (eventInfo) {
             if (cloud.navigationHasPrevious()) {
                 cloud.navigationGotoPrevious();
 
-                //Selektion leeren
-                cloud.pages.directoryView.selectedDirectoryContent = [];
-                WinJS.Application.sessionState.selectedDirectoryContent = [];
+                // Load content
+                self.loadFolder();
 
-                //Verzeichnis laden
-                directoryView.prototype.loadFolder();
-
-                //Session Speichern
+                // Save session data
                 WinJS.Application.sessionState.navigationListBackwards = cloud.getNavigationListBack();
                 WinJS.Application.sessionState.navigationListForwards = cloud.getNavigationListForward();
             }
         },
 
-        //Beim Vornavigieren wird der Verzeichnisstack um ein Element erweitert
+        // Add new element to stack when navigating forwards
         navigateForwardEvent: function (eventInfo) {
             if (cloud.navigationHasNext()) {
                 cloud.navigationGotoNext();
 
-                //Selektion leeren
-                cloud.pages.directoryView.selectedDirectoryContent = [];
-                WinJS.Application.sessionState.selectedDirectoryContent = [];
+                // Load content
+                self.loadFolder();
 
-                //Verzeichnis laden
-                directoryView.prototype.loadFolder();
-
-                //Session Speichern
+                // Save session data
                 WinJS.Application.sessionState.navigationListBackwards = cloud.getNavigationListBack();
                 WinJS.Application.sessionState.navigationListForwards = cloud.getNavigationListForward();
             }
         },
 
-        //Zum Root-Verzeichnis navigieren
+        // Navigate to root directory (unless already there)
         goToHomePage: function (eventInfo) {
-            //Nur navigieren sofern man nicht bereits im Hauptverzeichnis ist
             if (cloud.getNavigationPathCurrent() != "/") {
                 cloud.navigationGotoPath({ path: "/" });
-                directoryView.prototype.loadFolder();
+                self.loadFolder();
             }
         },
 
-        //Sortieren der Verzeichnisinhalte
+        // Event handler for sort-content-by-name button
         sortByName: function () {
             cloud.pages.directoryView.sortByFlex({ sortBy: "name" });
         },
+
+        // Event handler for sort-content-by-size-desc button
         sortBySizeDesc: function () {
             cloud.pages.directoryView.sortByFlex({ sortBy: "sizeDesc" });
         },
+
+        // General sorting function
         sortByFlex: function (obj) {
-            //Sortierung Speichern
+            // Update sort type
             cloud.pages.directoryView.currentSortType = obj.sortBy;
+
+            // Save session data
             WinJS.Application.sessionState.currentSortType = cloud.pages.directoryView.currentSortType;
 
-            //Verzeichnis Laden
-            cloud.pages.directoryView.loadFolder();
+            // Refresh folder content
+            self.loadFolder();
 
-            //Appbar verbergen sofern Sortieren darüber ausgelöst wurde
+            // Hide app bar
             document.getElementById("appbar").winControl.hide();
             document.getElementById("navbar").winControl.hide();
         },
 
-        //Aktuelle Auswahl aufheben
+        // Event handler to clear the current selection
         clearSelection: function () {
-            var listView = document.getElementById("directoryView").winControl;
             listView.selection.set([]);
             cloud.pages.directoryView.selectedDirectoryContent = [];
             WinJS.Application.sessionState.selectedDirectoryContent = [];
         },
 
-        //Datei zu Path hochladen. Sofern file übergeben wird, wird dieses direkt hochgeladen, ansonsten kann der Benutzer eine Datei über den filePicker von einer anderen Datenquelle auswählen
+        // Upload a file to a specific path. If a file is provided take this one, otherwise ask user to pick a file
         uploadFile: function (path, file, fileSize, successCallback, errorCallback) {
             document.getElementById("operationPending").style.visibility = 'visible';
 
@@ -1727,11 +1389,14 @@
                 {
                     targetPath: path,
                     fileSize: fileSize,
-                    file: file // ggf. bereits Vorhandene Datei (z.B. Bild/Video von Kamera oder aus shareTarget)
+                    file: file // eventually existing file (from camera or shareTarget)
                 },
                 function (uploadedFile, isLast) {
+                    // Notify user and update view only after the last upload in the queue
                     if (isLast) {
                         document.getElementById("operationPending").style.visibility = 'hidden';
+
+                        // Notify user
                         if (!deleteError) {
                             cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("UPLOADCOMPLETED"), "/images/notifications/success.png");
                         } else {
@@ -1739,681 +1404,526 @@
                         }
                         uploadError = false;
 
-                        //Lade die Anzeige nach Abschluss des Uploads neu, sofern der Benutzer im Uploadverzeichnis ist
-                        if (!cloud.isShareTarget && !cloud.isSavePicker) {
-                            //Sofern eine Datei wiederhergestellt wird, die gerade angezeigt wird:
-                            //Vorschau ggf. aktualisieren
-                            if (document.getElementById("previewHeader").innerText == uploadedFile) {
-                                document.getElementById("previewHeader").innerText = "";
-                                document.getElementById("previewHeader").style.visibility = 'hidden';
-                                document.getElementById("previewTag").style.visibility = 'hidden';
-                                document.getElementById("previewHeaderContainer").style.visibility = 'hidden';
+                        // Reload directory if it's currently visible
+                        self.loadFolder(true, path);
 
-                                //EDITOR VERBERGEN --> Gab noch Error, benötigt fix
-                                /*if (cloud.pages.directoryView.editor) {
-                                    // Löscht Editor falls vorhanden
-                                    cloud.pages.directoryView.editor.toTextArea();
-                                    //Geht das so?
-                                    cloud.pages.directoryView.editor = null;
-                                }*/
-                            }
-
-                            if (path == cloud.getNavigationPathCurrent()) {
-                                //Selektionen leeren
-                                cloud.pages.directoryView.selectedDirectoryContent = [];
-                                WinJS.Application.sessionState.selectedDirectoryContent = [];
-                                //Verzeichnis neu laden
-                                directoryView.prototype.loadFolder();
-                            }
-                        }
                         successCallback();
                     }
-                    return;
+
+                    // Refresh preview if the selected file was reuploaded
+                    var selectedItem = self.getSelectedItem();
+                    if (selectedItem && selectedItem.title == uploadedFile) {
+                        selectedItem.hasTemporaryFile = false;
+                        self.updatePreview();
+                    }
                 },
                 function (isLast) {
-                    if (isLast) {
-                        cloud.functions.showMessageDialog("UPLOADINTERRUPTED");
-                        document.getElementById("operationPending").style.visibility = 'hidden';
-                        directoryView.prototype.loadFileError();
-                        uploadError = false;
-                        errorCallback();
-                    } else {
-                        uploadError = true;
-                    }
+                    // Notify if any file encountered an error while uploading
+                    cloud.functions.showMessageDialog("UPLOADINTERRUPTED");
+                    document.getElementById("operationPending").style.visibility = 'hidden';
+                    errorCallback();
                 });
         },
 
-        //Bild oder Video mit Kamera aufnehmen und hochladen
+        // Take a picture or video with the camera and upload
         cameraUpload: function () {
             var currentState = Windows.UI.ViewManagement.ApplicationView.value;
             if (currentState === Windows.UI.ViewManagement.ApplicationViewState.snapped &&
                 !Windows.UI.ViewManagement.ApplicationView.tryUnsnap()) {
-                // Fail silently if we can't unsnap
+                // Inform user about fail to unsnap to open camera
+                cloud.functions.showMessageDialog("NOSNAPVIEW");
                 return;
             }
 
-            //KameraGUI öffnen
+            // Open camera
             var captureUI = new Windows.Media.Capture.CameraCaptureUI();
             captureUI.captureFileAsync(Windows.Media.Capture.CameraCaptureUIMode.photoOrVideo).then(function (capturedItem) {
-                //Sofern der Benutzer ein Bild gemacht hat
                 if (capturedItem) {
-                    console.log("User captured a photo or video.");
+                    // User captured a picture/video -> upload
                     var path = cloud.getNavigationPathCurrent();
-                    directoryView.prototype.uploadFile(path, capturedItem, null, function () {/*success*/}, function () {/*error*/});
+                    self.uploadFile(path, capturedItem, null, function () {/*success*/ }, function () {/*error*/ });
                 } else {
-                    console.log("User didn't capture a photo or video.");
+                    /* no picture taken, do nothing */
                 }
             });
-
         },
 
-        //Lokale Datei aus Datenquelle auswählen und hochladen
+        // Pick file from local data source and upload
         uploadLocalFile: function () {
-            // Verify that we are currently not snapped, or that we can unsnap to open the picker
             var currentState = Windows.UI.ViewManagement.ApplicationView.value;
             if (currentState === Windows.UI.ViewManagement.ApplicationViewState.snapped &&
                 !Windows.UI.ViewManagement.ApplicationView.tryUnsnap()) {
-                // Fail silently if we can't unsnap
+                // Inform user about fail to unsnap to open picker
+                cloud.functions.showMessageDialog("NOSNAPVIEW");
                 return;
             }
+
             var path = cloud.getNavigationPathCurrent();
-            directoryView.prototype.uploadFile(path, null, null, function () { }, function () { });
+            self.uploadFile(path, null, null, function () { /*success*/ }, function () {/*error*/ });
         },
 
-        //Upload aller an die App geteilten Dateien
-        //Sharm Bar Share Funktion
+        // Upload files shared to this app via the charm bar
         uploadSharedFile: function () {
             var appbar = document.getElementById("appbar").winControl;
             appbar.disabled = true;
 
-            //System darüber zu informieren, dass App noch ausgeführt wird --> Benutzer kann die UI der App verlassen und mit der vorherigen Tätigkeit fortfahren
-            //Nach dem Aufruf von reportStarted sollte die App keine Benutzerinteraktion mehr verlangen.
+            // After reportStarted is called no interaction with the app should be required.
             cloud.shareOperation.reportStarted();
-            //Bericht, dass App Daten erhalten hat --> Quellapp kann ggf. beendet werden
+            
+            // Upload files one by one
             if (cloud.shareOperation.data.contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.storageItems)) {
                 cloud.shareOperation.data.getStorageItemsAsync().then(function (storageItems) {
                     for (var i = 0; i < storageItems.size; i++) {
-                        //Jede Datei hochladen
-                        directoryView.prototype.uploadFile(cloud.getNavigationPathCurrent(), storageItems.getAt(i), null, function () { cloud.shareOperation.reportCompleted(); }, function () { cloud.shareOperation.reportError(cloud.translate("UPLOADINTERRUPTED")); });
+                        self.uploadFile(cloud.getNavigationPathCurrent(), storageItems.getAt(i), null, function () { cloud.shareOperation.reportCompleted(); }, function () { cloud.shareOperation.reportError(cloud.translate("UPLOADINTERRUPTED")); });
                     }
                 });
             }
         },
 
-        loadFileError: function (error) {
-            console.log("Error.");
-        },
-
-        //Datei Temporär Downloaden (Für Preview oder Teilen an andere App=
-        //shareRequest enthält ggf. das request Element des Charmbar-Share Events
+        /*
+        Temporary download of a file for file preview or sharing to other apps
+        The shareRequrest parameter contains the request element of the charm bar share event if existing
+        */
         downloadFileTemporary: function (successCallback, errorCallback, shareRequest) {
-            var listView = document.getElementById("directoryView").winControl;
             //Sofern etwas angeklickt wurde...
-            if (listView.selection.count() == 1) {
-                var indices = listView.selection.getIndices();
-                var selectedItem = listViewItems.getAt(indices[0]);
-                //Ordner und gelöschte Dateien können nicht direkt runtergeladen werden
-                if (selectedItem.fileType != "folder" && !selectedItem.deleted) {
+            if (listView.selection.count() != 1) {
+                // No temporary download for multiple or no files
+                return;
+            }
+            
+            // Don't download folders or deleted files
+            var selectedItem = self.getSelectedItem();
+            if (!selectedItem || selectedItem.fileType == "folder" || selectedItem.deleted) {
+                return;
+            }
 
-                    //////////////TEILEN AN ANDERE TEIL1 APP//////////////
-                    //Sofern die Datei vom Share-Charm-Bar-Element angefordert wurde
-                    var deferral;
-                    if (shareRequest) {
-                        // Title is required
-                        var dataPackageTitle = selectedItem.title;
-                        if ((typeof dataPackageTitle === "string") && (dataPackageTitle !== "")) {
+            // Show progress bar
+            document.getElementById("operationPending").style.visibility = 'visible';
 
-                            shareRequest.data.properties.title = dataPackageTitle;
+            // Prepare sharing to other app via charm bar
+            var deferral;
+            if (shareRequest) {
 
-                            //The description is optional.
-                            var dataPackageDescription = cloud.translate("CHOOSEAPP");
-                            if ((typeof dataPackageDescription === "string") && (dataPackageDescription !== "")) {
-                                shareRequest.data.properties.description = dataPackageDescription;
+                // Title is required
+                var title = selectedItem.title;
+                if (typeof title === "string" && title !== "") {
+                    shareRequest.data.properties.title = title;
+                } else {
+                    shareRequest.failWithDisplayText(SdkSample.missingTitleError);
+                }
+
+                // The description is optional
+                var description = cloud.translate("CHOOSEAPP");
+                if ((typeof description === "string") && (description !== "")) {
+                    shareRequest.data.properties.description = description;
+                }
+
+                deferral = shareRequest.getDeferral();
+            }
+
+            // Check if temporary file exists to serve directly
+            if (selectedItem.hasTemporaryFile) {
+
+                // Sharing to app: Set file
+                if (shareRequest) {
+                    shareRequest.data.setStorageItems([selectedItem.temporaryFile]);
+                    deferral.complete();
+                }
+
+                successCallback(selectedItem.temporaryFile);
+            } else {
+
+                // Create temporary file to fill
+                var temporaryFolder = Windows.Storage.ApplicationData.current.temporaryFolder;
+                temporaryFolder.createFileAsync(selectedItem.title, Windows.Storage.CreationCollisionOption.replaceExisting).then(function (targetFile) {
+
+                    // Prepare file to download
+                    var param = [];
+                    param[0] = cloud.helper.convertPath({ path: selectedItem.path });
+                    param[0].fileSize = selectedItem.sizeNum;
+                    param[0].type = shareRequest ? "share" : "preview";
+                    param[0].targetFile = targetFile;
+
+                    // Download file to temporary file
+                    cloud.downloadFile(param,
+                        function () { /* success */
+
+                            // Update listview item
+                            selectedItem.hasTemporaryFile = true;
+                            selectedItem.temporaryFile = targetFile;
+
+                            // Show thumbnail for downloaded pictures
+                            if (appconfig.fileTypes && appconfig.fileTypes[selectedItem.fileType] && appconfig.fileTypes[selectedItem.fileType].previewType == "image") {
+                                var blob = URL.createObjectURL(targetFile, { oneTimeOnly: true });
+                                selectedItem.picture = blob;
+                                listView.forceLayout();
                             }
 
-                            deferral = shareRequest.getDeferral();
-                        } else {
-                            //Titel muss gegeben sein, sonst Fehler!
-                            shareRequest.failWithDisplayText(SdkSample.missingTitleError);
-                        }
-                    }
+                            // Hide progress bar
+                            document.getElementById("operationPending").style.visibility = 'hidden';
 
-                    //////////////TEILEN AN ANDERE APP TEIL1 ENDE//////////////
+                            // Sharing to app: Pass file
+                            if (shareRequest) {
+                                shareRequest.data.setStorageItems([targetFile]);
+                                deferral.complete();
+                            }
 
-                    //Wenn Datei in aktueller Ansicht nicht temporär vorhanden ist
-                    //Datei temporär herunterladen
-                    if (!selectedItem.hasTemporaryFile) {
-                        var applicationData = Windows.Storage.ApplicationData.current;
-                        var temporaryFolder = applicationData.temporaryFolder;
-                        //Temporäre Datei anlegen
-                        temporaryFolder.createFileAsync(selectedItem.title, Windows.Storage.CreationCollisionOption.replaceExisting)
-                            .then(function (targetFile) {
+                            successCallback(targetFile);
+                        }, function (e) { /* error */
 
-                                //Download File
-                                var param = [];
-                                param[0] = cloud.helper.convertPath({ path: selectedItem.path });
-                                param[0].fileSize = selectedItem.sizeNum;
-                                if (shareRequest) {
-                                    param[0].type = "share";
-                                } else {
-                                    param[0].type = "preview";
-                                }
-                                param[0].targetFile = targetFile;
+                            // Notify user
+                            if (e == "DOWNLOADFOLDER") {
+                                cloud.functions.showMessageDialog("DOWNLOADFOLDER");
+                                document.getElementById("operationPending").style.visibility = 'hidden';
+                            } else if (e && e.description && e.description == "Canceled") {
+                                // The preview download was canceled, do nothing
+                                // Don't hide progress bar to avoid crash when logging out during active transfer
+                            } else {
+                                cloud.functions.showMessageDialog("DOWNLOADINTERRUPTED");
+                                document.getElementById("operationPending").style.visibility = 'hidden';
+                            }
 
-                                document.getElementById("operationPending").style.visibility = 'visible';
-                                cloud.downloadFile(param,
-                                    function () {
-                                        /* success */
-                                        //Gedownloadete Datei an ListView anhängen --> Anzeige in Vorschau erleichtern und Download ersparen
-                                        selectedItem.hasTemporaryFile = true;
-                                        selectedItem.temporaryFile = targetFile;
+                            // Sharing to app: Notify app
+                            if (shareRequest) {
+                                deferral.complete();
+                            }
 
-
-                                        // Show Thumbnail for downloaded pictures
-                                        if (appconfig.fileTypes && appconfig.fileTypes[selectedItem.fileType] && appconfig.fileTypes[selectedItem.fileType].previewType == "image") {
-                                            var blob = URL.createObjectURL(targetFile, { oneTimeOnly: true });
-                                            selectedItem.picture = blob;
-                                            listView.forceLayout();
-                                        }
-
-                                        //cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("DOWNLOADCOMPLETED"), "/images/notifications/success.png");
-                                        document.getElementById("operationPending").style.visibility = 'hidden';
-
-                                        //////////////TEILEN AN ANDERE TEIL2 APP//////////////
-                                        if (shareRequest) {
-                                            shareRequest.data.setStorageItems([targetFile]);
-                                            deferral.complete();
-                                        }
-                                        //////////////TEILEN AN ANDERE TEIL2 APP ENDE//////////////
-
-                                        successCallback(targetFile);
-                                    }, function (e) {
-                                        /* error */
-                                        if (e == "DOWNLOADFOLDER") {
-                                            cloud.functions.showMessageDialog("DOWNLOADFOLDER");
-                                            document.getElementById("operationPending").style.visibility = 'hidden';
-                                        } else if (e && e.description && e.description == "Canceled") {
-                                            // The preview download was canceled, do nothing
-                                            //Pending-Anzeige nicht ausblenden, da diese aktuell eh wieder angezeigt wird, da Download nur durch neuen Download unterbrochen wird --> Verhindert so Crash der App beim Logout während eines aktiven Transfers
-                                        } else {
-                                            cloud.functions.showMessageDialog("DOWNLOADINTERRUPTED");
-                                            document.getElementById("operationPending").style.visibility = 'hidden';
-                                        }
-
-                                        //////////////TEILEN AN ANDERE TEIL3 APP//////////////
-                                        if (shareRequest) {
-                                            deferral.complete();
-                                        }
-                                        //////////////TEILEN AN ANDERE TEIL3 APP ENDE//////////////
-
-                                        errorCallback(targetFile);
-                                    });
-                            }).done(function () {
-                            });
-                    } else { //Bereits vorhandene Temp Datei öffnen
-                        var targetFile = selectedItem.temporaryFile;
-
-                        //////////////TEILEN AN ANDERE TEIL4 APP//////////////
-                        if (shareRequest) {
-                            shareRequest.data.setStorageItems([targetFile]);
-                            deferral.complete();
-                        }
-                        //////////////TEILEN AN ANDERE TEIL4 APP ENDE//////////////
-
-                        successCallback(targetFile);
-                    }
-                } else {
-                    //ORDNER SELEKTIERT --> Nicht sinnvoll ohne ZIP-Download von Ordnern
-                    //ODER GELÖSCHTE DATEI
-                }
-            } else {
-                //mehrere Dateien --> kein Termporärer Download angedacht
-            }
+                            errorCallback(targetFile);
+                        });
+                });
+            }                
         },
 
-        //Wenn nötig temporären Download durchführen und Datei öffnen
+        // Open file
         openFileButtonEvent: function () {
-            var listView = document.getElementById("directoryView").winControl;
-            //Sofern etwas angeklickt wurde...
-            if (listView.selection.count() == 1) {
-                //Wenn Datei in aktueller Ansicht nicht temporär vorhanden ist
-                //Datei wenn nicht bereits vorhanden temporär herunterladen
-                directoryView.prototype.downloadFileTemporary(
-                    function (targetFile) {
-                        //Datei in externem Viewer öffnen
-                        cloud.functions.openFileFromSystem(targetFile);
-                    },
-                    function () {
-                        return;
-                    });
+            if (listView.selection.count() != 1) {
+                return;
             }
+
+            // Download file temporarily and open
+            self.downloadFileTemporary(
+                function (targetFile) {
+                    // Open in external application
+                    cloud.functions.openFileFromSystem(targetFile);
+                },
+                function () { /* error, do nothing */ });
         },
 
-        //Eine oder mehrere Dateien herunterladen und im durch dem FilePicker gewählten Ort speichern --> Nicht unterstützte Selektionen werden hier aussortiert
+        // Save file 
         downloadAndSaveFileButtonEvent: function () {
             // Verify that we are currently not snapped, or that we can unsnap to open the picker
             var currentState = Windows.UI.ViewManagement.ApplicationView.value;
             if (currentState === Windows.UI.ViewManagement.ApplicationViewState.snapped &&
                 !Windows.UI.ViewManagement.ApplicationView.tryUnsnap()) {
-                // Fail silently if we can't unsnap
+                // Inform user about fail to unsnap to open file picker
+                cloud.functions.showMessageDialog("NOSNAPVIEW");
                 return;
             }
 
-            var listView = document.getElementById("directoryView").winControl;
+            // Check if selection exists
+            if (listView.selection.count() == 0) {
+                return;
+            }
+            
+            // Prepare files to download, exclude folders and deleted files
+            var containsFolderOrDeleted  = false;
+            var indices = listView.selection.getIndices();
 
-            //Prüfen ob eine oder mehrere Dateien selektiert wurden
-            if (listView.selection.count() >= 1) {
-                var indices = listView.selection.getIndices();
-                //App-Bar verbergen
-                document.getElementById('appbar').winControl.hide();
-                document.getElementById('navbar').winControl.hide();
-
-                //Für Fehlermeldung
-                var containsFolderOrDeleted  = false;
-
-                //Parameter vorbereiten
-                var param = [];
-                var idx = 0
-                for (var i = 0; i < listView.selection.count() ; i++) {
-                    var selectedItem = listViewItems.getAt(indices[i]);
-                    if (selectedItem.fileType != "folder" && !selectedItem.deleted) {
-                        //Pro Datei: Pfad und Dateigröße --> Bereits über ListView bekannt
-                        param[idx] = cloud.helper.convertPath({ path: selectedItem.path });
-                        param[idx].fileSize = selectedItem.sizeNum;
-                        idx++;
-                    } else if (selectedItem.fileType == "folder") {
-                        containsFolderOrDeleted = true;
-                    } else if (selectedItem.deleted) {
-                        containsFolderOrDeleted = true;
-                    }
-                }
-
-                //Sofern gelöschte oder Ordner selektiert waren --> Benutzer darüber benachrichtigen, dass dies nicht geht.
-                if (containsFolderOrDeleted) {
-                    //Zeige Fehlermeldung an und führen Download danach durch
-                    cloud.functions.showMessageDialog("DOWNLOADFOLDERORDELETEDERROR", function () { directoryView.prototype.downloadAndSaveFile(param) });
+            //Parameter vorbereiten
+            var param = [];
+            var idx = 0; // file list index
+            for (var i = 0; i < listView.selection.count() ; i++) {
+                var selectedItem = cloud.pages.directoryView.listViewItems.getAt(indices[i]);
+                if (selectedItem.fileType != "folder" && !selectedItem.deleted) {
+                    param[idx] = cloud.helper.convertPath({ path: selectedItem.path });
+                    param[idx].fileSize = selectedItem.sizeNum;
+                    idx++;
                 } else {
-                    //Führe Download durch
-                    directoryView.prototype.downloadAndSaveFile(param);
+                    containsFolderOrDeleted = true;
                 }
+            }
+
+            // Download
+            if (containsFolderOrDeleted) {
+                // Notify user about excluded items first
+                cloud.functions.showMessageDialog("DOWNLOADFOLDERORDELETEDERROR", function () {
+                    self.downloadAndSaveFile(param)
+                });
+            } else {
+                self.downloadAndSaveFile(param);
             }
         },
 
-        //Download durchführen --> Nicht unterstützte Selektionen durch Buttonevent ignoriert
+        // Perform download (objects to download need to be validated before)
         downloadAndSaveFile: function(param) {
-            //Nicht nur ein Ordner ausgewählt
-            if (param.length > 0) {
-                document.getElementById("operationPending").style.visibility = 'visible';
-
-                //Dateien herunterladen
-                cloud.downloadFile(param,
-                    function (isLast) {
-                        /* success */
-                        if (isLast) {
-                            if (!downloadError) {
-                                cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("DOWNLOADCOMPLETED"), "/images/notifications/success.png");
-                            } else {
-                                cloud.functions.showMessageDialog("DOWNLOADINTERRUPTED");
-                            }
-                            document.getElementById("operationPending").style.visibility = 'hidden';
-                            downloadError = false;
-                        }
-                        return;
-                    }, function (error, isLast) {
-                        /* error */
-                        if (isLast) {
-                            cloud.functions.showMessageDialog("DOWNLOADINTERRUPTED");
-                            document.getElementById("operationPending").style.visibility = 'hidden';
-                            downloadError = false;
-                        } else {
-                            downloadError = true;
-                        }
-                        return;
-                    });
-            } else {
-                //ORDNER SELEKTIERT --> Nicht sinnvoll ohne ZIP-Download von Ordnern
+            if (param.length == 0) {
+                return;
             }
+
+            // Show progress bar
+            document.getElementById("operationPending").style.visibility = 'visible';
+
+            // Download file
+            cloud.downloadFile(param,
+                function (isLast) { /* success */
+                    if (isLast) {
+                        if (!downloadError) {
+                            cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("DOWNLOADCOMPLETED"), "/images/notifications/success.png");
+                        } else {
+                            cloud.functions.showMessageDialog("DOWNLOADINTERRUPTED");
+                        }
+                        document.getElementById("operationPending").style.visibility = 'hidden';
+                        downloadError = false;
+                    }
+                }, function (error, isLast) { /* error */
+                    if (isLast) {
+                        cloud.functions.showMessageDialog("DOWNLOADINTERRUPTED");
+                        document.getElementById("operationPending").style.visibility = 'hidden';
+                        downloadError = false;
+                    } else {
+                        downloadError = true;
+                    }
+                });
         },
         
-        //Ausgewählte gelöschte Dateien nacheinander wiederherstellen (Schleife)
+        // Handles button to restore deleted files
         restoreFileButtonEvent: function () {
-            var listView = document.getElementById("directoryView").winControl;
-            if (listView.selection.count() >= 1 && cloud.context.showDeletedFiles) {
-                var isLast = false;
-                var indices = listView.selection.getIndices();
-
-                //Appbar nach Klick ausblenden
-                document.getElementById('appbar').winControl.hide();
-                document.getElementById('navbar').winControl.hide();
-
-                //Speichern des Uploadverzeichnisses um das aktuelle Verzeichnis neu zu laden sofern der Benutzer sich noch in diesem befindet
-                var restoreDirectory = cloud.getNavigationPathCurrent();
-                document.getElementById("operationPending").style.visibility = 'visible';
-
-                //Für jede ausgewählte Datei
-                for (var i = 0; i < listView.selection.count() ; i++) {
-                    var selectedItem = listViewItems.getAt(indices[i]);
-                    //Sofern es eine gelöschte Datei ist
-                    var targetFile = selectedItem.path;
-                    
-                    //Rufe Funktion Rekursiv auf, sofern es die letzte zu löschende Datei ist, teile dies der Löschenfunktion mit
-                    directoryView.prototype.restoreFile(targetFile, selectedItem.deletedId, restoreDirectory, i == listView.selection.count() - 1);
-                }
-            }
-        },
-
-        //Einzelne gelöschte Datei wiederherstellen, bei der letzten Datei Erfolgs- oder Fehlermeldung anzeigen
-        restoreFile: function (targetFile, deleted, restoreDirectory, isLast) {
-            var listView = document.getElementById("directoryView").winControl;
-            //Letzte ausgewählte Datei ist keine gelöschte
-            if (deleted) {
-                if (targetFile != null) {
-                    var indices = listView.selection.getIndices();
-                    var selectedItem = listViewItems.getAt(indices[0]);
-
-                    cloud.restoreFile({ path: targetFile, deletedId: deleted },
-                        function () { //success
-                            //Sofern es das letzte Element ist und wir uns immer noch im gleichen Verzeichnis befinden
-                            if (isLast && restoreDirectory == cloud.getNavigationPathCurrent()) {
-                                //Selektionen leeren
-                                cloud.pages.directoryView.selectedDirectoryContent = [];
-                                WinJS.Application.sessionState.selectedDirectoryContent = [];
-
-                                //Gelöschte Dateien ausblenden
-                                cloud.context.showDeletedFiles = false;
-
-                                //Verzeichnis neu laden
-                                cloud.pages.directoryView.loadFolder();
-                            }
-
-                            if (isLast) {
-                                document.getElementById("operationPending").style.visibility = 'hidden';
-
-                                if (restoreError) {
-                                    cloud.functions.showMessageDialog("FILENOTRESTORED");
-                                } else {
-                                    cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILERESTORED"), "/images/notifications/success.png");
-                                }
-
-                            }
-                            return;
-                        },
-                        function () { //error
-                            restoreError = true;
-
-                            //Sofern es das letzte Element ist und wir uns immer noch im gleichen Verzeichnis befinden
-                            if (isLast && restoreDirectory == cloud.getNavigationPathCurrent()) {
-                                cloud.context.showDeletedFiles = false;
-                                //Verzeichnis neu laden
-                                directoryView.prototype.loadFolder();
-                            }
-
-                            if (isLast) {
-                                //Sofern es im Verlauf einen Fehler gab, einen Fehler anzeigen.
-                                if (restoreError) {
-                                    cloud.functions.showMessageDialog("FILENOTRESTORED");
-                                }
-                                document.getElementById("operationPending").style.visibility = 'hidden';
-                            }
-                            return;
-                        });
-                }
-            } else {
-                //keine gelöschte Datei --> Nötig, da in der Selektion aktuell auch nicht gelöschte Dateien sein können
-                if (isLast) {
-                    document.getElementById("operationPending").style.visibility = 'hidden';
-
-                    //Selektionen leeren
-                    cloud.pages.directoryView.selectedDirectoryContent = [];
-                    WinJS.Application.sessionState.selectedDirectoryContent = [];
-
-                    //Verzeichnis neu laden
-                    directoryView.prototype.loadFolder();
-
-                    if (restoreError) {
-                        cloud.functions.showMessageDialog("FILENOTRESTORED");
-                    } else {
-                        cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILERESTORED"), "/images/notifications/success.png");
-                    }
-                }
+            if (listView.selection.count() == 0 || !cloud.context.showDeletedFiles) {
                 return;
             }
+
+            // Show progress ring
+            document.getElementById("operationPending").style.visibility = 'visible';
+
+            var indices = listView.selection.getIndices();
+            var restoreDirectory = cloud.getNavigationPathCurrent();
+            
+            cloud.pages.directoryView.restoreError = false;
+
+            // Iterate through selected files and restore
+            for (var i = 0; i < listView.selection.count() ; i++) {
+                var selectedItem = cloud.pages.directoryView.listViewItems.getAt(indices[i]);
+                var isLast = i == listView.selection.count() - 1;
+
+                self.restoreFile(selectedItem, selectedItem.deletedId, restoreDirectory, isLast);
+            }
         },
 
-        //Event des Delete-File Buttons --> Schleife über alle ausgewählte Dateien um diese einzeln zu löschen
+        // Restore a single deleted file
+        restoreFile: function (targetFile, deleted, restoreDirectory, isLast) {
+
+            // Only restore deleted files
+            if (!targetFile || !deleted) {
+                cloud.pages.directoryView.restoreError = true;
+                self.restoreFileFinally(restoreDirectory, isLast);
+                return;
+            }
+
+            cloud.restoreFile({ path: targetFile.path, deletedId: deleted },
+                function () { /* success */
+                    self.restoreFileFinally(restoreDirectory, isLast);
+                },
+                function () { /* error */
+                    cloud.pages.directoryView.restoreError = true;
+                    self.restoreFileFinally(restoreDirectory, isLast);
+                });
+        },
+
+        // Final actions to perform after any outcome of a file restoration
+        restoreFileFinally: function (restoreDirectory, isLast) {
+            if (isLast) {
+                // Notify user on last element
+                if (cloud.pages.directoryView.restoreError) {
+                    cloud.functions.showMessageDialog("FILENOTRESTORED");
+                } else {
+                    cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILERESTORED"), "/images/notifications/success.png");
+                }
+
+                // Reset view
+                document.getElementById("operationPending").style.visibility = 'hidden';
+
+                // Hide deleted files and reload folder
+                cloud.context.showDeletedFiles = false;
+                self.loadFolder(false, restoreDirectory);
+
+                cloud.pages.directoryView.restoreError = false;
+            }
+        },
+
+        // Handles button to delete files
         deleteFileButtonEvent: function (e) {
-            var listView = document.getElementById("directoryView").winControl;
-            if (listView.selection.count() >= 1) {
-                var isLast = false;
-                var indices = listView.selection.getIndices();
+            if (listView.selection.count() == 0) {
+                return;
+            }
 
-                //Speichern des Löschverzeihnisses um das aktuelle Verzeichnis neu zu laden sofern der Benutzer sich noch in diesem befindet
-                var deleteDirectory = cloud.getNavigationPathCurrent();
+            var isLast = false;
+            var indices = listView.selection.getIndices();
+            var deleteDirectory = cloud.getNavigationPathCurrent();
 
-                //Für jede ausgewählte Datei
-                var alreadyDeletedOrSharedFolder = false;
-                for (var i = 0; i < listView.selection.count() ; i++) {
-                    var selectedItem = listViewItems.getAt(indices[i]);
-                    //Sofern es keine gelöschte Datei ist
-                    if (!selectedItem.deleted && selectedItem.path != "/Shared") {
-                        var pathAndName = selectedItem.path;
-                        var fileName = selectedItem.title;
-                        if (i == 0) {
-                            //Appbar nach Klick ausblenden
-                            document.getElementById('appbar').winControl.hide();
-                            document.getElementById('navbar').winControl.hide();
+            cloud.pages.directoryView.deleteError = false;
 
-                            document.getElementById("operationPending").style.visibility = 'visible';
-                        }
-                        //Rufe Funktion Rekursiv auf, sofern es die letzte zu löschende Datei ist, teile dies der Löschenfunktion mit
-                        directoryView.prototype.deleteFile(pathAndName, fileName, deleteDirectory, i == listView.selection.count() - 1);
-                    } else {
-                        //Datei ist bereits gelöscht oder Shared-Ordner
-                        alreadyDeletedOrSharedFolder = true;
-                    }
-                }
-                //Sofern eine gelöschte Datei dabei war, wird diese einfach übersprungen und im Anschluss an die Operation ein Fehler angezeigt
-                if (alreadyDeletedOrSharedFolder) {
-                    cloud.functions.showMessageDialog("OBJECTCANTBEDELETED");
-                }
+            // Iterate through files and delete
+            for (var i = 0; i < listView.selection.count() ; i++) {
+                var selectedItem = cloud.pages.directoryView.listViewItems.getAt(indices[i]);
+                var isLast = i == listView.selection.count() - 1;
+ 
+                self.deleteFile(selectedItem, deleteDirectory, isLast);
             }
         },
 
-        //deletePath = zu löschende Datei (übergeben aus Button-Click Event)
-        //fileName = Zum checken der aktuellen Vorschau
-        //IsLast = Schließt beim letzten zu löschenden Element in der SuccessMethode die Erfolgsmeldung ein
-        deleteFile: function (deletePath, fileName, deleteDirectory, isLast) {
-            if (deletePath != null) {
-                cloud.deleteObject({ path: deletePath },
-                    function () { //success
-                        //Lade die Anzeige nach Abschluss des Löschvorgangs neu, sofern der Benutzer im gleichen Verzeichnis ist
-                        if (isLast && deleteDirectory == cloud.getNavigationPathCurrent()) {
-                            //Selektionen leeren
-                            cloud.pages.directoryView.selectedDirectoryContent = [];
-                            WinJS.Application.sessionState.selectedDirectoryContent = [];
+        // Delete a single file
+        deleteFile: function (selectedItem, deleteDirectory, isLast) {
+            // Delete only existing files and exclude shared files
 
-                            //Verzeichnis neu laden
-                            directoryView.prototype.loadFolder();
-                        }
+            if (!selectedItem.path || selectedItem.deleted || selectedItem.path.indexOf("/Shared") == 0) {
+                cloud.pages.directoryView.deleteError = true;
+                self.deleteFileFinally(deleteDirectory, isLast);
+                return;
+            }
 
-                        //Vorschau ggf. ausblenden
-                        if (document.getElementById("previewHeader").innerText == fileName) {
-                            document.getElementById("previewHeader").innerText = "";
-                            document.getElementById("previewHeader").style.visibility = 'hidden';
-                            document.getElementById("previewTag").style.visibility = 'hidden';
-                            document.getElementById("previewHeaderContainer").style.visibility = 'hidden';
-                        }
+            cloud.deleteObject({ path: selectedItem.path },
+                function () { /* success */
+                    self.deleteFileFinally(deleteDirectory, isLast);
+                },
+                function () { /* error */
+                    cloud.pages.directoryView.deleteError = true;
+                    self.deleteFileFinally(deleteDirectory, isLast);
+                });
+        },
 
-                        //Bei der letzten Datei Vorgang abschließen & ggf. Fehler anzeigen oder Success
-                        if (isLast) {
-                            document.getElementById("operationPending").style.visibility = 'hidden';
+        // Final actions to perform after any outcome of a file deletion
+        deleteFileFinally: function (deleteDirectory, isLast) {
+            if (isLast) {
+                // Notify user on last element
+                if (cloud.pages.directoryView.deleteError) {
+                    cloud.functions.showMessageDialog("FILENOTDELETED");
+                } else {
+                    cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILEDELETED"), "/images/notifications/success.png");
+                }
 
-                            //Sofern es im Verlauf einen Fehler gab
-                            if (deleteError) {
-                                cloud.functions.showMessageDialog("FILENOTDELETED");
-                            //Sofern der gesamte Vorgang erfolgreich war
-                            } else {
-                                cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILEDELETED"), "/images/notifications/success.png");
-                            }
-                            deleteError = false;
-                        }
-                        return;
-                    },
-                    function () { //error
-                        deleteError = true;
+                // Reset view
+                document.getElementById("operationPending").style.visibility = 'hidden';
+                self.preparePreview(null);
 
-                        //Sofern es der letzte Löschvorgang ist und wir uns immer noch im gleichen Verzeichnis befinden
-                        if (isLast && deleteDirectory == cloud.getNavigationPathCurrent()) {
-                            //Ansicht neu laden
-                            directoryView.prototype.loadFolder();
-                        }
-
-                        if (isLast) {
-                            //Sofern es im Verlauf einen Fehler gab, einen Fehler anzeigen.
-                            if (deleteError) {
-                                cloud.functions.showMessageDialog("FILENOTDELETED");
-                            }
-                            document.getElementById("operationPending").style.visibility = 'hidden';
-                            deleteError = false;
-                        }
-                        return;
-                    });
+                // Reload folder
+                self.loadFolder(false, deleteDirectory);
             }
         },
 
-        //Datei umbenennen
+        // Rename a file
         renameFile: function () {
-            var listView = document.getElementById("directoryView").winControl;
-
-            if (listView.selection.count() == 1) {
-                var indices = listView.selection.getIndices();
-                var selectedItem = listViewItems.getAt(indices[0]);
-
-                if (!selectedItem.deleted && selectedItem.path != "/Shared" && selectedItem.path.indexOf("/Shared") == -1) {
-                    //Speichern des RenameVerzeichnisses um das aktuelle Verzeichnis neu zu laden sofern der Benutzer sich noch in diesem befindet
-                    var renameDirectory = cloud.getNavigationPathCurrent();
-
-                    var selectedItem = listViewItems.getAt(indices[0]);
-                    document.getElementById('appbar').winControl.hide();
-                    document.getElementById('navbar').winControl.hide();
-
-                    document.getElementById("operationPending").style.visibility = 'visible';
-
-                    //Neuen Namen zusammensetzten --> Wenn es eine Datei und kein Ordner ist, Dateitypen ranhängen
-                    if (selectedItem.fileType == "folder") {
-                        var targetName = document.getElementById('renameInput').value;
-                    } else {
-                        var targetName = document.getElementById('renameInput').value + selectedItem.fileType;
-                    }
-
-                    //Datei umbenennen
-                    cloud.renameObject({ srcPath: selectedItem.path, targetName: targetName, isDir: selectedItem.fileType == "folder" },
-                        function () { /*success*/
-                            cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILERENAMED"), "/images/notifications/success.png");
-                            document.getElementById("operationPending").style.visibility = 'hidden';
-                            //Lade die Anzeige nach Abschluss des renames neu, sofern der Benutzer im Renameverzeichnis ist
-                            if (renameDirectory == cloud.getNavigationPathCurrent()) {
-                                //Im vorraus ListView Item Titel überschrieben, (nur Anzeige) damit ggf. Preview Titel geupdatet werden kann (loadFolder ist noch nicht fertig wenn updatePreview danach direkt aufgerufen wird (da ansynchron))
-                                selectedItem.title = targetName;
-                                //Vorschau ggf. ausblenden
-                                if (document.getElementById("previewHeader").innerText == selectedItem.fileName) {
-                                    document.getElementById("previewHeader").innerText = targetName;
-                                }
-
-                                //Selektionen leeren
-                                cloud.pages.directoryView.selectedDirectoryContent = [];
-                                WinJS.Application.sessionState.selectedDirectoryContent = [];
-
-                                directoryView.prototype.loadFolder();
-                            }
-                            return;
-                        },
-                        function () { /*error*/
-                            //Überprüfung auf einen eingegebenen nicht leeren Namen
-                            if (document.getElementById('renameInput').value == "") {
-                                cloud.functions.showMessageDialog("EMPTYDATANAMETEXT");
-                            } else {
-                                cloud.functions.showMessageDialog("FILENOTRENAMED");
-                            }
-                            document.getElementById("operationPending").style.visibility = 'hidden';
-                            return;
-                        });
-                }
+            // Makes only sense for single files
+            if (listView.selection.count() != 1) {
+                return;
             }
+
+            // Check that shared items are not renamed
+            var selectedItem = self.getSelectedItem();
+            if (selectedItem.deleted || selectedItem.path.indexOf("/Shared") == 0) {
+                return;
+            }
+
+            // Check for empty input
+            var targetName = document.getElementById('renameInput').value;
+            if (targetName == "") {
+                cloud.functions.showMessageDialog("EMPTYDATANAMETEXT");
+                return;
+            }
+
+            // Show progress ring
+            document.getElementById("operationPending").style.visibility = 'visible';
+            
+            // Add file extension in case of files
+            if (selectedItem.fileType != "folder") {
+                targetName += selectedItem.fileType;
+            }
+
+            var renameDirectory = cloud.getNavigationPathCurrent();
+
+            // Rename
+            cloud.renameObject({ srcPath: selectedItem.path, targetName: targetName, isDir: selectedItem.fileType == "folder" },
+                function () { /*success*/
+                    cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILERENAMED"), "/images/notifications/success.png");
+                    document.getElementById("operationPending").style.visibility = 'hidden';
+
+                    // Reload view if still in same directory
+                    if (renameDirectory == cloud.getNavigationPathCurrent()) {
+                        // Update title in listView item to avoid errors before loadFolder is completed
+                        selectedItem.title = targetName;
+
+                        // Refresh name on preview
+                        if (document.getElementById("previewHeader").innerText == selectedItem.fileName) {
+                            document.getElementById("previewHeader").innerText = targetName;
+                        }
+
+                        self.loadFolder();
+                    }
+                    return;
+                },
+                function () { /*error*/
+                    cloud.functions.showMessageDialog("FILENOTRENAMED");
+                    document.getElementById("operationPending").style.visibility = 'hidden';
+                });
         },
 
-        //Einfügen der zum verschieben ausgewählten Objekte
-        //Wird im fileMover ausgeführt
+        // Insert selected objects while moving files
         pasteObject: function () {
             document.getElementById("operationPending").style.visibility = 'visible';
-            var moveCount;
-            var moveError = false;
-            var moveErrorType = null;
 
-            //Verschiebe jede ausgewählte Datei einzeln
-            for (var i = 0; i < cloud.context.fileMover.cutObjectPath.length ; i++) {
-                var targetPath = cloud.getNavigationPathCurrent() + "/" + cloud.context.fileMover.cutObjectName[i];
-                moveCount = i;
+            // Move every file separately
+            for (var i = 0; i < cloud.context.fileMover.cutObjects.length ; i++) {
+                var targetPath = cloud.helper.normalizePath(cloud.getNavigationPathCurrent(), { "trailingSlash": true, "prependSlash": true }) + cloud.context.fileMover.cutObjects[i].title;
+                var isLast = i == cloud.context.fileMover.cutObjects.length - 1;
 
-                //Datei verschieben
-                cloud.moveObject({ srcPath: cloud.context.fileMover.cutObjectPath[i], targetPath: targetPath, isDir: cloud.context.fileMover.cutObjectIsDir[i] },
-                    function () {
-                        //Sofern das letzte Element erfolgreich verschoben wurde
-                        if (moveCount == cloud.context.fileMover.cutObjectPath.length - 1) {
-                            //Wenn es im Verlauf einen Fehler gab, gebe diesen aus
-                            if (moveError) {
-                                if (moveErrorType == "IDENTICAL") {
-                                    cloud.functions.showNotification(cloud.translate("IDENTICALINDEX"), cloud.translate("IDENTICALINDEXTEXT"), "/images/notifications/warning.png");
-                                } else if (moveErrorType == "RECURSION") {
-                                    cloud.functions.showMessageDialog("RECURSIONTEXT");
-                                } else {
-                                    cloud.functions.showMessageDialog("MOVEERRORGENERAL");
-                                }
-                            } else { //Ansonsten berichte den Erfolg
-                                cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILEMOVED"), "/images/notifications/success.png");
-                            }
-                            
-                            document.getElementById("operationPending").style.visibility = 'hidden';
-                            //Variablen resetten
-                            cloud.context.fileMover.cutObjectPath = [];
-                            cloud.context.fileMover.cutObjectName = [];
-                            cloud.context.fileMover.cutObjectIsDir = [];
-
-                            //Sofern eine Datei verschoben wurde, muss die "Verschieben-Ansicht" wieder verlassen werden und zurück zum Browser navigiert werden
-                            directoryView.prototype.leaveFileMover();
-                        }
-                        return;
-                    },
-                    function (e) {
-                        moveError = true;
-                        moveErrorType = e;
-
-                        //Sofern es im Verlauf des Verschiebens einen Fehler gab
-                        if (i == cloud.context.fileMover.cutObjectPath.length - 1) {
-                            document.getElementById("operationPending").style.visibility = 'hidden';
-
-                            //Variablen resetten
-                            cloud.context.fileMover.cutObjectPath = [];
-                            cloud.context.fileMover.cutObjectName = [];
-                            cloud.context.fileMover.cutObjectIsDir = [];
-
-                            //Gebe Fehler für einzelne Fehlertypen aus
-                             if (moveErrorType == "IDENTICAL") {
-                                 cloud.functions.showMessageDialog("IDENTICALINDEXTEXT");
-                             } else if (moveErrorType == "RECURSION") {
-                                 cloud.functions.showMessageDialog("RECURSIONTEXT");
-                             } else {
-                                 cloud.functions.showMessageDialog("MOVEERRORGENERAL");
-                             }
-
-                            //FileMover verlassen
-                            directoryView.prototype.leaveFileMover();
-                        }
-                    });
+                self.pasteObjectSingle(i, targetPath, isLast);
             }
         },
 
-        //Öffne fileMover View
+        // Move a single file
+        pasteObjectSingle: function (index, targetPath, isLast) {
+            cloud.moveObject({
+                srcPath: cloud.context.fileMover.cutObjects[index].path,
+                targetPath: targetPath,
+                isDir: cloud.context.fileMover.cutObjects[index].fileType == "folder"
+            },
+                function () {
+                    self.pasteObjectFinally(isLast);
+                },
+                function (e) {
+                    cloud.pages.directoryView.moveError = true;
+                    cloud.pages.directoryView.moveErrorType = e;
+                    self.pasteObjectFinally(isLast);
+                });
+        },
+
+        // Final actions to perform after any outcome of a file movement
+        pasteObjectFinally: function(isLast) {
+            if (isLast) {
+                if (cloud.pages.directoryView.moveError) {
+                    if (cloud.pages.directoryView.moveErrorType == "IDENTICAL") {
+                        cloud.functions.showNotification(cloud.translate("IDENTICALINDEX"), cloud.translate("IDENTICALINDEXTEXT"), "/images/notifications/warning.png");
+                    } else if (cloud.pages.directoryView.moveErrorType == "RECURSION") {
+                        cloud.functions.showMessageDialog("RECURSIONTEXT");
+                    } else {
+                        cloud.functions.showMessageDialog("MOVEERRORGENERAL");
+                    }
+                } else { /* success */
+                    cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FILEMOVED"), "/images/notifications/success.png");
+                }
+
+                document.getElementById("operationPending").style.visibility = 'hidden';
+
+                // Reset variables
+                cloud.context.fileMover.cutObjects = [];
+                cloud.pages.directoryView.moveError = false;
+                cloud.pages.directoryView.moveErrorType = null;
+
+                // Back to file browser
+                self.leaveFileMover();
+            }
+        },
+
+        // Open file mover context
         moveObject: function (path, isLast) {
             var currentState = Windows.UI.ViewManagement.ApplicationView.value;
             if (currentState === Windows.UI.ViewManagement.ApplicationViewState.snapped &&
@@ -2422,459 +1932,208 @@
                 return;
             }
 
-            var listView = document.getElementById("directoryView").winControl;
+            var selectionContent = cloud.functions.analyzeSelection(listView.selection);
+            if (selectionContent.size == 0) {
+                // Nothing to move
+                return; 
+            }
 
-            if (listView.selection.count() >= 1) {
-                cloud.context.fileMover.isFileMover = true;
-                var listView = document.getElementById("directoryView").winControl;
-                var indices = listView.selection.getIndices();
-
-                var containsDeletedOrSharedFolder = false;
-                var containsMoveableObject = false;
-
-                var idx = 0;
-                for (var i = 0; i < listView.selection.count() ; i++) {
-                    var selectedItem = listViewItems.getAt(indices[i]);
-                    if (!selectedItem.deleted && selectedItem.path != "/Shared") {
-                        containsMoveableObject = true;
-                        cloud.context.fileMover.cutObjectPath[idx] = selectedItem.path;
-                        cloud.context.fileMover.cutObjectName[idx] = selectedItem.title;
-                        if (selectedItem.fileType == "folder") {
-                            cloud.context.fileMover.cutObjectIsDir[idx] = true;
-                        } else {
-                            cloud.context.fileMover.cutObjectIsDir[idx] = false;
-                        }
-                        idx++;
-                    } else {
-                        //Gelöschte Datei oder der Ordner shared --> Zeig vor Start des Vorgangs eine Fehlermeldung an
-                        containsDeletedOrSharedFolder = true;
-                    }
-                }
+            cloud.context.fileMover.isFileMover = true; // switch to file mover context
+            cloud.context.fileMover.cutObjects = selectionContent.onlyNormalItems;
         
-                //Navigation zurücksetzen
-                cloud.resetNavigation();
+            //Navigation zurücksetzen
+            cloud.resetNavigation();
 
-                //Sofern gelöschte Dateien selektiert waren --> Benutzer darüber benachrichtigen, dass dies nicht geht.
-                if (containsDeletedOrSharedFolder) {
-                    //Zeige Fehlermeldung an und öffne Filemover erst danach
-                    cloud.functions.showMessageDialog("MOVENOTPOSSIBLEERROR", function () {
-                        if (containsMoveableObject) {
-                            WinJS.Navigation.navigate("/pages/directoryView/directoryView.html");
-                        }
-                    });
-                } else {
-                    //Führe Download durch
-                    WinJS.Navigation.navigate("/pages/directoryView/directoryView.html");
-                }                
+            // Open file mover by navigating to directoryView in fileMover context
+            if (selectionContent.containsDeletedItems || selectionContent.containsSharedItems) {
+                // Inform user about non-moveable items first
+                cloud.functions.showMessageDialog("MOVENOTPOSSIBLEERROR", function () {
+                    if (selectionContent.containsNormalItems) {
+                        WinJS.Navigation.navigate("/pages/directoryView/directoryView.html");
+                    }
+                });
+            } else {
+                WinJS.Navigation.navigate("/pages/directoryView/directoryView.html");
             }
         },
 
-        //Verlasse den fileMover bzw. ShareTarget
+        // Leave file mover / shareTarget (= folder view of directory structure)
         leaveFileMover: function () {
+            // Reset context and variables
             cloud.context.fileMover.isFileMover = false;
-            cloud.context.fileMover.cutObjectPath = [];
-            cloud.context.fileMover.cutObjectName = [];
-            cloud.context.fileMover.cutObjectIsDir = [];
+            cloud.context.fileMover.cutObjects = [];
 
-            //Vorwärtsliste leeren
-            cloud.clearNavigationListForward();
-
-            //Selektion leeren
-            cloud.pages.directoryView.selectedDirectoryContent = [];
-            WinJS.Application.sessionState.selectedDirectoryContent = [];
-
-            //Verzeichnisansicht im normalen Kontext neu laden
+            // Reload directory in normal context
+            cloud.resetNavigation();
             WinJS.Navigation.navigate("/pages/directoryView/directoryView.html");
         },
 
-        //Neuen Ordner anlegen
+        // Create new folder
         createFolder: function () {
-            //Speichern des Verzeichnisses um das aktuelle Verzeichnis neu zu laden sofern der Benutzer sich noch in diesem befindet
-            var createFolderDirectory = cloud.getNavigationPathCurrent();
-            var targetPath = createFolderDirectory;
-            
-            document.getElementById('appbar').winControl.hide();
-            document.getElementById('navbar').winControl.hide();
-
+            // Show progress bar
             document.getElementById("operationPending").style.visibility = 'visible';
 
+            var targetPath = cloud.getNavigationPathCurrent();
             var folderName = document.getElementById('folderNameInput').value;
 
-            //Suche ob Ordner bereits existiert --> Doppeltes erstellen eines Ordners zwar nicht schädlich, jedoch irreführend
-            var alreadyExistsFolder = false;
-            var id = 0;
-            for (; id < listViewItems.length;) {
-                if (listViewItems.getAt(id).fileType == "folder" && listViewItems.getAt(id).fileName == folderName) {
-                    alreadyExistsFolder = true;
-                    break;
-                } else {
-                    id++;                  
-                }
-            }
+            // Create folder
+            cloud.createFolder({ path: targetPath, folderName: folderName },
+                function () { /*success*/
+                    cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FOLDERCREATED"), "/images/notifications/success.png");
+                    document.getElementById("operationPending").style.visibility = 'hidden';
+                    document.getElementById('folderNameInput').value = "";
 
-            //Sofern der Ordner noch nicht existiert, lege ihn an
-            if (!alreadyExistsFolder) {
-                cloud.createFolder({ path: targetPath, folderName: folderName },
-                    function () { /*success*/
-                        cloud.functions.showNotification(cloud.translate("ACTIONCOMPLETE"), cloud.translate("FOLDERCREATED"), "/images/notifications/success.png");
-                        document.getElementById("operationPending").style.visibility = 'hidden';
-                        document.getElementById('folderNameInput').value = "";
-                        if (createFolderDirectory == cloud.getNavigationPathCurrent()) {
-                            //Selektionen leeren
-                            cloud.pages.directoryView.selectedDirectoryContent = [];
-                            WinJS.Application.sessionState.selectedDirectoryContent = [];
-
-                            //Verzeichnis neu laden
-                            directoryView.prototype.loadFolder();
-                        }
-                        return;
-                    },
-                    function (e) { /*error*/
+                    // Reload folder if it is still current folder
+                    self.loadFolder(false, targetPath);
+                },
+                function (e) { /*error*/
+                    if (e && e == "NONAME") {
+                        cloud.functions.showMessageDialog("NONAMETEXT");
+                    } else {
                         cloud.functions.showMessageDialog("FOLDERNOTCREATED");
-                        if (e == "NONAME") {
-                            cloud.functions.showMessageDialog("NONAMETEXT");
-                        }
-                        document.getElementById("operationPending").style.visibility = 'hidden';
-                    });
-            } else { //Wenn der Ordner bereits existiert, zeige Fehlermeldung
-                cloud.functions.showMessageDialog("FOLDERALREADYEXISTS");
-                document.getElementById("operationPending").style.visibility = 'hidden';
-            }
+                    }
+                    document.getElementById("operationPending").style.visibility = 'hidden';
+                });
         },
 
-        //Dateihistorie anzeigen
-        showHistory: function () {
+        // Open file history flyout
+        showHistoryFlyout: function () {
             if (cloud.hasFunctionality({ functionkey: "getFileHistory" })) {
-                var listView = document.getElementById("directoryView").winControl;
                 if (listView.selection.count() == 1) {
-                    var indices = listView.selection.getIndices();
-                    var selectedItem = listViewItems.getAt(indices[0]);
-
+                    var selectedItem = self.getSelectedItem();
                     if (selectedItem.fileType != "folder" && !selectedItem.deleted) {
 
-                        //Stelle Flyout Datei zur Verfügung
+                        // Provide file to flyout
                         cloud.context.history.file = selectedItem;
-
-                        //Zeige Flyout
                         WinJS.UI.SettingsFlyout.showSettings("history", "/settings/html/history.html");
                     }
                 }
             }
         },
 
-        //Öffne das Share-Settings-Flyout
-        openShareMenu: function () {
+        // Open share flyout
+        openShareFlyout: function () {
             if (cloud.hasFunctionality({ functionkey: "getPublicLink" }) || cloud.hasFunctionality({ functionkey: "shareFile" })) {
-                var listView = document.getElementById("directoryView").winControl;
                 if (listView.selection.count() == 1) {
-                    var indices = listView.selection.getIndices();
-                    var selectedItem = listViewItems.getAt(indices[0]);
-
+                    var selectedItem = self.getSelectedItem();
                     if (!selectedItem.deleted && selectedItem.path != "/Shared") {
 
-                        //Stelle Flyout Datei zur Verfügung
+                        // Provide file to flyout
                         cloud.context.share.file = selectedItem;
-
-                        //Zeige Flyout
                         WinJS.UI.SettingsFlyout.showSettings("share", "/settings/html/share.html");
                     }
                 }
             }
         },
 
-        //Öffne das Sortieren-Flyout
-        showSortFlyout: function () {
+        // Open sorting flyout
+        openSortFlyout: function () {
             document.getElementById("sortFlyout").winControl.show(sortButton, "auto");
 
             if (cloud.pages.directoryView.currentSortType == "name") {
                 document.getElementById("sortByName").style.backgroundColor = "#009DD1";
                 document.getElementById("sortBySize").style.backgroundColor = "white";
-
-
-            }
-            else {
+            } else {
                 document.getElementById("sortByName").style.backgroundColor = "white";
                 document.getElementById("sortBySize").style.backgroundColor = "#009DD1";
-
             }
-            //cloud.pages.showFlyOut(sortFlyout, sortButton, "top");
-
         },
 
-        showFlyOut: function (flyout, anchor, placement) {
-            flyout.winControl.show(anchor, placement);
-        },
-
-        //Starte ORC Erkennung --> Sende Datei an Fileee sofern die ownCloud Instance dies unterstützt
+        // Start OCR analysis: send to fileee if supported by owncloudPlugin
         recognizeTextFromPicture: function () {
-            var listView = document.getElementById("directoryView").winControl;
             var count = listView.selection.count();
 
-            //Prüfe ob Backend die Funktion bereitstellt
+            // Check for functionality
             if (cloud.hasFunctionality({ functionkey: "fileee" })) {
-                //Nur ein Element ausgewält
+                // If one element was selected
                 if (count == 1) {
-                    var indices = listView.selection.getIndices();
-                    var selectedItem = listViewItems.getAt(indices[0]);
-                    //Prüfe ob Dateityp für Analyse geeignet
-                    if (cloud.config && cloud.config.fileTypes && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()]
-                    && typeof cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport !== "undefined"
-                    && cloud.config.fileTypes[selectedItem.fileType.toLowerCase()].hasFileeeSupport == true) {
-                        cloud.fileeeAnalyse({ path: selectedItem.path, isDir: selectedItem.fileType == "folder" },
-                            function () {
-                                //success
-                                cloud.functions.showMessageDialog("FILEEEANALYSESTARTED");
-                            },
-                            function () {
-                                //error
+                    var selectedItem = self.getSelectedItem();
+                    cloud.fileeeAnalyse({ path: selectedItem.path, isDir: selectedItem.fileType == "folder" },
+                        function () { //success
+                            cloud.functions.showMessageDialog("FILEEEANALYSESTARTED");
+                        },
+                        function (message) { //error
+                            if (message) {
+                                cloud.functions.showMessageDialog(message);
+                            } else {
                                 cloud.functions.showMessageDialog("FILEEEANALYSEERROR");
-                            });
-                    }
+                            }
+                    });
                 }
             }
         },
 
-		//Touch-Gesten Interaktionsziel definieren.
-        setTarget: function (obj) {
+        /* PDF gestures */
+		// Define gesture interaction target
+        setGestureTarget: function (obj) {
             var preview = document.getElementById(obj);
-            console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            console.log(preview);
-            //Gestenerkennung erstellen
             var msGesture = new MSGesture();
             msGesture.target = preview;
             preview.gesture = msGesture;
-            //Handhabung multipler Pointer
             preview.gesture.pointerType = null;
 
-            //Pointerarray zum verfolgen der Pointer
+            // Pointerarray to follow pointer
             preview.pointers = [];
 
-            //Eventhandler der Gestenerkennung
+            // Register events for gestures
             preview.addEventListener("MSPointerDown", this.onMSPointerDown, false);
             preview.addEventListener("MSGestureChange", this.onMSGestureChange, false);
             preview.addEventListener("MSGestureEnd", this.onMSGestureEnd, false);
         },
 
-        //PDF Gesten
-
-        //Funktion für das "Runter-Drücken"
+        // Eventhandler to push down
         onMSPointerDown: function (e) {
-            //Pointererstellung
-            //Erstkontakt der Geste
+            // Add pointers
             if (this.gesture.pointerType === null) {
-                console.log("FirstContact");
+                // First contact
                 this.gesture.addPointer(e.pointerId);
                 this.gesture.pointerType = e.pointerType;
-            }
-                //Weiterer Kontakt der Geste
-            else if (e.pointerType === this.gesture.pointerType) {
-                console.log("subsequent contact");
+            } else if (e.pointerType === this.gesture.pointerType) {
+                // Subsequent contact
                 this.gesture.addPointer(e.pointerId);
-            }
-                //Neue Geste
-            else {
-                console.log("new pointer type");
-                var msGesture = new MSGesture();
-                msGesture.target = e.target;
-                e.target.gesture = msGesture;
-                e.target.gesture.pointerType = e.pointerType;
-                e.target.gesture.addPointer(e.pointerId);
-            }
-        },
-
-        //Gestenänderung, für swipen, rotieren und zoomen.
-        onMSGestureChange: function (e) {
-            console.log("Gesture change");
-
-            //Für die PDF Steuerung
-
-            if (this == document.getElementById("pdfPreview")) {
-                //Bei negativem Zoom
-                if (e.scale < 1) {
-                    //Sofern im erlaubten Bereich
-                    if (cloud.pages.directoryView.pdfCurrentZoom >= 0.2) {
-                        //Verringere den Zoom
-                        cloud.pages.directoryView.pdfCurrentZoom -= 0.1;
-                        cloud.functions.renderPage(cloud.pages.directoryView.pdfPageNum, cloud.pages.directoryView.pdfCurrentZoom);
-                        console.log(cloud.pages.directoryView.pdfCurrentZoom);
-                    }
-                    //Bei positivem Zoom
-                } else {
-                    //Sofern im Bereich und der Zoom nicht auf 1 (Standart) steht.
-                    if (cloud.pages.directoryView.pdfCurrentZoom <= 2.0 && e.scale > 1) {
-                        //Erhöhe Zoom
-                        cloud.pages.directoryView.pdfCurrentZoom += 0.1;
-                        cloud.functions.renderPage(cloud.pages.directoryView.pdfPageNum, cloud.pages.directoryView.pdfCurrentZoom);
-                        console.log(cloud.pages.directoryView.pdfCurrentZoom);
-                    }
-                }
-                //Falls es sich um den Erstkontakt einer Geste handelt und die Geste auf eine PDF gewirkt wird
-                if (newGesture && (this == document.getElementById("pdfPreview"))) {
-                    //Falls es sich um eine negative Bewegung auf der X-Achse handelt.
-                    if (e.translationX < -10) {
-                        cloud.functions.pdfGoNext();
-                        //Flag für bekannte Geste setzen
-                        newGesture = false;
-                        //Falls es sich um eine positive Bewegung auf der X-Achse handelt.
-                    } else if (e.translationX > 10) {
-                        cloud.functions.pdfGoPrevious();
-                        //Flag für bekannte Geste setzen
-                        newGesture = false;
-                    }
-                }
-                console.log(e.translationX);
-            //} else {
-
-            //    //Für die Picture Steuerung
-            //    //Größe des Pictures auslesen
-            //    var width = this.clientWidth;
-            //    var height = this.clientHeight;
-            //    //document.getElementById("previewTag").style.maxWidth = screen.width - 40 + "px";
-            //    //document.getElementById("previewTag").style.maxHeight = screen.height + "px";
-            //    //document.getElementById("preview").style.maxWidth = screen.width - 40 + "px";
-            //    //document.getElementById("preview").style.maxHeight = screen.height + "px";
-
-            //    //Bei negativem Zoom
-            //    //if (e.scale < 1) {
-            //    //    console.log("Picture negativ zoom width: "+width+", height: "+height);
-            //    //    //Sofern im erlaubten Bereich
-            //    //    if (width > 400 && height > 300) {
-            //    //        //Verringere den Zoom
-            //    //        document.getElementById("preview").style.width = (width * 0.9) + "px";
-            //    //        document.getElementById("displayImage").style.width = (width * 0.9) + "px";
-            //    //        this.style.width = (width * 0.9) + "px";
-            //    //        document.getElementById("preview").style.height = (height * 0.9) + "px";
-            //    //        document.getElementById("displayImage").style.height = (height * 0.9) + "px";
-            //    //        this.style.height = (width * 0.9) + "px";
-            //    //        console.log("Picture width: "+width+" Picture height: "+height);
-            //    //    }
-            //    //} else {
-            //    //    //Bei positivem Zoom
-            //    //    console.log("Picture positiv zoom width: " + width + ", height: " + height);
-            //    //    //Sofern im Bereich und der Zoom nicht auf 1 (Standart) steht.
-            //    //    if (width < (400*8) && height < (300*8) && e.scale > 1) {
-            //    //        //Erhöhe Zoom
-            //    //        document.getElementById("preview").style.width = (width * 1.1) + "px";
-            //    //        document.getElementById("displayImage").style.width = (width * 1.1) + "px";
-            //    //        this.style.width = (width * 1.1) + "px";
-            //    //        document.getElementById("preview").style.height = (height * 1.1) + "px";
-            //    //        document.getElementById("displayImage").style.height = (height * 1.1) + "px";
-            //    //        this.style.height = (width * 1.1) + "px";
-            //    //        console.log("Picture width: "+width+" Picture height: "+height);
-            //    //    }
-            //    }
-            }
-        },
-
-        //Gesten-Beendung
-        onMSGestureEnd: function (e){
-            if(e.target === this){
-                //Flag für neue Geste setzen
-                newGesture = true;
-            }
-            console.log("GestureEnd");
-        },
-
-        //Picture Gesten
-
-        /*//Touch-Gesten Interaktionsziel definieren.
-        setPictureTarget: function () {
-            var picturePreview = document.getElementById("displayImage");
-            //Gestenerkennung erstellen
-            var msPictureGesture = new MSGesture();
-            msPictureGesture.target = picturePreview;
-            picturePreview.gesture = msPictureGesture;
-            //Handhabung multipler Pointer
-            picturePreview.gesture.pointerType = null;
-
-            //Pointerarray zum verfolgen der Pointer
-            picturePreview.pointers = [];
-
-            //Eventhandler der Gestenerkennung
-            pdfPreview.addEventListener("MSPointerDown", this.onMSPointerDown, false);
-            //pdfPreview.addEventListener("MSPointerUp", this.onMSPointerUp, false);
-            //pdfPreview.addEventListener("MSPointerCancel", this.onMSPointerCancel, false);
-            //pdfPreview.addEventListener("MSLostPointerCapture", this.onMSPointerCancel, false);
-            pdfPreview.addEventListener("MSGestureChange", this.onMSGestureChange, false);
-            //pdfPreview.addEventListener("MSGestureTap", this.onMSGestureTap, false);
-            pdfPreview.addEventListener("MSGestureEnd", this.onMSGestureEnd, false);
-            //pdfPreview.addEventListener("MSGestureHold", this.onMSGestureHold, false);
-        },
-
-        //Funktion für das "Runter-Drücken"
-        onMSPointerDown: function (e) {
-            var pdfPreview = document.getElementById("pdfPreview");
-            //Pointererstellung
-            this.style.borderStyle = "double";
-            //Erstkontakt der Geste
-            if (this.gesture.pointerType === null) {
-                console.log("FirstContact");
-                this.gesture.addPointer(e.pointerId);
-                this.gesture.pointerType = e.pointerType;
-            }
-                //Weiterer Kontakt der Geste
-            else if (e.pointerType === this.gesture.pointerType) {
-                console.log("subsequent contact");
-                this.gesture.addPointer(e.pointerId);
-            }
-                //Neue Geste
-            else {
-                console.log("new pointer type");
-                var msGesture = new MSGesture();
-                msGesture.target = e.target;
-                e.target.gesture = msGesture;
-                e.target.gesture.pointerType = e.pointerType;
-                e.target.gesture.addPointer(e.pointerId);
-            }
-        },
-
-        //Gestenänderung, für swipen, rotieren und zoomen.
-        onMSGestureChange: function (e) {
-            console.log("Gesture change");
-            //Bei negativem Zoom
-            if (e.scale < 1) {
-                //Sofern im erlaubten Bereich
-                if (cloud.pages.directoryView.pdfCurrentZoom >= 0.2) {
-                    //Verringere den Zoom
-                    cloud.pages.directoryView.pdfCurrentZoom -= 0.1;
-                    cloud.functions.renderPage(cloud.pages.directoryView.pdfPageNum, cloud.pages.directoryView.pdfCurrentZoom);
-                    console.log(cloud.pages.directoryView.pdfCurrentZoom);
-                }
-                //Bei positivem Zoom
             } else {
-                //Sofern im Bereich und der Zoom nicht auf 1 (Standart) steht.
-                if (cloud.pages.directoryView.pdfCurrentZoom <= 2.0 && e.scale > 1) {
-                    //Erhöhe Zoom
-                    cloud.pages.directoryView.pdfCurrentZoom += 0.1;
-                    cloud.functions.renderPage(cloud.pages.directoryView.pdfPageNum, cloud.pages.directoryView.pdfCurrentZoom);
-                    console.log(cloud.pages.directoryView.pdfCurrentZoom);
-                }
+                // New gesture
+                var msGesture = new MSGesture();
+                msGesture.target = e.target;
+                e.target.gesture = msGesture;
+                e.target.gesture.pointerType = e.pointerType;
+                e.target.gesture.addPointer(e.pointerId);
             }
-            //Falls es sich um den Erstkontakt einer Geste handelt
-            if (newPDFGesture) {
-                //Falls es sich um eine negative Bewegung auf der X-Achse handelt.
-                if (e.translationX < -10) {
-                    cloud.functions.pdfGoNext();
-                    //Flag für bekannte Geste setzen
-                    newPDFGesture = false;
-                    //Falls es sich um eine positive Bewegung auf der X-Achse handelt.
-                } else if (e.translationX > 10) {
-                    cloud.functions.pdfGoPrevious();
-                    //Flag für bekannte Geste setzen
-                    newPDFGesture = false;
-                }
-            }
-            console.log(e.translationX);
         },
 
-        //Gesten-Beendung
+        // Gesture change to swipe, rotate and zoom
+        onMSGestureChange: function (e) {
+            // PDF gesture
+            if (this == document.getElementById("pdfPreview")) {
+                if (e.scale < 1) {
+                    // Negative zoom
+                    cloud.functions.pdfZoomOut();
+                } else if (e.scale > 1) {
+                    // Positive zoom
+                    cloud.functions.pdfZoomIn()
+                }
+
+                // In case of first contact on PDF
+                if (cloud.pages.directoryView.newGesture) {
+                    if (e.translationX < -10) {
+                        // X-axis negative movement
+                        cloud.functions.pdfGoNext();
+                        cloud.pages.directoryView.newGesture = false;
+                    } else if (e.translationX > 10) {
+                        // X-axis positive movement
+                        cloud.functions.pdfGoPrevious();
+                        cloud.pages.directoryView.newGesture = false;
+                    }
+                }
+            }
+        },
+
+        // Gesture end
         onMSGestureEnd: function (e){
             if(e.target === this){
-                this.style.borderStyle = "solid";
-                //Flag für neue Geste setzen
-                newPDFGesture = true;
+                // Reset new gesture flag
+                cloud.pages.directoryView.newGesture = true;
             }
-            console.log("GestureEnd");
-        },*/
+        },
     });
 })();

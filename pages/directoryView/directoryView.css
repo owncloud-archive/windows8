@@ -1,20 +1,19 @@
 ﻿/*Alle Anzeigemodi*/
 
 #fileInfoFlyout {
-    border-color: #7AB51D; 
-    box-shadow: 1px 1px 9px #000000; 
-    background-color: #3E3E3B;
-    color: white;
-   margin-bottom: 23px;
-}
-
-#renameFlyout {
-    border-color: #7AB51D; 
-    box-shadow: 1px 1px 9px #000000; 
+    border-color: #7AB51D;
+    box-shadow: 1px 1px 9px #000000;
     background-color: #3E3E3B;
     color: white;
     margin-bottom: 23px;
-    
+}
+
+#renameFlyout {
+    border-color: #7AB51D;
+    box-shadow: 1px 1px 9px #000000;
+    background-color: #3E3E3B;
+    color: white;
+    margin-bottom: 23px;
 }
 
 #renameInput {
@@ -22,13 +21,13 @@
     width: 250px;
 }
 
-   #renameButton {
-        background-color: #20A127;
-        border: solid 2px white;
-        color: white;
-    }
+#renameButton {
+    background-color: #20A127;
+    border: solid 2px white;
+    color: white;
+}
 
-    
+
     #renameButton:hover {
         background-color: #03CC11;
         color: white;
@@ -36,108 +35,97 @@
     }
 
 #deleteFlyout {
-    border-color: #7AB51D; 
-    box-shadow: 1px 1px 9px #000000; 
+    border-color: #7AB51D;
+    box-shadow: 1px 1px 9px #000000;
     background-color: #3E3E3B;
     color: white;
     margin-bottom: 23px;
 }
 
- #confirmDeleteButton {
+#confirmDeleteButton {
     -ms-grid-column: 2;
-   background-color: #D1251F;
+    background-color: #D1251F;
     border: solid 2px white;
     color: white;
 }
 
- #confirmDeleteButton:hover {
+    #confirmDeleteButton:hover {
         background-color: #FF3830;
-         border: solid 2px white;
-         color: white;
-    }
-
-
-#sortFlyout button:hover {
-        font-weight: bold;
-        
-    }
-
-    #sortFlyout button:active {
-        color: black;
-        
-
-    }
-
-    #sortFlyout {
-        width: 200px;
-        
-    }
-
-    #addFlyout {
-        border-color: #7AB51D; 
-        box-shadow: 1px 1px 9px #000000; 
-        background-color: #3E3E3B;
-        color: white !important;
-        margin-bottom: 23px;
-}
-
-     #addFlyout button{
-
-      
-        color: white;
-        background-color: transparent;
-}
-
-        #addFlyout button:hover {
-            text-shadow: 0 0 10px #fff;
-
-        }
-
-         #addFlyout button:hover {
-            text-shadow: 0 0 10px #fff;
-
-        }
-
-    #manageFlyout {
-        border-color: #7AB51D; 
-        box-shadow: 1px 1px 9px #000000; 
-        background-color: #3E3E3B;
-        color: white !important;
-        margin-bottom: 23px;
-}
-
-     #manageFlyout button{
-      
-        color: white;
-        background-color: transparent;
-}
-
-        #manageFlyout button:hover {
-            text-shadow: 0 0 10px #fff;
-
-        }
-
-         #manageFlyout button:hover {
-            text-shadow: 0 0 10px #fff;
-
-        }
-
-    #createFolderFlyout {
-        margin-bottom: 23px;
-        border-color: #7AB51D; 
-        box-shadow: 1px 1px 9px #000000; 
-        background-color: #3E3E3B;
-        color: white !important;
-        width: 267px;
-}
-
-     #createFolder {
-        background-color: #20A127;
         border: solid 2px white;
         color: white;
     }
 
-    
+
+#sortFlyout button:hover {
+    font-weight: bold;
+}
+
+#sortFlyout button:active {
+    color: black;
+}
+
+#sortFlyout {
+    width: 200px;
+}
+
+#addFlyout {
+    border-color: #7AB51D;
+    box-shadow: 1px 1px 9px #000000;
+    background-color: #3E3E3B;
+    color: white !important;
+    margin-bottom: 23px;
+}
+
+    #addFlyout button {
+        color: white;
+        background-color: transparent;
+    }
+
+        #addFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+        #addFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+#manageFlyout {
+    border-color: #7AB51D;
+    box-shadow: 1px 1px 9px #000000;
+    background-color: #3E3E3B;
+    color: white !important;
+    margin-bottom: 23px;
+}
+
+    #manageFlyout button {
+        color: white;
+        background-color: transparent;
+    }
+
+        #manageFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+        #manageFlyout button:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
+#createFolderFlyout {
+    margin-bottom: 23px;
+    border-color: #7AB51D;
+    box-shadow: 1px 1px 9px #000000;
+    background-color: #3E3E3B;
+    color: white !important;
+    width: 267px;
+}
+
+#createFolder {
+    background-color: #20A127;
+    border: solid 2px white;
+    color: white;
+}
+
+
     #createFolder:hover {
         background-color: #03CC11;
         color: white;
@@ -145,19 +133,118 @@
     }
 
 
+ #toggleLayout {
+        position: absolute;
+        left: 0px;
+        font-family: 'Segoe UI Symbol';
+        font-size: 20px;
+        border: none;
+        width: 20px;
+        height: 30px;
+        text-shadow: 0px 1px 3px black;
+    }
 
-    
+        #toggleLayout:hover {
+            text-shadow: 0 0 10px #fff;
+            background-color: transparent;
+        }
+
+.directoryView section {
+    height: 100%;
+}
+
+.contentGrid {
+    height: calc(100% - 130px);
+}
+
+ #directoryView .directoryViewItem {
+    height: 60px;
+    width: 100%;
+    overflow: hidden;
+    display: -ms-grid;
+    -ms-grid-columns: 60px 1fr;
+}
+
+
+/** For introductionTour **/
+#tourOverlay {
+    display:none;
+    position:absolute;
+    top:0;
+    left:0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+#tourInstructionWrapper, #tourInstructionClose, #tourInstructionMain {
+    display:none;
+}
+
+#tourOverlay.showTour {
+    display:block;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#tourInstructionWrapper.showTour {
+        position:absolute;
+        display:block;
+        top:0;
+        left:0;
+        margin-left: calc(50% - 250px);
+        margin-top: 125px;
+        width:500px;
+        height:600px;
+        border: 4px solid black;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.9);
+        color: black;
+    }
+
+    .showTour #tourInstructionClose {
+        display:block;
+        position:relative;
+        right: -450px;
+        top:-35px;
+    }
+
+	.buttondark,
+	.buttondark .win-commandimage{
+		 color: black;
+	}
+		
+	.buttondark .win-commandring,
+	.buttondark:active .win-commandring
+	.buttondark:hover .win-commandring {
+		background-color: white !important;
+		border-color: black !important;
+		 
+	}
+		
+    .showTour #tourInstructionMain {
+        display:block;
+        padding: 20px;
+    }
+
+    .showTour #tourInstructionFooter {
+        position: relative;
+        display:block;
+        padding: 10px;
+        bottom: 0;
+        right: -375px;
+    }
+
+/** Introduction tour specific end */
 
 @media screen and (-ms-view-state: fullscreen-landscape) {
 
-  
- .directoryViewItem.isDeleted .directoryViewItemText {
-            /*background: #3E3E3B !important;*/
-            height:60px;
-            background-image: url(/images/ribbon.svg);
-            /*background-image: url(/images/ribbonTrash.svg);*/
-            
-        }
+
+    .directoryViewItem.isDeleted .directoryViewItemText {
+        /*background: #3E3E3B !important;*/
+        height: 60px;
+        background-image: url(/images/ribbon.svg);
+        /*background-image: url(/images/ribbonTrash.svg);*/
+    }
 
 
 
@@ -168,12 +255,10 @@
     #moreButton {
         float: right;
         visibility: visible !important;
-
     }
 
     .fragment section [role=main] {
         /*width: 100%;*/
-        
     }
 
     /*Entfernt den unetrsten Hintergrund aller Listenelemente*/
@@ -193,22 +278,21 @@
 
 
 
-     body {
+    body {
         background-size: cover;
         background-image: url(/images/directoryBackground/bottom_cloud_small.jpg);
     }
 
-       #video_background {
-      position: absolute;
-      height: 1080px;
-      width: 1920px;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      z-index: -1000;
-  
-}
+    #video_background {
+        position: absolute;
+        height: 1080px;
+        width: 1920px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: -1000;
+    }
 
 
     #variousControls {
@@ -216,7 +300,6 @@
 
 
     #backgroundHolder {
-       
     }
 
 
@@ -232,9 +315,9 @@
         background: transparent;
     }
 
-    #syncButton:hover {
-        text-shadow: 0 0 10px #fff;
-    }
+        #syncButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
 
     #sortButton {
         position: absolute;
@@ -247,9 +330,9 @@
         background: transparent;
     }
 
-    #sortButton:hover {
-        text-shadow: 0 0 10px #fff;
-    }
+        #sortButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
 
     #clearSelectionButton {
         position: absolute;
@@ -262,75 +345,25 @@
         background: transparent;
     }
 
-    #clearSelectionButton:hover {
-        text-shadow: 0 0 10px #fff;
-    }
-	
+        #clearSelectionButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
     #totalHeader {
         display: -ms-grid;
         -ms-grid-rows: 20px 30px 60px;
         -ms-grid-columns: 100%;
         width: 100%;
-		position:relative;
-
+        position: relative;
     }
-	
-    #changeLayout{
-		position: absolute;
-		top: 8px;
-		left: 10px;
-		margin-left: 0px;
-		
-		}
 
-
-
-
-    #changeToGridLayout {
+    #changeLayout {
         position: absolute;
-        left: 0px;
-        font-family: 'Segoe UI Symbol';
-        font-size: 20px;
-        border: none;
-        width: 20px;
-        height: 30px;
-        
-		/*-ms-flex-order: 1;*/
-        text-shadow: 0px 1px 3px black;
+        top: 8px;
+        left: 10px;
+        margin-left: 0px;
     }
 
-    #changeToGridLayout:hover {
-        text-shadow: 0 0 10px #fff;
-    }
-
-
-	
-	#changeToGridLayout:hover{
-		background-color: transparent;
-       
-       
-		}
-	
-    #changeToListLayout {
-        position: absolute;
-        left: 0px;
-        font-family: 'Segoe UI Symbol';
-        font-size: 20px;
-        border: none;
-        width: 10px;
-		/*-ms-flex-order: 2;*/
-        text-shadow: 0px 1px 3px black;
-    }
-
-     #changeToListLayout:hover {
-        text-shadow: 0 0 10px #fff;
-    }
-	
-	#changeToListLayout:hover{
-		background-color: transparent;
-		}
-
- 
     #emptyDirectory {
         position: absolute;
         top: 10px;
@@ -339,42 +372,13 @@
         font-family: "Segoe UI Light";
         font-weight: bold;
         text-shadow: 0px 1px 3px black;
-     }
-
-
-
-
-     /*#showDeletedIsTrue {
-        position: absolute;
-        left: 370px;
-        top: 13px;
-        font-family: 'Segoe UI Symbol';
-        font-size: 20px;
-        border: none;
-        width: 20px;
-        height: 30px;
-        
-		
-        text-shadow: 0px 1px 3px black;
-        visibility: hidden;
-        background-color: transparent;
     }
 
-    #showDeletedIsTrue:hover {
-        
-        background-color: transparent;
-    }*/
-
-
-	
-
-
-
     .progressContainer {
-		text-align: right;
-		-ms-grid-row: 2;
+        text-align: right;
+        -ms-grid-row: 2;
         right: 20px;
-		margin-right: 20px;
+        margin-right: 20px;
     }
 
     #downloadProgressBar {
@@ -390,30 +394,28 @@
         margin-left: 27.5px;
         color: white;
     }
-	
-	#downloadProgressBarLabel{
-		
-		
-		
-	}
-		
-	#uploadProgressBarLabel{
-		
-	}
-		
 
+    #downloadProgressBarLabel {
+    }
+
+    #uploadProgressBarLabel {
+    }
 
 
     #innerHeader {
         -ms-grid-row: 3;
         -ms-grid-column: 1;
         display: -ms-grid;
-       -ms-grid-columns: auto auto 1fr 1fr;
+        -ms-grid-columns: auto auto 1fr 1fr;
         height: 100%;
         position: relative;
         width: 100%;
         margin-left: 10px;
     }
+
+        #innerHeader.folderview { /* change title size */
+            -ms-grid-columns: auto auto 1fr;
+        }
 
     #operationPending {
         height: 8px;
@@ -428,38 +430,34 @@
         display: -ms-flexbox;
         -ms-flex-direction: row;
         text-shadow: 0px 1px 3px black;
-        
     }
 
     #backButton {
         -ms-flex-order: 1;
-        text-shadow: 0px 1px 3px black; 
-
+        text-shadow: 0px 1px 3px black;
     }
 
-     #backButton .win-commandring {
-         box-shadow: 0px 1px 3px black; 
-    }
-  
+        #backButton .win-commandring {
+            box-shadow: 0px 1px 3px black;
+        }
+
 
     #forwardButton {
         -ms-flex-order: 2;
-        text-shadow: 0px 1px 3px black; 
-		
+        text-shadow: 0px 1px 3px black;
     }
 
-    #forwardButton .win-commandring {
-         box-shadow: 0px 1px 3px black; 
-    }
+        #forwardButton .win-commandring {
+            box-shadow: 0px 1px 3px black;
+        }
 
     #pagetitle {
         -ms-grid-column: 3;
         font-size: 40px;
         font-family: 'segoe ui Light';
         text-shadow: 0px 1px 3px black;
-		margin-top: 20px;
+        margin-top: 20px;
         text-overflow: ellipsis;
-		
     }
 
 
@@ -467,23 +465,21 @@
     #directoryProgressRing {
         padding-top: 0px;
         -ms-grid-column: 2;
-		/*Die Linke Margin ist nicht notwendig
+        /*Die Linke Margin ist nicht notwendig
 		Mit ihr wirkt der Platz links von dem Vorwärts-Button
 		etwas zu leer*/
-		/*margin-left: 20px;*/
-		/*Die rechte Margin sollte bleiben, da ohne diese
+        /*margin-left: 20px;*/
+        /*Die rechte Margin sollte bleiben, da ohne diese
 		der Text 'Verzeichnis laden' zu nah an den Ordnernamen
 		heranrückt*/
-		margin-right: 20px;
+        margin-right: 20px;
         padding-top: 10px;
     }
-	
-	#loadingRing{
-		padding-left: 10px;
-		
-		}
 
-    
+    #loadingRing {
+        padding-left: 10px;
+    }
+
     #directoryProgressRing .win-ring {
         height: 30px;
         width: 30px;
@@ -492,31 +488,25 @@
         text-align: center;
         margin-left: 30px;
     }
-	
-   .previewHeaderContainer {
+
+    .previewHeaderContainer {
         -ms-grid-column: 4;
         font-size: 30px;
         font-family: 'segoe ui Light';
         height: 100%;
-		margin-left: 20px;
-		margin-right: 10px;
-		margin-top: 30px;
+        margin-left: 20px;
+        margin-right: 10px;
+        margin-top: 30px;
         text-shadow: 0px 1px 3px black;
         text-overflow: ellipsis;
-       
-        
-
     }
 
     .pageSubheader {
         /*position: absolute;*/
-        
         margin-left: auto;
         margin-right: 20px;
         text-overflow: ellipsis;
-       
         text-align: right;
-
     }
 
 
@@ -528,26 +518,22 @@
         display: -ms-flexbox;
         -ms-flex-direction: row;
         height: calc(100% - 130px);
-
         /*height: 100%;*/
         margin-left: 40px;
         /*padding-right: 40px*/
-        
-        
     }
 
     #preview {
         -ms-flex-order: 2;
         display: -ms-flexbox;
-		-ms-flex-direction: row;
+        -ms-flex-direction: row;
         /*width: auto;*/
         margin-left: 20px;
         padding-right: 20px;
-		/*padding-right: 20px;*/
+        /*padding-right: 20px;*/
         max-height: 100%;
         /*overflow-y: auto;*/
-		/*height: auto;*/
-       
+        /*height: auto;*/
     }
 
     /*.previewGrid_class {
@@ -558,13 +544,8 @@
     }*/
 
     #previewTag {
-
-		-ms-flex-order: 1;
-         z-index: 0;
-        
-        
-        
-         
+        -ms-flex-order: 1;
+        z-index: 0;
     }
 
         #previewTag h1 {
@@ -587,38 +568,36 @@
             font-size: 16px;
         }
 
-         
 
-    /*Dieser Tag führt dazu, dass das Bild/Video nicht zentriert ausgerichtet wird
+
+        /*Dieser Tag führt dazu, dass das Bild/Video nicht zentriert ausgerichtet wird
         Dem Element wird von default.css eine margin-left von "auto" gesetzt.*/
-    #previewTag > img {
-        margin-left: 0px;
-        -ms-touch-action: pan-y
-            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
-       
-    }
+        #previewTag > img {
+            margin-left: 0px;
+            -ms-touch-action: pan-y pan-x; /*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+        }
 
     /*displayImage wird dynamisch erzeugt. Das Element dieser ID*/
     #displayImage {
-        box-shadow: 0px 1px 3px black; 
-        -ms-touch-action: pan-y
-            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+        box-shadow: 0px 1px 3px black;
+        -ms-touch-action: pan-y pan-x; /*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
     }
 
     #video {
-       overflow: hidden;
+        overflow: hidden;
     }
+
     .audioplayer {
         width: 500px;
     }
 
     .pdfPreview {
         overflow: hidden;
-        -ms-touch-action: pan-y;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
-		-ms-flex-order: 2;
-		display: -ms-flexbox;
-		-ms-flex-direction: column; 
-		max-height: 100%;
+        -ms-touch-action: pan-y; /*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        max-height: 100%;
         width: auto;
         overflow: auto;
         padding-right: 25px;
@@ -626,15 +605,13 @@
         /*box-shadow: 0px 1px 3px black;*/
     }
 
-    
+
         .pdfPreview canvas {
             /*???*/
-           
         }
 
     canvas {
-         box-shadow: 0px 1px 3px black;
-         
+        box-shadow: 0px 1px 3px black;
     }
 
     #pdfControls div {
@@ -642,67 +619,63 @@
         /*visibility: hidden;*/
     }
 
-	#pdfControls{
-		-ms-flex-order: 3;
+    #pdfControls {
+        -ms-flex-order: 3;
         margin-left: auto;
         margin-right: 0px;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		right: 0px;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        right: 0px;
         /*background-color: #3E3E3B;*/
         background-image: url(/images/verticalBar.svg);
         background-size: cover;
         height: 500px;
         z-index: -10000;
-        box-shadow: 0px 1px 3px black; 
+        box-shadow: 0px 1px 3px black;
+    }
 
-		}
-		
-	#pdfBackForward{
-		-ms-flex-order: 1;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		
-		}
-		
-	#pdfZoom{
-		-ms-flex-order: 2;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		margin-bottom: 40px;
-		margin-top: 40px;
-		}
-		
-	#pdfJump{
-		-ms-flex-order: 3;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		}
-		/*Center the PageNum Input*/
-		#pdfPageNum{
-			margin-left: auto;
-			margin-right: auto;
-			}
-		
-	.pdfPreview{
-		-ms-grid-row: 2;
+    #pdfBackForward {
+        -ms-flex-order: 1;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+    }
+
+    #pdfZoom {
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        margin-bottom: 40px;
+        margin-top: 40px;
+    }
+
+    #pdfJump {
+        -ms-flex-order: 3;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+    }
+    /*Center the PageNum Input*/
+    #pdfPageNum {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .pdfPreview {
+        -ms-grid-row: 2;
         width: auto;
-		}
+    }
 
     #pdfPageNum {
-	width: 20px;
-}
+        width: 20px;
+    }
 
     #code {
-		-ms-flex-order: 3;
-		/*height: 110px;
+        -ms-flex-order: 3;
+        /*height: 110px;
         width: auto;*/
         overflow: auto;
         display: none;
-
-        
     }
-	
+
 
 
     /*Loading Indicator*/
@@ -722,54 +695,50 @@
         height: 98.9%;
         min-width: 380px;
         background-color: transparent !important;
-
-
     }
 
         #directoryView .win-container {
-         margin: 5px;
-         box-shadow: 0px 1px 3px black; 
-    }
+            margin: 5px;
+            box-shadow: 0px 1px 3px black;
+        }
 
             #directoryView .win-container:hover {
                 box-shadow: 0 0 10px #fff;
             }
 
-   
-        
 
 
 
-    /* individual item dimensions */
-    #directoryView .directoryViewItem {
-        height: 60px;
-        width: 360px;
-        overflow: hidden;
-        /*border: 1px solid rgba(0,0,0,0.5);
+
+
+        /* individual item dimensions */
+        #directoryView .directoryViewItem {
+            height: 60px;
+            width: 360px;
+            overflow: hidden;
+            /*border: 1px solid rgba(0,0,0,0.5);
    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), 
        inset 0 10px rgba(255,255,255,0.2), 
        inset 0 10px 20px rgba(255,255,255,0.25), 
        inset 0 -15px 30px rgba(0,0,0,0.3);*/
-        display: -ms-grid;
-        -ms-grid-columns: auto auto;
-        
+            display: -ms-grid;
+            -ms-grid-columns: auto auto;
+        }
 
-    }
-
-        #directoryView .win-selectionborder  {
-           
-           background-color: #7AB51D;
+        #directoryView .win-selectionborder {
+            background-color: #7AB51D;
         }
 
 
 
-.win-container.win-selected .win-selectionborder {
-	border-color: #7AB51D !important;
-}
-.win-container.win-selected .win-selectioncheckmarkbackground {
-	border-top-color: #7AB51D;
-	border-right-color: #7AB51D;
-}
+    .win-container.win-selected .win-selectionborder {
+        border-color: #7AB51D !important;
+    }
+
+    .win-container.win-selected .win-selectioncheckmarkbackground {
+        border-top-color: #7AB51D;
+        border-right-color: #7AB51D;
+    }
 
 
 
@@ -779,7 +748,7 @@
     #directoryView .win-container {
         margin-right: 25px;
         margin-top: 7px;
-   }
+    }
 
 
 
@@ -788,31 +757,25 @@
         -ms-grid-column: 1;
         width: 60px;
         height: 60px;
-     
         /*padding: 10px;*/
         /*background-size: cover;*/
         background-color: white;
-
     }
 
     .directoryViewItem .directoryViewItemText {
         padding-left: 10px;
-
         -ms-grid-column: 2;
         width: 290px;
         height: 60px;
         background-color: #009DD1;
-        
         background-size: cover;
         color: white;
         text-overflow: ellipsis;
         /*box-shadow: inset 0px 0px 50px 0px #ABABAB,5px 5px 5px 1px #242424;*/
         /*text-shadow: 0px 1px 3px black;*/
-       
-      
     }
 
-    
+
 
     /* text line 1 */
     .directoryViewItem .directoryViewItemHeader {
@@ -836,7 +799,7 @@
         background-image: url(/images/appBar/appBarBackground.svg);
         /*background-color: #008E96;*/
         background-size: cover;
-        height:100px;
+        height: 100px;
     }
 
 
@@ -905,7 +868,6 @@
         background-image: url(/images/navBar/favorite.svg);
         background-position: 35px -6px;
         background-size: 75px;
-        
     }
 
     .three {
@@ -913,7 +875,6 @@
         background-image: url(/images/navBar/history.svg);
         background-position: 38px -2px;
         background-size: 65px;
-        
     }
 
     .four {
@@ -954,16 +915,13 @@
 
 @media screen and (-ms-view-state: snapped) {
 
-   
-
     #emptyDirectory {
         position: absolute;
         top: 170px;
         left: 25px;
         font-family: "Segoe UI Light";
-        
         text-shadow: 0px 1px 3px black;
-     }
+    }
 
     #moreButton {
         float: right;
@@ -977,7 +935,6 @@
 
     .directoryView section[role=main] {
         overflow: auto;
-        
     }
 
     .directoryView {
@@ -1000,7 +957,7 @@
         z-index: -1000;
     }
 
- 
+
     #backgroundHolder {
     }
 
@@ -1013,38 +970,12 @@
     }
 
     /*Die Buttons für das ändern des Layouts
-        müssen ausgeblendet werden, da eine Öndeurng
+        müssen ausgeblendet werden, da eine Ändeurng
         der Ansicht, hin zum rasterlayout, nicht sinnvoll ist*/
     #changeLayout {
         display: none;
     }
-
-    #changeToGridLayout {
-        display: none;
-    }
-
-
-        #changeToGridLayout:hover {
-            background-color: transparent;
-        }
-
-    #changeToListLayout {
-        position: absolute;
-        left: 0px;
-        font-family: 'Segoe UI Symbol';
-        font-size: 20px;
-        border: none;
-        width: 10px;
-        /*-ms-flex-order: 2;*/
-        text-shadow: 0px 1px 3px black;
-    }
-
-        #changeToListLayout:hover {
-            background-color: transparent;
-        }
-
-
-
+    
     #syncButton {
         position: absolute;
         left: 10px;
@@ -1075,7 +1006,7 @@
             text-shadow: 0 0 10px #fff;
         }
 
-            #clearSelectionButton {
+    #clearSelectionButton {
         position: absolute;
         left: 190px;
         top: 8px;
@@ -1086,7 +1017,7 @@
         background: transparent;
     }
 
-            #clearSelectionButton:hover {
+        #clearSelectionButton:hover {
             text-shadow: 0 0 10px #fff;
         }
 
@@ -1264,7 +1195,6 @@
 
 
     #previewTag > img {
-        
     }
 
 
@@ -1398,13 +1328,12 @@
 
 
 
-      .directoryViewItem.isDeleted .directoryViewItemText {
-            /*background: #3E3E3B !important;*/
-            height:60px;
-            background-image: url(/images/ribbonSnapview.svg);
-            /*background-image: url(/images/ribbonTrash.svg);*/
-            
-        }
+    .directoryViewItem.isDeleted .directoryViewItemText {
+        /*background: #3E3E3B !important;*/
+        height: 60px;
+        background-image: url(/images/ribbonSnapview.svg);
+        /*background-image: url(/images/ribbonTrash.svg);*/
+    }
 
 
 
@@ -1511,7 +1440,6 @@
         background-image: url(/images/appBar/appBarBackground.svg);
         /*background-color: #008E96;*/
         background-size: cover;
-        
     }
 
     #showDeletedButton {
@@ -1521,12 +1449,6 @@
     #restoreFileButton {
         display: none;
     }
-
-    /*upload Button muss angezeigt werden*/
-
-    /*addFolder Button muss angezeigt werden*/
-
-    /*clearSelection Button muss angezeigt werden*/
 
     #getTextFromImage {
         display: none;
@@ -1542,38 +1464,21 @@
         display: none;
     }
 
-    /*open Button kann angezeigt werden*/
-
-    /*download Buton kann eingeblendet werden*/
-
-    /*rename button kann eingeblendet werden*/
-
-    /*delet button kann eingeblendet werden*/
-
-
-
-
-
-    
-
     #navbar {
-        
         display: none;
     }
-
 }
 
 
 @media screen and (-ms-view-state: filled) {
 
-  
- .directoryViewItem.isDeleted .directoryViewItemText {
-            /*background: #3E3E3B !important;*/
-            height:60px;
-            background-image: url(/images/ribbon.svg);
-            /*background-image: url(/images/ribbonTrash.svg);*/
-            
-        }
+
+    .directoryViewItem.isDeleted .directoryViewItemText {
+        /*background: #3E3E3B !important;*/
+        height: 60px;
+        background-image: url(/images/ribbon.svg);
+        /*background-image: url(/images/ribbonTrash.svg);*/
+    }
 
 
 
@@ -1584,18 +1489,11 @@
     #moreButton {
         float: right;
         visibility: visible !important;
-
     }
 
     .fragment section [role=main] {
-        /*width: 100%;*/
         
     }
-
-    /*Entfernt den unetrsten Hintergrund aller Listenelemente*/
-    /*.win-listview :not(.win-footprint).win-container {
-        background-color: transparent;
-    }*/
 
     .directoryView section[role=main] {
         overflow: auto;
@@ -1606,25 +1504,21 @@
         height: 100%;
     }
 
-
-
-
-     body {
+    body {
         background-size: cover;
         background-image: url(/images/directoryBackground/bottom_cloud_small.jpg);
     }
 
-       #video_background {
-      position: absolute;
-      height: 1080px;
-      width: 1920px;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      z-index: -1000;
-  
-}
+    #video_background {
+        position: absolute;
+        height: 1080px;
+        width: 1920px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: -1000;
+    }
 
 
     #variousControls {
@@ -1632,7 +1526,6 @@
 
 
     #backgroundHolder {
-       
     }
 
 
@@ -1648,9 +1541,9 @@
         background: transparent;
     }
 
-    #syncButton:hover {
-        text-shadow: 0 0 10px #fff;
-    }
+        #syncButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
 
     #sortButton {
         position: absolute;
@@ -1663,9 +1556,9 @@
         background: transparent;
     }
 
-    #sortButton:hover {
-        text-shadow: 0 0 10px #fff;
-    }
+        #sortButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
 
     #clearSelectionButton {
         position: absolute;
@@ -1678,75 +1571,25 @@
         background: transparent;
     }
 
-    #clearSelectionButton:hover {
-        text-shadow: 0 0 10px #fff;
-    }
-	
+        #clearSelectionButton:hover {
+            text-shadow: 0 0 10px #fff;
+        }
+
     #totalHeader {
         display: -ms-grid;
         -ms-grid-rows: 20px 30px 60px;
         -ms-grid-columns: 100%;
         width: 100%;
-		position:relative;
-
+        position: relative;
     }
-	
-    #changeLayout{
-		position: absolute;
-		top: 8px;
-		left: 10px;
-		margin-left: 0px;
-		
-		}
 
-
-
-
-    #changeToGridLayout {
+    #changeLayout {
         position: absolute;
-        left: 0px;
-        font-family: 'Segoe UI Symbol';
-        font-size: 20px;
-        border: none;
-        width: 20px;
-        height: 30px;
-        
-		/*-ms-flex-order: 1;*/
-        text-shadow: 0px 1px 3px black;
+        top: 8px;
+        left: 10px;
+        margin-left: 0px;
     }
 
-    #changeToGridLayout:hover {
-        text-shadow: 0 0 10px #fff;
-    }
-
-
-	
-	#changeToGridLayout:hover{
-		background-color: transparent;
-       
-       
-		}
-	
-    #changeToListLayout {
-        position: absolute;
-        left: 0px;
-        font-family: 'Segoe UI Symbol';
-        font-size: 20px;
-        border: none;
-        width: 10px;
-		/*-ms-flex-order: 2;*/
-        text-shadow: 0px 1px 3px black;
-    }
-
-     #changeToListLayout:hover {
-        text-shadow: 0 0 10px #fff;
-    }
-	
-	#changeToListLayout:hover{
-		background-color: transparent;
-		}
-
- 
     #emptyDirectory {
         position: absolute;
         top: 10px;
@@ -1755,42 +1598,13 @@
         font-family: "Segoe UI Light";
         font-weight: bold;
         text-shadow: 0px 1px 3px black;
-     }
-
-
-
-
-     /*#showDeletedIsTrue {
-        position: absolute;
-        left: 370px;
-        top: 13px;
-        font-family: 'Segoe UI Symbol';
-        font-size: 20px;
-        border: none;
-        width: 20px;
-        height: 30px;
-        
-		
-        text-shadow: 0px 1px 3px black;
-        visibility: hidden;
-        background-color: transparent;
     }
 
-    #showDeletedIsTrue:hover {
-        
-        background-color: transparent;
-    }*/
-
-
-	
-
-
-
     .progressContainer {
-		text-align: right;
-		-ms-grid-row: 2;
+        text-align: right;
+        -ms-grid-row: 2;
         right: 20px;
-		margin-right: 20px;
+        margin-right: 20px;
     }
 
     #downloadProgressBar {
@@ -1806,25 +1620,18 @@
         margin-left: 27.5px;
         color: white;
     }
-	
-	#downloadProgressBarLabel{
-		
-		
-		
-	}
-		
-	#uploadProgressBarLabel{
-		
-	}
-		
 
+    #downloadProgressBarLabel {
+    }
 
+    #uploadProgressBarLabel {
+    }
 
     #innerHeader {
         -ms-grid-row: 3;
         -ms-grid-column: 1;
         display: -ms-grid;
-       -ms-grid-columns: auto auto 1fr 1fr;
+        -ms-grid-columns: auto auto 1fr 1fr;
         height: 100%;
         position: relative;
         width: 100%;
@@ -1844,38 +1651,34 @@
         display: -ms-flexbox;
         -ms-flex-direction: row;
         text-shadow: 0px 1px 3px black;
-        
     }
 
     #backButton {
         -ms-flex-order: 1;
-        text-shadow: 0px 1px 3px black; 
-
+        text-shadow: 0px 1px 3px black;
     }
 
-     #backButton .win-commandring {
-         box-shadow: 0px 1px 3px black; 
-    }
-  
+        #backButton .win-commandring {
+            box-shadow: 0px 1px 3px black;
+        }
+
 
     #forwardButton {
         -ms-flex-order: 2;
-        text-shadow: 0px 1px 3px black; 
-		
+        text-shadow: 0px 1px 3px black;
     }
 
-    #forwardButton .win-commandring {
-         box-shadow: 0px 1px 3px black; 
-    }
+        #forwardButton .win-commandring {
+            box-shadow: 0px 1px 3px black;
+        }
 
     #pagetitle {
         -ms-grid-column: 3;
         font-size: 40px;
         font-family: 'segoe ui Light';
         text-shadow: 0px 1px 3px black;
-		margin-top: 20px;
+        margin-top: 20px;
         text-overflow: ellipsis;
-		
     }
 
 
@@ -1883,23 +1686,22 @@
     #directoryProgressRing {
         padding-top: 0px;
         -ms-grid-column: 2;
-		/*Die Linke Margin ist nicht notwendig
+        /*Die Linke Margin ist nicht notwendig
 		Mit ihr wirkt der Platz links von dem Vorwärts-Button
 		etwas zu leer*/
-		/*margin-left: 20px;*/
-		/*Die rechte Margin sollte bleiben, da ohne diese
+        /*margin-left: 20px;*/
+        /*Die rechte Margin sollte bleiben, da ohne diese
 		der Text 'Verzeichnis laden' zu nah an den Ordnernamen
 		heranrückt*/
-		margin-right: 20px;
+        margin-right: 20px;
         padding-top: 10px;
     }
-	
-	#loadingRing{
-		padding-left: 10px;
-		
-		}
 
-    
+    #loadingRing {
+        padding-left: 10px;
+    }
+
+
     #directoryProgressRing .win-ring {
         height: 30px;
         width: 30px;
@@ -1908,79 +1710,52 @@
         text-align: center;
         margin-left: 30px;
     }
-	
-   .previewHeaderContainer {
+
+    .previewHeaderContainer {
         -ms-grid-column: 4;
         font-size: 30px;
         font-family: 'segoe ui Light';
         height: 100%;
-		margin-left: 20px;
-		margin-right: 10px;
-		margin-top: 30px;
+        margin-left: 20px;
+        margin-right: 10px;
+        margin-top: 30px;
         text-shadow: 0px 1px 3px black;
         text-overflow: ellipsis;
-       
-        
-
     }
 
     .pageSubheader {
         /*position: absolute;*/
-        
         margin-left: auto;
         margin-right: 20px;
         text-overflow: ellipsis;
-       
         text-align: right;
-
     }
-
-
-
-
-
 
     .contentGrid {
         display: -ms-flexbox;
         -ms-flex-direction: row;
         height: calc(100% - 130px);
-
         /*height: 100%;*/
         margin-left: 40px;
         /*padding-right: 40px*/
-        
-        
     }
 
     #preview {
         -ms-flex-order: 2;
         display: -ms-flexbox;
-		-ms-flex-direction: row;
+        -ms-flex-direction: row;
         /*width: auto;*/
         margin-left: 20px;
         padding-right: 20px;
-		/*padding-right: 20px;*/
+        /*padding-right: 20px;*/
         max-height: 100%;
         /*overflow-y: auto;*/
-		/*height: auto;*/
-       
+        /*height: auto;*/
     }
 
-    /*.previewGrid_class {
-        -ms-flex-order: 1;
-		display: -ms-flexbox;
-		-ms-flex-direction: row;
-        width: auto;
-    }*/
-
     #previewTag {
-
-		-ms-flex-order: 1;
-         z-index: 0;
-        
-        
-        
-         
+        -ms-flex-order: 1;
+        z-index: 0;
     }
 
         #previewTag h1 {
@@ -2003,38 +1778,36 @@
             font-size: 16px;
         }
 
-         
 
-    /*Dieser Tag führt dazu, dass das Bild/Video nicht zentriert ausgerichtet wird
+
+        /*Dieser Tag führt dazu, dass das Bild/Video nicht zentriert ausgerichtet wird
         Dem Element wird von default.css eine margin-left von "auto" gesetzt.*/
-    #previewTag > img {
-        margin-left: 0px;
-        -ms-touch-action: pan-y
-            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
-       
-    }
+        #previewTag > img {
+            margin-left: 0px;
+            -ms-touch-action: pan-y pan-x; /*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+        }
 
     /*displayImage wird dynamisch erzeugt. Das Element dieser ID*/
     #displayImage {
-        box-shadow: 0px 1px 3px black; 
-        -ms-touch-action: pan-y
-            pan-x;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+        box-shadow: 0px 1px 3px black;
+        -ms-touch-action: pan-y pan-x; /*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
     }
 
     #video {
-       overflow: hidden;
+        overflow: hidden;
     }
+
     .audioplayer {
         width: 500px;
     }
 
     .pdfPreview {
         overflow: hidden;
-        -ms-touch-action: pan-y;/*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
-		-ms-flex-order: 2;
-		display: -ms-flexbox;
-		-ms-flex-direction: column; 
-		max-height: 100%;
+        -ms-touch-action: pan-y; /*Notwendig für Scrolling, kein Fehler sondern ein regulärer Msdnaa-Befehl*/
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        max-height: 100%;
         width: auto;
         overflow: auto;
         padding-right: 25px;
@@ -2042,15 +1815,8 @@
         /*box-shadow: 0px 1px 3px black;*/
     }
 
-    
-        .pdfPreview canvas {
-            /*???*/
-           
-        }
-
     canvas {
-         box-shadow: 0px 1px 3px black;
-         
+        box-shadow: 0px 1px 3px black;
     }
 
     #pdfControls div {
@@ -2058,78 +1824,68 @@
         /*visibility: hidden;*/
     }
 
-	#pdfControls{
-		-ms-flex-order: 3;
+    #pdfControls {
+        -ms-flex-order: 3;
         margin-left: auto;
         margin-right: 0px;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		right: 0px;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        right: 0px;
         /*background-color: #3E3E3B;*/
         background-image: url(/images/verticalBar.svg);
         background-size: cover;
         height: 500px;
         z-index: -10000;
-        box-shadow: 0px 1px 3px black; 
+        box-shadow: 0px 1px 3px black;
+    }
 
-		}
-		
-	#pdfBackForward{
-		-ms-flex-order: 1;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		
-		}
-		
-	#pdfZoom{
-		-ms-flex-order: 2;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		margin-bottom: 40px;
-		margin-top: 40px;
-		}
-		
-	#pdfJump{
-		-ms-flex-order: 3;
-		display: -ms-flexbox;
-		-ms-flex-direction: column;
-		}
-		/*Center the PageNum Input*/
-		#pdfPageNum{
-			margin-left: auto;
-			margin-right: auto;
-			}
-		
-	.pdfPreview{
-		-ms-grid-row: 2;
+    #pdfBackForward {
+        -ms-flex-order: 1;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+    }
+
+    #pdfZoom {
+        -ms-flex-order: 2;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+        margin-bottom: 40px;
+        margin-top: 40px;
+    }
+
+    #pdfJump {
+        -ms-flex-order: 3;
+        display: -ms-flexbox;
+        -ms-flex-direction: column;
+    }
+    /*Center the PageNum Input*/
+    #pdfPageNum {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .pdfPreview {
+        -ms-grid-row: 2;
         width: auto;
-		}
+    }
 
     #pdfPageNum {
-	width: 20px;
-}
+        width: 20px;
+    }
 
     #code {
-		-ms-flex-order: 3;
-		/*height: 110px;
+        -ms-flex-order: 3;
+        /*height: 110px;
         width: auto;*/
         overflow: auto;
         display: none;
-
-        
     }
-	
 
-
-    /*Loading Indicator*/
 
     #backForwardNavigation {
         -ms-grid-row: 1;
         display: -ms-flexbox;
     }
-
-
-
 
     /* overall list dimensions */
     #directoryView {
@@ -2138,97 +1894,73 @@
         height: 98.9%;
         min-width: 380px;
         background-color: transparent !important;
-
-
     }
 
         #directoryView .win-container {
-         margin: 5px;
-         box-shadow: 0px 1px 3px black; 
-    }
+            margin: 5px;
+            box-shadow: 0px 1px 3px black;
+        }
 
             #directoryView .win-container:hover {
                 box-shadow: 0 0 10px #fff;
             }
 
-   
-        
 
-
-
-    /* individual item dimensions */
-    #directoryView .directoryViewItem {
-        height: 60px;
-        width: 360px;
-        overflow: hidden;
-        /*border: 1px solid rgba(0,0,0,0.5);
+        /* individual item dimensions */
+        #directoryView .directoryViewItem {
+            height: 60px;
+            width: 360px;
+            overflow: hidden;
+            /*border: 1px solid rgba(0,0,0,0.5);
    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), 
        inset 0 10px rgba(255,255,255,0.2), 
        inset 0 10px 20px rgba(255,255,255,0.25), 
        inset 0 -15px 30px rgba(0,0,0,0.3);*/
-        display: -ms-grid;
-        -ms-grid-columns: auto auto;
-        
-
-    }
-
-        #directoryView .win-selectionborder  {
-           
-           background-color: #7AB51D;
+            display: -ms-grid;
+            -ms-grid-columns: auto auto;
         }
 
+        #directoryView .win-selectionborder {
+            background-color: #7AB51D;
+        }
 
+    .win-container.win-selected .win-selectionborder {
+        border-color: #7AB51D !important;
+    }
 
-.win-container.win-selected .win-selectionborder {
-	border-color: #7AB51D !important;
-}
-.win-container.win-selected .win-selectioncheckmarkbackground {
-	border-top-color: #7AB51D;
-	border-right-color: #7AB51D;
-}
-
-
-
-
+    .win-container.win-selected .win-selectioncheckmarkbackground {
+        border-top-color: #7AB51D;
+        border-right-color: #7AB51D;
+    }
 
 
     #directoryView .win-container {
         margin-right: 25px;
         margin-top: 7px;
-   }
-
-
+    }
 
     /* image */
     .directoryViewItem img.directoryViewItemImage {
         -ms-grid-column: 1;
         width: 60px;
         height: 60px;
-     
         /*padding: 10px;*/
         /*background-size: cover;*/
         background-color: white;
-
     }
 
     .directoryViewItem .directoryViewItemText {
         padding-left: 10px;
-
         -ms-grid-column: 2;
         width: 290px;
         height: 60px;
         background-color: #009DD1;
-        
         background-size: cover;
         color: white;
         text-overflow: ellipsis;
         /*box-shadow: inset 0px 0px 50px 0px #ABABAB,5px 5px 5px 1px #242424;*/
         /*text-shadow: 0px 1px 3px black;*/
-       
-      
     }
-
-    
 
     /* text line 1 */
     .directoryViewItem .directoryViewItemHeader {
@@ -2242,7 +1974,6 @@
         font-size: 15px;
     }
 
-
     #directoryViewContainer {
         -ms-grid-column: 1;
         -ms-grid-row: 2;
@@ -2252,10 +1983,8 @@
         background-image: url(/images/appBar/appBarBackground.svg);
         /*background-color: #008E96;*/
         background-size: cover;
-        height:100px;
+        height: 100px;
     }
-
-
 
     /*Styling der Navigationsleiste*/
     .navBarContent {
@@ -2321,7 +2050,6 @@
         background-image: url(/images/navBar/favorite.svg);
         background-position: 35px -6px;
         background-size: 75px;
-        
     }
 
     .three {
@@ -2329,7 +2057,6 @@
         background-image: url(/images/navBar/history.svg);
         background-position: 38px -2px;
         background-size: 65px;
-        
     }
 
     .four {
@@ -2367,12 +2094,3 @@
         background-size: 85px;
     }
 }
-
-
-
-
-
-
-
-
-

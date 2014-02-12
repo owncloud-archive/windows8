@@ -44,56 +44,64 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  /*******************************************************************************/
-// Eine Einführung zur Navigationsvorlage finden Sie in der folgenden Dokumentation:
-// http://go.microsoft.com/fwlink/?LinkId=232506
 
-//Windows.Storage.ApplicationData.current.clearAsync();
-
-//Instanziierung der App-Logik über das Interface
+// Instanciate app logic
 //var cloud = new frontendDummy();
 var cloud = new frontendProduction();
 
 //Initialisierung
 cloud.doInit({});
 
-// Eigenschaft für Zusatzfunktionen bereitstellen
-if (!cloud.pages) {
-    cloud.pages = {};
-}
-if (!cloud.functions) {
-    cloud.functions = {};
-}
+// Namespaces for additional functions and pages
+if (!cloud.pages)                   cloud.pages = {};
+if (!cloud.pages.directoryView)     cloud.pages.directoryView = {};
+if (!cloud.pages.login)             cloud.pages.login = {};
+if (!cloud.pages.history) cloud.pages.history = {};
 
-// Cloud-Objekt erweitern
+cloud.functions = {};
 cloud.session = {};
+cloud.vars = {};
 
-//Gespeicherte Serverselektion wiederherstellen (wenn vorhanden)
-cloud.session.selectedServer = Windows.Storage.ApplicationData.current.roamingSettings.values["selectedServer"];
-cloud.session.selectedServerType = Windows.Storage.ApplicationData.current.roamingSettings.values["selectedServerType"];
-//Ermitteln ob der Benutzer bei der letzten Verwendung eingeloggt war
-cloud.session.tryAutoLogin = Windows.Storage.ApplicationData.current.roamingSettings.values["loginStatus"];
+cloud.vars.roamingSettings = Windows.Storage.ApplicationData.current.roamingSettings; // shortcut
 
-if (!cloud.pages.directoryView) {
-    cloud.pages.directoryView = {};
+// Version variable to check for updates
+cloud.vars.version = Windows.ApplicationModel.Package.current.id.version; // current version
+
+var lastVersion = { build: 0, major: 0, minor: 0, revision: 0 }; // default
+if (cloud.vars.roamingSettings.values["currentVersion"] != null) { // last saved version
+    lastVersion = JSON.parse(cloud.vars.roamingSettings.values["currentVersion"]);
 }
 
-if (!cloud.pages.login) {
-    cloud.pages.login = {};
+if (cloud.vars.roamingSettings.values["currentVersion"] == null
+    || (cloud.vars.version.build > lastVersion.build)
+    || (cloud.vars.version.build == lastVersion.build && cloud.vars.version.major > lastVersion.major)
+    || (cloud.vars.version.build == lastVersion.build && cloud.vars.version.major == lastVersion.major && cloud.vars.version.minor > lastVersion.minor)
+    || (cloud.vars.version.build == lastVersion.build && cloud.vars.version.major == lastVersion.major && cloud.vars.version.minor == lastVersion.minor && cloud.vars.version.revision > lastVersion.revision)) {
+    // Upgrade happened
+    cloud.debug("Upgraded!");
+
+    // Reset login settings to avoid auto login problems
+    cloud.vars.roamingSettings.values["selectedServer"] = null;
+    cloud.vars.roamingSettings.values["selectedServerType"] = null;
+    cloud.vars.roamingSettings.values["loginStatus"] = false;
+};
+// Save current version
+cloud.vars.roamingSettings.values["currentVersion"] = JSON.stringify(cloud.vars.version);
+
+// Restore server selection if exists
+cloud.session.selectedServer = cloud.vars.roamingSettings.values["selectedServer"];
+cloud.session.selectedServerType = cloud.vars.roamingSettings.values["selectedServerType"];
+cloud.session.tryAutoLogin = cloud.vars.roamingSettings.values["loginStatus"]; // last login status
+
+// Autoscroll
+if (typeof cloud.vars.roamingSettings.values["autoScroll"] === "undefined") {
+    cloud.vars.roamingSettings.values["autoScroll"] = true; // default
 }
 
-if (!cloud.pages.history) {
-    cloud.pages.history = {};
-} 
-
-//Autoscroll anfangs aktivieren
-if (typeof Windows.Storage.ApplicationData.current.roamingSettings.values["autoScroll"] === "undefined") {
-    Windows.Storage.ApplicationData.current.roamingSettings.values["autoScroll"] = true;
-}
-
-//Selektierte Ordner und Dateien in aktuellem Ordner (Session)
+// Selected objects in current folder
 cloud.pages.directoryView.selectedDirectoryContent = [];
 
-//Kontext der App: Normal, FilePicker, ShareTarget
+// App contexts: Normal, FilePicker, ShareTarget
 cloud.context = {};
 cloud.context.showDeletedFiles = false;
 cloud.context.isOpenPicker = false;
@@ -110,16 +118,6 @@ cloud.context.history.file = null;
 cloud.context.share = {};
 cloud.context.share.file = null;
 
-// Sprache einstellen - Systemsprache
-var systemLang = cloud.getSystemLanguage();
-cloud.setCustomLanguage({ customLanguage: systemLang });
-
-// Falls vorhanden gespeicherte Sprache nutzen
-var languageCode = Windows.Storage.ApplicationData.current.roamingSettings.values["language"];
-if (languageCode && languageCode != "") {
-    cloud.setCustomLanguage({ customLanguage: languageCode });
-};
-
 cloud.shareOperation = null;
 function shareReady(args) {
     args.setPromise(WinJS.UI.processAll().then(function () {
@@ -128,12 +126,11 @@ function shareReady(args) {
 }
 
 
-//APP INITIALISIEREN
+// Initialize App
 (function () {
     "use strict";
 
     WinJS.Binding.optimizeBindingReferences = true;
-
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
     var nav = WinJS.Navigation;
@@ -141,28 +138,29 @@ function shareReady(args) {
     app.addEventListener("activated", function (args) {
         var thumbnail;
 
+        // General initialization on launch or reactivation
+        // Restore custom language if exists
+        var languageCode = cloud.vars.roamingSettings.values["language"];
+        if (languageCode && languageCode != "") {
+            cloud.setCustomLanguage({ customLanguage: languageCode });
+        };
+
+        // Keyboard contexts
+        cloud.setKeystrokeContext({
+            context: "superglobal",
+            actions: {
+                showHelpSettings: cloud.functions.showHelpSettings
+            }
+        });
+
+
+        // Special treatments
         if (args.detail.kind === activation.ActivationKind.launch) {
             if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.terminated) {
-                //Diese Anwendung wurde neu eingeführt --> Die Anwendung hier initialisieren.
+                // Application is newly launched
 
-                // Superglobale und globale Tastaturbefehle definieren
-                cloud.setKeystrokeContext({
-                    context: "superglobal",
-                    actions: {
-                        showHelpSettings: cloud.functions.showHelpSettings
-                    }
-                });
-
-                /*cloud.setKeystrokeContext({
-                    context: "global",
-                    actions: {
-                        logout: cloud.functions.logout,
-                        account: cloud.functions.showAccountSettings
-                    }
-                });*/
             } else {
-                // Diese Anwendung war angehalten und wurde reaktiviert.
-                // Anwendungszustand hier wiederherstellen.
+                // Application was stopped and reactived. Restore state here
 
                 //Navigationslisten für Session wiederherstellen
                 var navigationBackList = WinJS.Application.sessionState.navigationListBackwards;
@@ -187,17 +185,17 @@ function shareReady(args) {
             if (app.sessionState.history) { 
                 nav.history = app.sessionState.history;
             }
+
+            // Try automatic login
             args.setPromise(WinJS.UI.processAll().then(function () {
                 if (nav.location) {
                     nav.history.current.initialPlaceholder = true;
-                    return cloud.functions.tryAutoLogin(cloud.session.tryAutoLogin, nav.location); // sonst getDirectory-Fehler
-                    //return nav.navigate(nav.location, nav.state);
+                    return cloud.functions.tryAutoLogin(cloud.session.tryAutoLogin, nav.location); // getDirectory error otherwise
                 } else {
-                    //Versuche Autologin ansonsten navigiere zur Loginseite --> überspringt diese wenn möglich
                     return cloud.functions.tryAutoLogin(cloud.session.tryAutoLogin);
                 }
             }));
-        }if (args.detail.kind === activation.ActivationKind.fileOpenPicker) {
+        } if (args.detail.kind === activation.ActivationKind.fileOpenPicker) {
             cloud.context.isOpenPicker = true;
 
             cloud.context.pickerContext = args.detail.fileOpenPickerUI;
@@ -219,18 +217,14 @@ function shareReady(args) {
             WinJS.Application.addEventListener("shareready", shareReady, false);
             WinJS.Application.queueEvent({ type: "shareready" });
         }
-        
-        // Make sure the following is called after the DOM has initialized. Typically this would be part of app initialization
-        //WinJS.Application.start();
     });
 
     app.oncheckpoint = function (args) {
-        // Diese Anwendung wird gleich angehalten. Jeden Zustand,
-        // der über Anhaltevorgänge hinweg beibehalten muss, hier speichern. Wenn ein asynchroner 
-        // Vorgang vor dem Anhalten der Anwendung abgeschlossen werden muss, 
-        // args.setPromise() aufrufen.
+        // Save eveything important here, the application will be terminated soon.
+        // Use args.setPromise() to wait for asynchronous process before termination
         app.sessionState.history = nav.history;
     };
 
+    // Launch
     app.start();
 })();

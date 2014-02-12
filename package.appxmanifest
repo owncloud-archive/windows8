@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="24991ResearchGroupCCM.CampusCloud" Version="1.0.8.3" Publisher="CN=1689E651-F56B-450A-97E9-BC5052B06389" />
+  <Identity Name="33708CareerServicederUniv.CampusCloud" Version="1.3.0.1" Publisher="CN=4D9B6C30-E652-4626-B4EB-DFC04B5F8B52" />
   <Properties>
-    <DisplayName>Campus Cloud</DisplayName>
-    <PublisherDisplayName>Research Group CCM</PublisherDisplayName>
+    <DisplayName>CampusCloud</DisplayName>
+    <PublisherDisplayName>Career Service der Universität Münster</PublisherDisplayName>
     <Logo>images\storelogo.png</Logo>
   </Properties>
   <Prerequisites>
@@ -16,7 +16,7 @@
   </Resources>
   <Applications>
     <Application Id="App" StartPage="default.html">
-      <VisualElements DisplayName="Campus Cloud" Logo="images\logo.png" SmallLogo="images\smalllogo.png" Description="Campus Cloud App" ForegroundText="light" BackgroundColor="#009DD1" ToastCapable="true">
+      <VisualElements DisplayName="CampusCloud" Logo="images\logo.png" SmallLogo="images\smalllogo.png" Description="Campus Cloud App" ForegroundText="light" BackgroundColor="#009DD1" ToastCapable="true">
         <DefaultTile ShowName="allLogos" WideLogo="images\WideLogo.png" />
         <SplashScreen Image="images\splashscreen.png" BackgroundColor="#009DD1" />
         <InitialRotationPreference>

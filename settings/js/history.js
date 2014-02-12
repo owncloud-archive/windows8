@@ -110,15 +110,20 @@
 
         loadHistory: function () {
             document.getElementById("historyProgressRing").style.visibility = 'visible';
-            //Dateihistorie laden
+            // Load history
             cloud.getVersions({
                 path: cloud.context.history.file.path,
+                date: cloud.context.history.file.date,
+                fileType: cloud.context.history.file.fileType
             },
                 historyView.prototype.reloadHistoryView,
-                function () {
-                    cloud.functions.showMessageDialog("HISTORYERROR");
+                function (e) {
+                    if (typeof e !== "undefined") {
+                        cloud.functions.showMessageDialog(e);
+                    } else {
+                        cloud.functions.showMessageDialog("HISTORYERROR");
+                    }
                     document.getElementById("historyProgressRing").style.visibility = 'hidden';
-                    cloud.showError();
                 });
         },
 
@@ -126,33 +131,9 @@
             //Loading Indicator anzeigen
             document.getElementById("historyProgressRing").style.visibility = 'visible';
             var listView = document.getElementById("historyView").winControl;
-            //Auslesen der Dateihistorie
-            var items = [];
-
-            var versionCounter = historyList.length + 1;
-
-            //Aktuelle Version
-            items[0] = {
-                title: cloud.translate("VERSION") + ": " + versionCounter + " (" + cloud.translate("CURRENT") + ")",
-                versionId: "current",
-                date: cloud.context.history.file.date,
-                picture: cloud.getFileIcon({ fileType: cloud.context.history.file.fileType }),
-            };
-
-            var index = 1;
-            for (var i in historyList) {
-                items[index] = {
-                    title: cloud.translate("VERSION") + ": " + (versionCounter - index),
-                    path: historyList[i].path,
-                    versionId: historyList[i].versionId,
-                    date: historyList[i].date,
-                    picture: cloud.getFileIcon({ fileType: cloud.context.history.file.fileType }),
-                };
-                index++;
-            }
 
             //Übertragen der Title-Liste in ListView
-            listViewItems = new WinJS.Binding.List(items);
+            listViewItems = new WinJS.Binding.List(historyList);
 
             //ListView Listeninhalt übergeben
             listView.itemDataSource = listViewItems.dataSource;

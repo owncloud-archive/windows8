@@ -48,19 +48,18 @@
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
     <TargetPlatformVersion>8.0</TargetPlatformVersion>
     <DefaultLanguage>de-DE</DefaultLanguage>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <PackageCertificateThumbprint>B4816AE98991625CD3DE53482AD25229A2B53784</PackageCertificateThumbprint>
     <PackageCertificateKeyFile>Win8App_StoreKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>908C280B04BBBCDB61D6A60FB8C9D9EA66688B40</PackageCertificateThumbprint>
-    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="Win8App_StoreKey.pfx" />
     <Content Include="css\default.css" />
     <Content Include="css\Microsoft.VisualStudio.Blend.Html.Intrinsic.FlexboxHorizontal.css" />
-    <Content Include="images\AppBackground.svg" />
     <Content Include="images\appBar\appBarBackground.svg" />
-    <Content Include="images\Background.svg" />
     <Content Include="images\directoryBackground\bottom_cloud_small.jpg" />
     <Content Include="images\fileIcons\blue\code.svg" />
     <Content Include="images\fileIcons\blue\compressed.svg" />
@@ -113,7 +112,6 @@
     <Content Include="images\fileIcons\green\xps.svg" />
     <Content Include="images\fileIcons\green\zip.svg" />
     <Content Include="images\freigabeBackground\clock.jpg" />
-    <Content Include="images\generic_file.svg" />
     <Content Include="images\fileIcons\black\code.svg" />
     <Content Include="images\fileIcons\black\compressed.svg" />
     <Content Include="images\fileIcons\black\compressed_2.svg" />
@@ -154,7 +152,6 @@
     <Content Include="images\homeListIcons\gear.png" />
     <Content Include="images\homeListIcons\muenster_bnw.jpg" />
     <Content Include="images\homeListIcons\uni_muenster.jpg" />
-    <Content Include="images\listview.svg" />
     <Content Include="images\logo.scale-100.png" />
     <Content Include="images\logo.scale-140.png" />
     <Content Include="images\logo.scale-180.png" />
@@ -164,7 +161,6 @@
     <Content Include="images\ribbonSnapview.svg" />
     <Content Include="images\share\whiteBottom.jpg" />
     <Content Include="images\share\white_cloud.jpg" />
-    <Content Include="images\wallpaper2.jpg" />
     <Content Include="images\navBar\account.svg" />
     <Content Include="images\navBar\appBarBackgroundInverse.svg" />
     <Content Include="images\navBar\history.svg" />
@@ -187,16 +183,15 @@
     <Content Include="images\storelogo.scale-100.png" />
     <Content Include="images\storelogo.scale-140.png" />
     <Content Include="images\storelogo.scale-180.png" />
-    <Content Include="images\superman.png" />
     <Content Include="images\verticalBar.svg" />
     <Content Include="images\WideLogo.scale-100.png" />
     <Content Include="images\WideLogo.scale-140.png" />
     <Content Include="images\WideLogo.scale-180.png" />
     <Content Include="images\WideLogo.scale-80.png" />
     <Content Include="images\WWULine.svg" />
-    <Content Include="images\wallpaper.jpg" />
     <Content Include="js\appWindows.js" />
     <Content Include="js\default.js" />
+    <Content Include="js\introTour.js" />
     <Content Include="js\navigator.js" />
     <Content Include="lib\config\config.js" />
     <Content Include="lib\js\interface\backendDummy.js" />
@@ -444,7 +439,6 @@
     <Content Include="lib\js\plugins\jquery.scrollTo-1.4.3.1-min.js" />
     <Content Include="lib\js\plugins\jquery.scrollTo-1.4.3.1.js" />
     <Content Include="lib\js\plugins\pdfjs\generic\build\pdf0.8.2.js" />
-    <Content Include="lib\js\plugins\pdfjs\generic\pdf_old.js" />
     <Content Include="lib\js\plugins\pdfjs\generic\web\compatibility.js" />
     <Content Include="lib\js\plugins\pdfjs\generic\web\compressed.tracemonkey-pldi-09.pdf" />
     <Content Include="lib\js\plugins\pdfjs\generic\web\debugger.js" />
@@ -486,20 +480,16 @@
     <Content Include="lib\js\plugins\pdfjs\generic\web\viewer.js" />
     <Content Include="lib\js\plugins\pdfjs\pdf.js" />
     <Content Include="lib\js\plugins\pdfjs\pdf.LICENSE" />
+    <Content Include="lib\js\plugins\qunit-1.12.0.js" />
     <Content Include="lib\js\plugins\webdav.js" />
-    <Content Include="LICENSE" />
+    <Content Include="lib\unittests\tests_backend.js" />
+    <Content Include="lib\unittests\tests_frontend.js" />
+    <Content Include="lib\unittests\unittest_prepare.js" />
     <Content Include="NotificationsExtensions.winmd" />
-    <Content Include="README.md" />
-    <Content Include="res\interface-versionen\backendInterface-V4.16.130628.js" />
-    <Content Include="res\interface-versionen\backendInterface-V4.17.130701.js" />
-    <Content Include="res\interface-versionen\backendInterface-V4.18.130702.js" />
-    <Content Include="res\interface-versionen\backendInterface-V4.19.130703.js" />
-    <Content Include="res\interface-versionen\backendInterface-V4.20.130708.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V4.16.130628.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V4.17.130701.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V4.18.130702.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V4.19.130703.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V4.20.130708.js" />
+    <Content Include="res\architecture_logic_layer.png" />
+    <Content Include="res\architecture_overview.png" />
+    <Content Include="res\Windows8_Benutzerhandbuch.pdf" />
+    <Content Include="res\Windows8_Technische_Dokumentation.pdf" />
     <Content Include="settings\html\about.css" />
     <Content Include="settings\html\about.html" />
     <Content Include="settings\html\share.css" />
@@ -510,7 +500,10 @@
     <Content Include="settings\html\register.html" />
     <Content Include="settings\js\register.js" />
     <Content Include="settings\js\history.js" />
-    <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Win8App.licenseheader" />
+    <None Include="Package.StoreAssociation.xml">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="pages\directoryView\directoryView.css" />
     <Content Include="pages\directoryView\directoryView.html" />
     <Content Include="pages\directoryView\directoryView.js" />
@@ -518,30 +511,6 @@
     <Content Include="pages\home\home.html" />
     <Content Include="pages\home\home.js" />
     <Content Include="default.html" />
-    <Content Include="res\interface-versionen\backendInterface-V0.1.130514.js" />
-    <Content Include="res\interface-versionen\backendInterface-V1.2.130515.js" />
-    <Content Include="res\interface-versionen\backendInterface-V1.3.130516.js" />
-    <Content Include="res\interface-versionen\backendInterface-V1.4.130517.js" />
-    <Content Include="res\interface-versionen\backendInterface-V1.5.130520.js" />
-    <Content Include="res\interface-versionen\backendInterface-V1.7.130525.js" />
-    <Content Include="res\interface-versionen\backendInterface-V2.8.130527.js" />
-    <Content Include="res\interface-versionen\backendInterface-V2.9.130528.js" />
-    <Content Include="res\interface-versionen\backendInterface-V2.10.130530.js" />
-    <Content Include="res\interface-versionen\backendInterface-V4.14.130625.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V0.1.130514.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V1.2.130515.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V1.3.130516.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V1.4.130517.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V1.5.130520.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V1.6.130522.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V1.7.130525.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V2.8.130527.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V2.9.130528.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V2.10.130530.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V2.11.130603.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V2.12.130606.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V2.13.130611.js" />
-    <Content Include="res\interface-versionen\frontendInterface-V4.14.130625.js" />
     <Content Include="settings\html\account.css" />
     <Content Include="settings\html\general.css" />
     <Content Include="settings\html\help.css" />
@@ -553,6 +522,7 @@
     <Content Include="settings\js\help.js" />
     <Content Include="settings\js\general.js" />
     <Content Include="settings\js\account.js" />
+    <None Include="Win8App_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <SDKReference Include="Microsoft.WinJS.1.0, Version=1.0" />
@@ -562,9 +532,6 @@
       <HintPath>..\NotificationsExtensions.winmd</HintPath>
       <IsWinMDFile>true</IsWinMDFile>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="images\warnmeldungen\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\$(WMSJSProjectDirectory)\Microsoft.VisualStudio.$(WMSJSProject).targets" />
   <!-- To modify your build process, add your task inside one of the targets below then uncomment
