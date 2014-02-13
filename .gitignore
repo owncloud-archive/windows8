@@ -1,3 +1,14 @@
-#ignore key files
+#ignore personal/store key files
 *.pfx
-*.pfx
+
+#individual configuration
+/lib/config/config.js
+
+#build
+/bin/
+/bld/
+/AppPackages/
+
+#other stuff
+Thumbs.db
+*.suo

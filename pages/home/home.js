@@ -282,8 +282,10 @@
 
             if (cloud.session.selectedServerType == "manual") {
                 manualConfig.style.display = 'block';
+                document.getElementById("registerButton").style.display = 'none';
             } else {
                 manualConfig.style.display = 'none';
+                document.getElementById("registerButton").style.display = 'inline';
             }
         },
 

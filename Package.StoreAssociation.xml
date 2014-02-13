@@ -354,6 +354,13 @@
       <ReservedName>CampusCloud</ReservedName>
     </ReservedNames>
   </ProductReservedInfo>
-  <AccountPackageIdentityNames />
-  <PackageInfoList LandingUrl="https://appdev.microsoft.com:443/StorePortals/Developer/Catalog/ReleaseAnchor/485acd7a-82d2-4ec2-9701-2789ad252c41" />
+  <AccountPackageIdentityNames>
+    <MainPackageIdentityName>33708CareerServicederUniv.KAP.WWU.CS</MainPackageIdentityName>
+  </AccountPackageIdentityNames>
+  <PackageInfoList LandingUrl="https://appdev.microsoft.com:443/StorePortals/Developer/Catalog/ReleaseAnchor/485acd7a-82d2-4ec2-9701-2789ad252c41">
+    <PackageInfo>
+      <PackageArchitecture>neutral</PackageArchitecture>
+      <PackageMaxArchitectureVersion>1.3.0.1</PackageMaxArchitectureVersion>
+    </PackageInfo>
+  </PackageInfoList>
 </StoreAssociation>
