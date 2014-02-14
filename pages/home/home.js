@@ -147,8 +147,8 @@
             for (var serverObj in cloud.config.servers) {
                 items[i] = {
                     configName: cloud.config.servers[serverObj].name,
-                    title: cloud.config.servers[serverObj].title,
-                    text: cloud.config.servers[serverObj].description,
+                    title: cloud.translate(cloud.config.servers[serverObj].langKey) ? cloud.translate(cloud.config.servers[serverObj].langKey) : cloud.config.servers[serverObj].title, // show translation if directly available
+                    text: cloud.translate(cloud.config.servers[serverObj].langKeyDesc) ? cloud.translate(cloud.config.servers[serverObj].langKey) : cloud.config.servers[serverObj].description,
                     picture: cloud.config.servers[serverObj].iconPath,
                     serverType: cloud.config.servers[serverObj].type,
                     serverName: serverObj,
@@ -164,8 +164,8 @@
             // Add tile for manual entry
             items[i] = {
                 configName: "",
-                title: "Benutzerdefiniert",
-                text: "Manuelle Konfiguration des Servers",
+                title: cloud.translate("SERVERCUSTOM") ? cloud.translate("SERVERCUSTOM") : "Benutzerdefiniert",
+                text: cloud.translate("SERVERDESCRIPTIONCUSTOM") ? cloud.translate("SERVERDESCRIPTIONCUSTOM") : "Manuelle Konfiguration des Servers",
                 picture: "images/homeListIcons/gear.png",
                 serverType: "manual",
                 serverName: "",

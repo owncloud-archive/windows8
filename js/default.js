@@ -144,6 +144,7 @@ function shareReady(args) {
         if (languageCode && languageCode != "") {
             cloud.setCustomLanguage({ customLanguage: languageCode });
         };
+        cloud.vars.roamingSettings.values["language"] = cloud.getCurrentLanguage();
 
         // Keyboard contexts
         cloud.setKeystrokeContext({

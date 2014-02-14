@@ -57,7 +57,7 @@
             var languageSelection = document.getElementById("languageSelection");
             var languageCode = Windows.Storage.ApplicationData.current.roamingSettings.values["language"];
 
-            if (languageCode) {
+            if (typeof languageCode !== "undefined") {
                 if (languageCode == "de-de") {
                     languageSelection.value = 1;
                 }
@@ -111,25 +111,20 @@
         },
 
         buttonChangeLanguage: function (eventInfo) {
-            var appData = Windows.Storage.ApplicationData.current;
-            var roamingSettings = appData.roamingSettings;
             var languageSelection = document.getElementById("languageSelection").value;
-
-            //Speichern der Sprachauswahl
-            
-
-            //SPRACHAUSWAHL aktuallisieren
+                        
+            //SPRACHAUSWAHL aktualisieren
             if (languageSelection == 1) {
                 cloud.setCustomLanguage({ customLanguage: "de-de" });
-                roamingSettings.values["language"] = "de-de";
+                cloud.vars.roamingSettings.values["language"] = "de-de";
             }
             else if (languageSelection == 2) {
                 cloud.setCustomLanguage({ customLanguage: "en-us" });
-                roamingSettings.values["language"] = "en-us";
+                cloud.vars.roamingSettings.values["language"] = "en-us";
             }
             else {
                 cloud.setCustomLanguage({ customLanguage: "en-us" });
-                roamingSettings.values["language"] = "en-us";
+                cloud.vars.roamingSettings.values["language"] = "en-us";
             }
 
             //Sprache aktualisieren
